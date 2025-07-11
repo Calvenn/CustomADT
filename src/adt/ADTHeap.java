@@ -13,10 +13,13 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
     private static final int DEFAULT_SIZE = 20;
     private E[] heap;
     private int size;
+    private boolean isMaxHeap = true; //Default is max heap
+    //to use min heap init like this -> ADTHeap<Integer> maxHeap = new ADTHeap<>(false);
     
     public ADTHeap(){
         this.heap = (E[]) new Comparable[DEFAULT_SIZE];
         this.size = 0;
+        this.isMaxHeap = isMaxHeap;
     }
     
     @Override
@@ -77,7 +80,7 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
     public boolean remove(E data){
         int index = -1;
         for(int i=0; i< size; i++){
-            if(heap.equals(data)){
+            if(heap[i].equals(data)){
                 index = i;
                 break;
             }
@@ -106,7 +109,7 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         int child = index;
         while (child > 0) {
             int parent = (child - 1) / 2; //apply formula of floor(i/2)
-            if (heap[child].compareTo(heap[parent]) > 0) {
+            if (shouldSwap(heap[child], heap[parent])) {
                 swap(child, parent);
                 child = parent;
             } else {
@@ -121,21 +124,25 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         while (true) {
             int left  = 2 * parent + 1; // to locate the number of position
             int right = 2 * parent + 2;
-            int largest = parent;
+            int selected = parent;
 
-            if (left < size && heap[left].compareTo(heap[largest]) > 0) {
-                largest = left;
+            if (left < size && shouldSwap(heap[left], heap[selected])) {
+                selected = left;
             }
-            if (right < size && heap[right].compareTo(heap[largest]) > 0) {
-                largest = right;
+            if (right < size && shouldSwap(heap[right], heap[selected])) {
+                selected = right;
             }
-            if (largest != parent) {
-                swap(parent, largest);
-                parent = largest;
+            if (selected != parent) {
+                swap(parent, selected);
+                parent = selected;
             } else {
                 break;
             }
         }
+    }
+    
+    private boolean shouldSwap(E a, E b) {
+        return isMaxHeap ? a.compareTo(b) > 0 : a.compareTo(b) < 0;
     }
 
     // Swap two elements 
