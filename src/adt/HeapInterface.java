@@ -28,10 +28,12 @@ public interface HeapInterface<E extends Comparable<E>>{
     //Display the contents of heap
     void display();
     
-    //@return whether data sucessfully delete
-    boolean update();
+    //@param oldData that want to replace with newData
+    //@return whether data sucessfully update
+    boolean update(E oldData, E newData);
     
+    //@param data to remove
     //@return whether data sucessfully delete
-    boolean remove();
+    boolean remove(E data);
    
 }

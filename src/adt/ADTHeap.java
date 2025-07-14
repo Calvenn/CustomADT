@@ -16,7 +16,7 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
     private boolean isMaxHeap = true; //Default is max heap
     //to use min heap init like this -> ADTHeap<Integer> maxHeap = new ADTHeap<>(false);
     
-    public ADTHeap(){
+    public ADTHeap(boolean isMaxHeap){
         this.heap = (E[]) new Comparable[DEFAULT_SIZE];
         this.size = 0;
         this.isMaxHeap = isMaxHeap;
@@ -33,9 +33,9 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
     @Override
     public E extractRoot(){
         if(isEmpty()) return null;
-        E root = heap[0];
-        heap[0] = heap[size - 1];
-        heap[size -1] = null;
+        E root = heap[0]; //assign the first element as a TMP
+        heap[0] = heap[size - 1]; //the last element is assign to first
+        heap[size -1] = null; //last element become null
         size--;
         heapDown(0);
         return root;
@@ -104,7 +104,7 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         }
     }
     
-    // to insert data to heap
+    // to insert data to heap and rearrange
     private void heapUp(int index) {
         int child = index;
         while (child > 0) {
@@ -151,4 +151,12 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         heap[i]  = heap[j];
         heap[j]  = tmp;
     }
+    
+    public E get(int index) {
+    if (index >= 0 && index < size) {
+        return heap[index];
+    }
+    return null;
+}
+
 }
