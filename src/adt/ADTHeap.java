@@ -142,6 +142,7 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
     }
     
     private boolean shouldSwap(E a, E b) {
+        if (a == null || b == null)return false;
         return isMaxHeap ? a.compareTo(b) > 0 : a.compareTo(b) < 0;
     }
 

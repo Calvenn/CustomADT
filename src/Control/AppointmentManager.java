@@ -5,6 +5,7 @@ import Entity.Appointment;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Appointment Manager - handles appointment booking, validation,
@@ -22,18 +23,11 @@ public class AppointmentManager {
         appointmentHeap = new ADTHeap<>(false); // Min-heap: earliest appointment on top
     }
 
-    /**
-     * Check if appointment time is within working hours.
-     */
     public boolean isWithinWorkingHours(LocalDateTime time) {
         LocalTime appointmentTime = time.toLocalTime();
         return !appointmentTime.isBefore(WORK_START) && !appointmentTime.isAfter(WORK_END);
     }
 
-    /**
-     * Find the next available appointment slot,
-     * starting from 1 week later, then 1 month, then 3 months.
-     */
     public LocalDateTime findNextAvailableSlot() {
         LocalDateTime now = LocalDateTime.now();
 
@@ -66,13 +60,22 @@ public class AppointmentManager {
             }
         }
 
-        return null; // No available slot found
+        return null; 
+    }
+    
+    public Appointment findPatienInfo(String phoneNum, DateTimeFormatter f){
+        for(int i=0; i< appointmentHeap.size();i++){
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getPhoneNum().equals(phoneNum)){
+                System.out.println("Patient Name: " + appt.getPatientName());
+                System.out.println("Current appointment: " + appt.getTime().format(f));
+                return appt;
+            }
+        }
+        return null;
     }
 
-    /**
-     * Book an appointment if valid.
-     */
-    public boolean bookAppointment(String patientName, String doctorName, LocalDateTime time) {
+    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, LocalDateTime time) {
         System.out.println("Earliest available ");
         if (time.isBefore(LocalDateTime.now())) {
             System.out.println("Cannot book in the past.");
@@ -93,14 +96,25 @@ public class AppointmentManager {
             }
         }
 
-        Appointment newAppt = new Appointment(patientName, doctorName, time);
+        Appointment newAppt = new Appointment(patientName, phoneNum, doctorName, time);
         appointmentHeap.insert(newAppt);
         return true;
     }
+    
+    public boolean cancelAppointment(Appointment appt, DateTimeFormatter f){
+        return appointmentHeap.remove(appt);
+    }
+    
+    public boolean updateAppointment(Appointment oldAppt, LocalDateTime newTime, DateTimeFormatter f) {
+        Appointment newAppt = new Appointment(
+            oldAppt.getPatientName(),
+            oldAppt.getPhoneNum(),
+            oldAppt.getDoctorName(),
+            newTime
+        );
+        return appointmentHeap.update(oldAppt, newAppt); // ✅ Fixed
+    }
 
-    /**
-     * Display all booked appointments.
-     */
     public void displayAllAppointments() {
         appointmentHeap.display();
     }
@@ -113,18 +127,13 @@ public class AppointmentManager {
         return appointmentHeap.extractRoot();
     }
 
-    /**
-     * Get total number of appointments.
-     */
     public int totalAppointments() {
         return appointmentHeap.size();
     }
 
-    /**
-     * Allow access to heap element by index (for conflict check).
-     * Make sure `ADTHeap` has `get(int index)` method.
-     */
     public Appointment getAppointment(int index) {
         return appointmentHeap.get(index);
     }
 }
+
+//HOW TO ENSURE SMOOTH FLOW BETWEEN CONSULTATION & PHARMANCY????

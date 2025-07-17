@@ -35,5 +35,5 @@ public interface HeapInterface<E extends Comparable<E>>{
     //@param data to remove
     //@return whether data sucessfully delete
     boolean remove(E data);
-   
+    
 }

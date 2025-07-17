@@ -40,13 +40,5 @@ public class Main {
             }
         } while (choice != 3);
     }
-    
-    private static void displayMainMenu() {
-        System.out.println("\n=== Clinic Management System ===");
-        System.out.println("1. Patient Registration System");
-        System.out.println("2. Consultation System");
-        System.out.println("3. Exit");
-        System.out.print("\nEnter your choice: ");
-    }
-}  
+}    
 
