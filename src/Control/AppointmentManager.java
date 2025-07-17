@@ -20,7 +20,7 @@ public class AppointmentManager {
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
 
     public AppointmentManager() {
-        appointmentHeap = new ADTHeap<>(false); // Min-heap: earliest appointment on top
+        appointmentHeap = new ADTHeap<>(false); 
     }
 
     public boolean isWithinWorkingHours(LocalDateTime time) {
@@ -33,7 +33,7 @@ public class AppointmentManager {
 
         // Dates to check: 1 week, 1 month, 3 months later
         LocalDate[] baseDates = new LocalDate[] {
-            now.toLocalDate().plusDays(0), //TESTING PURPOSE
+            now.toLocalDate().plusDays(1), //TESTING PURPOSE
             now.toLocalDate().plusWeeks(1),
             now.toLocalDate().plusMonths(1),
             now.toLocalDate().plusMonths(3)
@@ -55,7 +55,6 @@ public class AppointmentManager {
                 }
 
                 if (!conflict) return currentSlot;
-
                 currentSlot = currentSlot.plusMinutes(30); // try next 30-min slot
             }
         }
@@ -75,7 +74,7 @@ public class AppointmentManager {
         return null;
     }
 
-    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, LocalDateTime time) {
+    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, int severity ,LocalDateTime time) {
         System.out.println("Earliest available ");
         if (time.isBefore(LocalDateTime.now())) {
             System.out.println("Cannot book in the past.");
@@ -96,7 +95,7 @@ public class AppointmentManager {
             }
         }
 
-        Appointment newAppt = new Appointment(patientName, phoneNum, doctorName, time);
+        Appointment newAppt = new Appointment(patientName, phoneNum,doctorName, severity, time);
         appointmentHeap.insert(newAppt);
         return true;
     }
@@ -110,6 +109,7 @@ public class AppointmentManager {
             oldAppt.getPatientName(),
             oldAppt.getPhoneNum(),
             oldAppt.getDoctorName(),
+                1,
             newTime
         );
         return appointmentHeap.update(oldAppt, newAppt); // ✅ Fixed
