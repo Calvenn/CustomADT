@@ -10,16 +10,18 @@ import java.time.format.DateTimeFormatter;
  * @author calve
  */
 public class Appointment implements Comparable<Appointment>{
-    private String patientName;
+    private String patientName; // patient id
     private String phoneNum;
     private String doctorID;
+    private int severity;
     private String doctorName; //chg to doc id after integration
     private LocalDateTime time;
     
-    public Appointment(String patientName, String phoneNum, String doctorName, LocalDateTime time){
+    public Appointment(String patientName, String phoneNum, String doctorName, int severity, LocalDateTime time){
         this.patientName = patientName;
         this.phoneNum = phoneNum;
         this.doctorID = "D001"; //FOR TESTING PURPOSE
+        this.severity = severity;
         this.doctorName = doctorName;
         this.time = time;
     }
@@ -36,6 +38,10 @@ public class Appointment implements Comparable<Appointment>{
         return doctorName;
     }
     
+    public int getSeverity(){
+        return severity;
+    }
+    
     public LocalDateTime getTime(){
         return time;
     }
@@ -46,6 +52,10 @@ public class Appointment implements Comparable<Appointment>{
     
     public void setDoctorName(String doctorName){
         this.doctorName = doctorName;
+    }
+    
+    public void setSeverity(int severity){
+        this.severity = severity;
     }
     
     public void setTime(LocalDateTime time){
@@ -60,8 +70,10 @@ public class Appointment implements Comparable<Appointment>{
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return "[" + time.format(formatter) + "] "
-             + patientName + " with " + doctorName;
+        return "Appointment Details:\n"
+             + " Date & Time : " + time.format(formatter) + "\n"
+             + " Patient     : " + patientName + " (" + phoneNum + ")\n"
+             + " Doctor      : " + doctorName + "\n"
+             + " Severity    : " + severity;
     }
-
 }

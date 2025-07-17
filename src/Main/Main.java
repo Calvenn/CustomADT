@@ -30,7 +30,7 @@ public class Main {
                     break;
                 case 2:
                     // Consultation System
-                    consultUI.consultMenu();
+                    consultUI.consultMainMenu();
                     break;
                 case 3:
                     System.out.println("\nThank you for using the Hospital System!");
@@ -39,6 +39,14 @@ public class Main {
                     System.out.println("\nInvalid choice. Please try again.");
             }
         } while (choice != 3);
+    }
+    
+    private static void displayMainMenu() {
+        System.out.println("\n=== Clinic Management System ===");
+        System.out.println("1. Patient Registration System");
+        System.out.println("2. Consultation System");
+        System.out.println("3. Exit");
+        System.out.print("\nEnter your choice: ");
     }
 }    
 

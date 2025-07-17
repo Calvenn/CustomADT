@@ -8,8 +8,9 @@ package Entity;
  *
  * @author calve
  */
-public class Consultation {
-    private int severity;
+public class Consultation implements Comparable<Consultation>{
+    //patient id as foreign key
+    private Integer  severity;
     private String notes;
     
     //private String treatmentAccessID; //sort by time, the earliest at the top
@@ -36,8 +37,13 @@ public class Consultation {
         this.notes = notes;
     }
     
+    //@Override
+    public int compareTo(Consultation other){
+        return this.severity.compareTo(other.severity);
+    }
+    
     @Override
     public String toString(){
-        return "Severity Level: " + severity + "\n Notes: " + notes;
+        return "Severity Level: " + severity + "\nNotes: " + notes;
     }
 }
