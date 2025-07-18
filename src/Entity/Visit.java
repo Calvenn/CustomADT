@@ -1,18 +1,20 @@
 package Entity;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Visit implements Comparable<Visit> {
     private String visitId;
-    private String patientPhoneNo;
+    private Patient patient;
     private String symptoms;
     private Severity severityLevel;
-    private String registrationTime;
+    private LocalDateTime registrationTime;
 
-    public Visit(String visitId, String patientPhoneNo, String symptoms, Severity severityLevel) {
+    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel) {
         this.visitId = visitId;
-        this.patientPhoneNo = patientPhoneNo;
+        this.patient = patient;
         this.symptoms = symptoms;
         this.severityLevel = severityLevel;
-        this.registrationTime = java.time.LocalDateTime.now().toString();
+        this.registrationTime = LocalDateTime.now();
     }
     
     public String getVisitId() {
@@ -23,12 +25,12 @@ public class Visit implements Comparable<Visit> {
         this.visitId = visitId;
     }
 
-    public String getPatientPhoneNo() {
-        return patientPhoneNo;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientPhoneNo(String patientPhoneNo) {
-        this.patientPhoneNo = patientPhoneNo;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
     
     public String getSymptoms() {
@@ -47,28 +49,34 @@ public class Visit implements Comparable<Visit> {
         this.severityLevel = severityLevel;
     }
 
-    public String getRegistrationTime() {
+    public LocalDateTime getRegistrationTime() {
         return registrationTime;
     }
 
-    public void setRegistrationTime(String registrationTime) {
+    public void setRegistrationTime(LocalDateTime registrationTime) {
         this.registrationTime = registrationTime;
     }
 
     
     @Override
-    public String toString() { 
-        return "Visit{" +
-                "visitId='" + visitId + '\'' +
-                ", patientPhoneNo='" + patientPhoneNo + '\'' +
-                ", symptoms='" + symptoms + '\'' +
-                ", severityLevel=" + severityLevel +
-                ", registrationTime=" + registrationTime +
-                '}';
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        return
+            "Visit ID        : " + visitId + "\n" +
+            "Symptoms        : " + symptoms + "\n" +
+            "Severity Level  : " + severityLevel + "\n" +
+            "Register Time   : " + registrationTime.format(formatter) + "\n";
     }
 
     @Override
     public int compareTo(Visit other) {
-        return this.severityLevel.getSeverity() - other.severityLevel.getSeverity();
+        int severityCompare = this.severityLevel.getSeverity() - other.severityLevel.getSeverity();
+        
+        // If severity is the same, compare by registration time (earlier time first)
+        if (severityCompare == 0) {
+            return other.registrationTime.compareTo(this.registrationTime);
+        }
+        
+        return severityCompare;
     }
 }

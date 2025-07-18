@@ -1,9 +1,9 @@
 package Entity;
 
 public enum Severity{
-    EMERGENCY(3, "Emergency: Immediate attention required"),
-    URGENT(2, "Serious: Urgent attention required"),
-    MILD(1, "Mild: Standard attention required"),;
+    EMERGENCY(3, "Immediate attention required"),
+    URGENT(2, "Urgent attention required"),
+    MILD(1, "Standard attention required"),;
 
     private final int severity;
     private final String description;
