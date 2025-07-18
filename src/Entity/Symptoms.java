@@ -2,33 +2,42 @@ package Entity;
 
 public class Symptoms {
     
-    public static Severity assessSeverity(String symptoms) {
+    public static Severity assessSeverity(String symptoms, boolean isLifeThreatening) {
         String lowerSymptoms = symptoms.toLowerCase();
         
-        // Check for emergency conditions
-        if (containsEmergencySymptoms(lowerSymptoms)) {
+        // If user indicated life-threatening, directly EMERGENCY=
+        if (isLifeThreatening) {
             return Severity.EMERGENCY;
         }
         
-        // Check for urgent conditions
+        // Check for emergency symptoms first
         if (containsUrgentSymptoms(lowerSymptoms)) {
             return Severity.URGENT;
         }
         
-        // All other conditions
+        // If not emergency, check if mild or default to mild
+        if (containsMildKeywords(lowerSymptoms)) {
+            return Severity.MILD;
+        }
+        
+        // Default case
         return Severity.MILD;
     }
     
-    private static boolean containsEmergencySymptoms(String symptoms) {
+    private static boolean containsUrgentSymptoms(String symptoms) {
         String[] emergencyKeywords = {
-            "chest pain", 
-            "difficulty breathing", 
-            "unconscious",
-            "severe bleeding",
-            "heart attack",
-            "stroke",
-            "choking",
-            "seizure"
+            "severe", 
+            "persistent", 
+            "high fever",
+            "39",
+            "vomiting",
+            "bleeding",
+            "cannot eat",
+            "worsening",
+            "getting worse",
+            "continuous",
+            "heavy",
+            "chest pain"
         };
         
         for (String keyword : emergencyKeywords) {
@@ -39,50 +48,25 @@ public class Symptoms {
         return false;
     }
     
-    private static boolean containsUrgentSymptoms(String symptoms) {
-        String[] urgentKeywords = {
-            "fever", 
-            "fracture", 
-            "pain",
-            "vomiting",
-            "diarrhea",
-            "headache",
-            "infection",
-            "allergic reaction"
+    private static boolean containsMildKeywords(String symptoms) {
+        String[] mildKeywords = {
+            "mild",
+            "light headache",
+            "slight pain",
+            "slight",
+            "occasional",
+            "sometimes",
+            "minor",
+            "little",
+            "small",
+            "light"
         };
         
-        for (String keyword : urgentKeywords) {
+        for (String keyword : mildKeywords) {
             if (symptoms.contains(keyword)) {
                 return true;
             }
         }
         return false;
-    }
-    
-    public static String getPriorityDescription(Severity severity) {
-        switch (severity) {
-            case EMERGENCY:
-                return "Highest Priority (Level 3) - Immediate attention required";
-            case URGENT:
-                return "Medium Priority (Level 2) - Requires prompt medical care";
-            case MILD:
-                return "Regular Priority (Level 1) - Routine medical consultation";
-            default:
-                return "Unknown Priority";
-        }
-    }
-    
-    public static String[] getEmergencySymptoms() {
-        return new String[]{
-            "chest pain", "difficulty breathing", "unconscious",
-            "severe bleeding", "heart attack", "stroke", "choking", "seizure"
-        };
-    }
-    
-    public static String[] getUrgentSymptoms() {
-        return new String[]{
-            "fever", "fracture", "pain", "vomiting", "diarrhea", 
-            "headache", "infection", "allergic reaction"
-        };
-    }
+    }  
 }

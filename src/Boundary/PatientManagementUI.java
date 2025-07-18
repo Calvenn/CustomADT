@@ -1,20 +1,17 @@
 package Boundary;
-import Control.PatientManager;
 import Control.QueueManager;
+import Control.PatientManager;
 import Entity.Patient;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class PatientManagementUI {
-    private PatientManager patientManager;
     private QueueManager queueManager;
+    private PatientManager patientManager;
     private Scanner scanner;
 
     public PatientManagementUI() {
-        patientManager = new PatientManager();
         queueManager = new QueueManager();
+        patientManager = new PatientManager();
         scanner = new Scanner(System.in);
     }
 
@@ -27,12 +24,11 @@ public class PatientManagementUI {
 
             switch (choice) {
                 case 1:
-                    // Add new patient
                     handleNewPatientRegistration();
                     break;
                 case 2:
-                    // Register Visit
-                    handleVisitRegistration();
+                    VisitRegistrationUI visitUI = new VisitRegistrationUI(queueManager, patientManager);
+                    visitUI.handleVisitRegistration();
                     break;
                 case 3:
                     System.out.println("\nThank you for using Patient Management System!");
@@ -52,31 +48,39 @@ public class PatientManagementUI {
     }
 
     private void handleNewPatientRegistration() {
-        Patient newPatient = patientManager.registerNewPatient();
-        if (newPatient != null) {
-            // Automatically proceed to visit registration for new patient
-            System.out.println("\nProceeding to visit registration...");
-            registerVisit(newPatient);
-        }
-    }
+        System.out.println("\n=== New Patient Registration ===");
 
-    private void handleVisitRegistration() {
-        System.out.print("\nEnter patient IC number: ");
+        System.out.print("Enter IC number: ");
         String ic = scanner.nextLine();
 
-        Patient patient = patientManager.findPatientByIC(ic);
-        if (patient != null) {
-            patientManager.displayPatientDetails(patient);
-            registerVisit(patient);
+        Patient existing = patientManager.findPatientByIC(ic);
+        if (existing != null) {
+            System.out.println("\nPatient already exists!");
+            patientManager.displayPatientDetails(existing);
+            return;
+        }
+
+        System.out.print("Enter name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter phone number: ");
+        String phone = scanner.nextLine();
+
+        System.out.print("Enter age: ");
+        int age = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Enter gender (M/F): ");
+        char gender = scanner.nextLine().trim().toUpperCase().charAt(0);
+
+        System.out.print("Enter address: ");
+        String address = scanner.nextLine();
+
+        Patient newPatient = patientManager.registerNewPatient(ic, name, phone, age, gender, address);
+        if (newPatient != null) {
+            System.out.println("\nPatient registered successfully!");
         } else {
-            System.out.println("\nPatient not found! Please register as new patient first.");
+            System.out.println("Error: Cannot register new patient.");
         }
     }
-
-    private void registerVisit(Patient patient) {
-        // Call QueueManager to handle visit registration
-        queueManager.addVisit(patient.getPatientPhoneNo());  // QueueManager will handle symptoms input
-        queueManager.displayQueue();  // Show current queue status
-    }
-    
 }

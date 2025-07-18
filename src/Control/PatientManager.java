@@ -1,6 +1,5 @@
 package Control;
 import Entity.Patient;
-import java.util.Scanner;
 
 /*  1. store patient in an array
     2. search for patient by ic number
@@ -15,64 +14,33 @@ public class PatientManager {
     private Entity.Patient[] patientList;
     private int totalPatients;
     private static final int MAX_PATIENTS = 100;
-    private Scanner scanner;
 
     public PatientManager() {
         patientList = new Entity.Patient[MAX_PATIENTS];
         totalPatients = 0;
-        scanner = new Scanner(System.in);
+
+        patientList[totalPatients++] = new Patient("050101070101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
+        patientList[totalPatients++] = new Patient("050202070202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
+        patientList[totalPatients++] = new Patient("050303070303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
     }
     
-    public Patient registerNewPatient() {
-        System.out.println("\n=== Patient Registration ===");
-        
-        // Get IC/Phone number first
-        System.out.print("Enter IC number: ");
-        String patientIC = scanner.nextLine();
-        
-        // Check if patient exists
-        Patient existingPatient = findPatientByIC(patientIC);
-        if (existingPatient != null) {
-            System.out.println("\nPatient already exists!");
-            displayPatientDetails(existingPatient);
-            return existingPatient;  // Return existing patient for visit registration
-        }
-        
-        // Continue with new patient registration
-        System.out.print("Enter patient name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter phone number: ");
-        String phoneNo = scanner.nextLine();
-        
-        System.out.print("Enter age: ");
-        int age = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
-        
-        System.out.print("Enter gender (M/F): ");
-        String gender = scanner.nextLine();
-        
-        System.out.print("Enter address: ");
-        String address = scanner.nextLine();
-        
-        // Create and add new patient
-        Patient newPatient = new Patient(patientIC, name, phoneNo, age, gender, address);
-        addNewPatient(newPatient);
-        
-        System.out.println("\nPatient registered successfully!");
-        return newPatient; 
+    public boolean isPatientExist(String ic) {
+        return findPatientByIC(ic) != null;
     }
 
-    public void addNewPatient(Entity.Patient patient) {
+    public Patient registerNewPatient(String ic, String name, String phone, int age, char gender, String address) {
+        Patient patient = new Patient(ic, name, phone, age, gender, address);
+        return addNewPatient(patient) ? patient : null;
+    }
+
+    public boolean addNewPatient(Patient patient) {
         if (totalPatients < MAX_PATIENTS) {
-            patientList[totalPatients] = patient;
-            totalPatients++;
-        } else {
-            System.out.println("Patient list is full. Cannot add new patient.");
+            patientList[totalPatients++] = patient;
+            return true;
         }
-
+        return false;
     }
-    
+
     public Patient findPatientByIC(String patientIC) {
         for (int i = 0; i < totalPatients; i++) {
             if (patientList[i].getPatientIC().equals(patientIC)) {
@@ -84,13 +52,7 @@ public class PatientManager {
 
     public void displayPatientDetails(Patient patient) {
         if (patient != null) {
-            System.out.println("\n=== Patient Details ===");
-            System.out.println("IC: " + patient.getPatientIC());
-            System.out.println("Name: " + patient.getPatientName());
-            System.out.println("Phone: " + patient.getPatientPhoneNo());
-            System.out.println("Age: " + patient.getPatientAge());
-            System.out.println("Gender: " + patient.getPatientGender());
-            System.out.println("Address: " + patient.getPatientAddress());
+            System.out.println(patient.toString());
         } else {
             System.out.println("Patient not found!");
         }
