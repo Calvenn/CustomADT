@@ -76,4 +76,16 @@ public class Treatment implements Comparable<Treatment> {
     public int compareTo(Treatment other) {
         return Integer.compare(this.frequency, other.frequency); 
     }
+    
+    @Override
+    public String toString() {
+        return String.format("""
+                             Treatment ID: %s
+                             Treatment Name: %s
+                             Description: %s 
+                             Duration: %s
+                             Frequency: %d
+                             """, 
+                treatmentId, name, description, duration, frequency); 
+    }
 }
