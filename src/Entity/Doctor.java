@@ -1,5 +1,6 @@
 package Entity;
 import java.util.Date;
+
 /**
  *
  * @author tanjixian
@@ -14,7 +15,7 @@ public class Doctor implements Comparable<Doctor>{
     private String doctorGender;
     private String position; // Treatment  & Consultation 
     private Date dateJoined;
-    private int workload;    // Availability, How many work handled by this doctor
+    private int patientCount;    // Availability, How many work handled by this doctor
     private static int doctorCount = 0;     // To count the total amount of doctors 
     
     // Constructor
@@ -28,7 +29,7 @@ public class Doctor implements Comparable<Doctor>{
         this.doctorGender = doctorGender;
         this.position = position;
         this.dateJoined = dateJoined;
-        this.workload = 0;
+        this.patientCount = 0;
     }
     
     // Setters
@@ -37,7 +38,7 @@ public class Doctor implements Comparable<Doctor>{
     public void setDoctorPhoneNo (String doctorPhoneNo){ this.doctorPhoneNo = doctorPhoneNo; }
     public void setDoctorGender (String doctorGender){ this.doctorGender = doctorGender; }
     public void setPosition (String position) { this.position = position; }
-    public void setWorkload (int workload) { this.workload = workload; }
+    public void setPatientCount (int workload) { this.patientCount = workload; }
     
     // Getters
     public String getDoctorID () { return doctorID; }
@@ -47,13 +48,26 @@ public class Doctor implements Comparable<Doctor>{
     public String getDoctorGender () { return doctorGender; }
     public String getPosition () { return position; }
     public Date getDateJoined () { return dateJoined; }
-    public int getWorkload() { return workload; }
+    public int getPatientCount() { return patientCount; }
     
-    //compareTo
+    //compareTo, Compare patientCount, used for Heap
     @Override
     public int compareTo(Doctor other){
-        return this.doctorID.compareTo(other.doctorID);
+        return Integer.compare(this.patientCount, other.patientCount);
     }
+    
+    //equals, Compare objects contents 
+    @Override
+    public boolean equals(Object obj){
+       if (this == obj) return true;
+       if (obj == null || !(obj instanceof Doctor)) return false;
+       Doctor other = (Doctor) obj;
+       return this.doctorID.equals(other.doctorID); 
+    }
+    
+    // !NO HASHCODE, BUT NO USE HASHMAP
+    //@Override
+    //public int hashCode(){}
     
     // toString
     @Override
@@ -65,7 +79,7 @@ public class Doctor implements Comparable<Doctor>{
                "Phone Number: " + doctorPhoneNo + "\n" +
                "Position   : " + position + "\n" +
                "Date Joined: " + dateJoined + "\n" +
-               "Workload   : " + workload + "\n";
+               "Patient Count: " + patientCount + "\n";
     }
     
     
