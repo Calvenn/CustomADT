@@ -1,5 +1,5 @@
 package Entity;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -14,13 +14,13 @@ public class Doctor implements Comparable<Doctor>{
     private String doctorPhoneNo;
     private String doctorGender;
     private String position; // Treatment  & Consultation 
-    private Date dateJoined;
-    private int patientCount;    // Availability, How many work handled by this doctor
+    private LocalDate dateJoined;
+    private Integer patientCount;    // Availability, How many work handled by this doctor
     private static int doctorCount = 0;     // To count the total amount of doctors 
     
     // Constructor
     public Doctor(){ doctorCount++; }
-    public Doctor(String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, Date dateJoined){
+    public Doctor(String doctorID, String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, LocalDate dateJoined){
         doctorCount++;
         this.doctorID = String.format("D%03d", doctorCount);
         this.doctorName = doctorName;
@@ -47,13 +47,13 @@ public class Doctor implements Comparable<Doctor>{
     public String getDoctorPhoneNo () { return doctorPhoneNo; }
     public String getDoctorGender () { return doctorGender; }
     public String getPosition () { return position; }
-    public Date getDateJoined () { return dateJoined; }
+    public LocalDate getDateJoined () { return dateJoined; }
     public int getPatientCount() { return patientCount; }
     
     //compareTo, Compare patientCount, used for Heap
     @Override
     public int compareTo(Doctor other){
-        return Integer.compare(this.patientCount, other.patientCount);
+        return this.patientCount.compareTo(other.patientCount);
     }
     
     //equals, Compare objects contents 

@@ -1,7 +1,7 @@
 package Control;
 import Entity.Doctor;
 import adt.ADTHeap;
-import java.util.Date;
+import java.time.LocalDate;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. Then use updateDoctor(Doctor minWorkDoctor), to update the doctor back into heap
@@ -12,15 +12,17 @@ import java.util.Date;
  * @author tanjixian
  */
 public class DoctorManager {
+    private ADTHeap<Doctor> doctorHeap;
     
-  // Variables
-    ADTHeap<Doctor> doctorHeap = new ADTHeap<>(false);  // Min-heap for patientCount
-
+    public DoctorManager(){
+    // Variables
+      doctorHeap = new ADTHeap<>(false);  // Min-heap for patientCount
+    }
     
   // Functions
     // Create a new doctor and insert into heap, boolean to ensure success or fail
-    public boolean addNewDoctor(String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, Date dateJoined){
-        Doctor newDoctor = new Doctor(doctorName, doctorAge, doctorPhoneNo, doctorGender, position, dateJoined);
+    public boolean addNewDoctor(String doctorID, String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, LocalDate dateJoined){
+        Doctor newDoctor = new Doctor(doctorID, doctorName, doctorAge, doctorPhoneNo, doctorGender, position, dateJoined);
         doctorHeap.insert(newDoctor);
         return true;
     }
@@ -87,6 +89,5 @@ public class DoctorManager {
     // Remove Doctor (from doctorHeap)
     public void removeDoctor(Doctor toRemove){
         doctorHeap.remove(toRemove);
-    }   
-    
+    } 
 }

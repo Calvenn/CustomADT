@@ -6,6 +6,11 @@ package Main;
  */
 import Boundary.ConsultationUI;
 import Boundary.PatientManagementUI;
+import Control.AppointmentManager;
+import Control.QueueManager;
+import Entity.Appointment;
+import Entity.Visit;
+import adt.ADTHeap;
 import java.util.Scanner;
 /**
  *
@@ -14,8 +19,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ConsultationUI consultUI = new ConsultationUI();
-        PatientManagementUI patientUI = new PatientManagementUI();
+        ADTHeap<Visit> sharedVisitQueue = new ADTHeap<>(true);
+        ADTHeap<Appointment> sharedApptHeap = new ADTHeap<>(false);
+        
+        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);
+        QueueManager queueManager = new QueueManager(sharedVisitQueue);
+        ConsultationUI consultUI = new ConsultationUI(sharedVisitQueue, apptManager);
+        PatientManagementUI patientUI = new PatientManagementUI(sharedVisitQueue);
         
         int choice;
         do {

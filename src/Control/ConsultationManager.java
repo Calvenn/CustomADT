@@ -6,9 +6,10 @@ package Control;
 
 import Entity.Appointment;
 import Entity.Consultation;
+import Entity.Visit;
 import adt.ADTHeap;
+import java.time.LocalDate;
 import java.util.Scanner;
-import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -17,31 +18,41 @@ import java.time.format.DateTimeFormatter;
 public class ConsultationManager {
     private final ADTHeap<Consultation> consultationHeap;
     private ADTHeap<Appointment> appointmentHeap;
-    //and walkin queue from patient
-    private Appointment appt;
+    private ADTHeap<Visit> queue;
     private Scanner scanner = new Scanner(System.in);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
-    public ConsultationManager() {
-        appointmentHeap = new ADTHeap<>(false);
-        //patient
-        consultationHeap = new ADTHeap<>(true); 
+    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap) {
+        this.queue = queue;
+        this.appointmentHeap = appointmentHeap;
+        this.consultationHeap = new ADTHeap<>(true);
     }
-    
-    /*
-    public Object dispatchNextPatient(){
+
+    public Object dispatchNextPatient() {
+        System.out.print(queue.size());
         Appointment nextAppt = appointmentHeap.peekRoot();
-        //Patient nextWalkIn = patientHeap.peekRoot();
-        
-        //if(nextAppt == null) return nextWalkIn.extractRoot();
-        //if(nextWalkIn == null) return appointmentHeap.extractRoot();
-        
-        if (nextWalkIn.getSeverity() > nextAppt.getSeverity()) {
-            return walkInQueue.extractRoot();
+        Visit nextWalkIn = queue.peekRoot();
+
+        // If both are empty
+        if (nextAppt == null && nextWalkIn == null) return null;
+        if (nextAppt == null) return queue.extractRoot();
+        if (nextWalkIn == null) return appointmentHeap.extractRoot();
+
+        // Check if appointment is today
+        boolean isToday = nextAppt.getTime().toLocalDate().equals(LocalDate.now());
+
+        // Dispatch based on severity if appointment is today
+        if (isToday) {
+            if (nextWalkIn.getSeverityLevel().getSeverity() > nextAppt.getSeverity()) {
+                return queue.extractRoot();
+            } else {
+                return appointmentHeap.extractRoot();
+            }
         } else {
-            return appointmentQueue.extractRoot();
+            // Appointment not today → prioritize walk-in
+            return queue.extractRoot();
         }
-    }*/
+    }
+
         
     public boolean consultationRecord(){
         //check patient flag see whether it is true or not if not thn set the severity in patient module 
@@ -56,6 +67,7 @@ public class ConsultationManager {
         
         Consultation newConsult = new Consultation(severity, notes); //patient id later on
         consultationHeap.insert(newConsult);
+        //docManager.updateDoctor();
         return true;
     }
     

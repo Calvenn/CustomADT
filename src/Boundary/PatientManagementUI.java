@@ -2,6 +2,8 @@ package Boundary;
 import Control.QueueManager;
 import Control.PatientManager;
 import Entity.Patient;
+import Entity.Visit;
+import adt.ADTHeap;
 import java.util.Scanner;
 
 public class PatientManagementUI {
@@ -9,8 +11,8 @@ public class PatientManagementUI {
     private PatientManager patientManager;
     private Scanner scanner;
 
-    public PatientManagementUI() {
-        queueManager = new QueueManager();
+    public PatientManagementUI(ADTHeap<Visit> sharedVisitQueue) {
+        queueManager = new QueueManager(sharedVisitQueue);
         patientManager = new PatientManager();
         scanner = new Scanner(System.in);
     }
