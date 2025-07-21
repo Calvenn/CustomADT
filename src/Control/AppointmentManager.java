@@ -14,13 +14,16 @@ import java.time.format.DateTimeFormatter;
  * Author: calve
  */
 public class AppointmentManager {
-
     private final ADTHeap<Appointment> appointmentHeap;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
 
     public AppointmentManager() {
         appointmentHeap = new ADTHeap<>(false); 
+    }
+    
+    public AppointmentManager(ADTHeap<Appointment> sharedHeap) {
+        this.appointmentHeap = sharedHeap;
     }
 
     public boolean isWithinWorkingHours(LocalDateTime time) {
@@ -133,6 +136,10 @@ public class AppointmentManager {
 
     public Appointment getAppointment(int index) {
         return appointmentHeap.get(index);
+    }
+    
+    public ADTHeap<Appointment> getAppointmentHeap() {
+        return appointmentHeap;
     }
 }
 

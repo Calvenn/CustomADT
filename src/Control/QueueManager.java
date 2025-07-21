@@ -2,7 +2,11 @@ package Control;
 import Entity.Visit;
 import Entity.Patient;
 import Entity.Severity;
+import Entity.Doctor;
+import Control.DoctorManager;
+import Boundary.ConsultationUI;
 import adt.ADTHeap;
+import java.time.LocalDate;
 
 /*1. Initialize max heap
 2. Add visit to the queue
@@ -25,21 +29,32 @@ import adt.ADTHeap;
 public class QueueManager {
     private ADTHeap<Visit> visitQueue;
     private int queueNumber;
-
+    private DoctorManager docManager;
     public boolean isEmpty() {
         return visitQueue.isEmpty();
     }
 
-    public QueueManager() {
-        visitQueue = new ADTHeap<>(true); // Max-heap for severity
+    public QueueManager(ADTHeap<Visit> sharedQueue) {
+        this.visitQueue = sharedQueue;
         queueNumber = 1000;
+        docManager = new DoctorManager();
+        loadDummyDoctors();
+        
     }
+    
+    private void loadDummyDoctors() {
+        docManager.addNewDoctor("D001", "John", 30, "012-1231234", "Man", "Head", LocalDate.now());
+        docManager.addNewDoctor("D002", "Spider Man", 25, "012-1231234", "Man", "Doctor", LocalDate.now());
+        docManager.addNewDoctor("D003", "Iron Man", 26, "012-1231234", "Man", "Assistant", LocalDate.now());
+    }    
 
     public Visit createVisit(Patient patient, String symptoms, boolean isLifeThreatening) {
         String visitId = generateVisitId();
         Severity severityLevel = Entity.Symptoms.assessSeverity(symptoms, isLifeThreatening);
-
-        Visit visit = new Visit(visitId, patient, symptoms, severityLevel);
+      
+        Doctor doctor = docManager.getMinWorkDoctor();
+        Visit visit = new Visit(visitId, patient, symptoms, severityLevel, doctor);
+        docManager.updateDoctor(doctor);
         visitQueue.insert(visit);
         return visit;
     }
@@ -55,5 +70,13 @@ public class QueueManager {
     //do only show visit id, severity level, and symptoms
     public void displayQueueDetails() {
         visitQueue.display();
+    }
+    
+    public Visit peekRootVisit(){
+        return visitQueue.peekRoot();
+    }
+    
+    public Visit extractRootVisit(){
+        return visitQueue.extractRoot();
     }
 }

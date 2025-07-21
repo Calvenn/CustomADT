@@ -3,12 +3,11 @@ package Boundary;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Entity.Appointment;
+import Entity.Visit;
+import adt.ADTHeap;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -18,21 +17,23 @@ import java.util.Scanner;
  * Author: calve
  */
 public class ConsultationUI {
+    private final ADTHeap<Visit> queue;
     private AppointmentUI apptUI;
     private AppointmentManager apptManager;
     private ConsultationManager consultManager;
     private Scanner scanner;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ConsultationUI() {
-        apptManager = new AppointmentManager();
-        apptUI = new AppointmentUI(apptManager);
-        consultManager = new ConsultationManager();
-        scanner = new Scanner(System.in);
-        
+    public ConsultationUI(ADTHeap<Visit> queue, AppointmentManager apptManager) {
+        this.queue = queue;
+        this.apptManager = apptManager;
+        this.apptUI = new AppointmentUI(apptManager); 
+        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap());
+        this.scanner = new Scanner(System.in);
+
         loadDummyAppointments();
     }
-    
+
     private void loadDummyAppointments() {
         apptManager.bookAppointment("Alice", "012-1231234", "Dr. Tan", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(0));
         apptManager.bookAppointment("Bob", "012-2231234", "Dr. Lim", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(30));
@@ -88,45 +89,78 @@ public class ConsultationUI {
         }
     }
     
-    private void consultRecord(){
-        // how to handle both walk in and appt patient?????
-        // and one from patient module & doc(QUEUE)
-        // call dispatchNextPatient after integrate with patient queue
-        // will extract at dispatchPatient func
-        Appointment current = apptManager.getNextAppointment(); 
+    private void consultRecord() {
+        Object currentPatient = consultManager.dispatchNextPatient(); 
 
-        if (current == null) {
-           System.out.println("No more patients in queue.");
+        if (currentPatient == null) {
+            System.out.println("No more patients in queue.");
             return;
         }
 
-        System.out.println("\n Now Consulting:");
-        System.out.println("Patient: " + current.getPatientName());
-        System.out.println("Doctor: " + current.getDoctorName());
-        System.out.println("Current Severity: " + current.getSeverity());
-        System.out.println("Time: " + current.getTime().format(formatter));
-        
-        if(consultManager.consultationRecord()){
-            System.out.println("Record successfully");
-            
-            System.out.println("Next action:");
-            System.out.println("1. Schedule follow-up appointment");
-            System.out.println("2. Send to treatment");// USE ARRAY METHOD TO HANDLE WHAT PATIENT NEED DO
-            System.out.println("3. Send to pharmacy");// USE ARRAY METHOD TO HANDLE WHAT MED WANT TO GET
-            System.out.println("4. Done");
+        System.out.println("\n--- Now Consulting ---");
 
-            int action = scanner.nextInt();
-            scanner.nextLine();
+        if (currentPatient instanceof Appointment appointment) {
+            System.out.println("Type     : Appointment");
+            System.out.println("Patient  : " + appointment.getPatientName());
+            System.out.println("Doctor   : " + appointment.getDoctorName());
+            System.out.println("Severity : " + appointment.getSeverity());
+            System.out.println("Time     : " + appointment.getTime().format(formatter));
 
-            switch (action) {
-                case 1 -> apptUI.bookAppointmentUI(current.getPatientName(), current.getPhoneNum(), current.getDoctorName(), current.getSeverity()); 
-                //case 2 -> ;
-                //case 3 -> ;
-                //case 4 -> ;
-                default -> System.out.println("Invalid choice.");
+            if (consultManager.consultationRecord()) {
+                System.out.println("Record saved.");
+
+                System.out.println("Next action:");
+                System.out.println("1. Schedule follow-up appointment");
+                System.out.println("2. Send to treatment");
+                System.out.println("3. Send to pharmacy");
+                System.out.println("4. Done");
+
+                int action = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (action) {
+                    case 1 -> apptUI.bookAppointmentUI(
+                                appointment.getPatientName(), 
+                                appointment.getPhoneNum(), 
+                                appointment.getDoctorName(), 
+                                appointment.getSeverity());
+                    default -> System.out.println("Done.");
+                }
             }
+
+        } else if (currentPatient instanceof Visit visit) {
+            System.out.println("Type     : Walk-In");
+            System.out.println("Patient  : " + visit.getPatient().getPatientName());
+            System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
+            System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());
+            System.out.println("Symptoms : " + visit.getSymptoms());
+
+            if (consultManager.consultationRecord()) {
+                System.out.println("Record saved.");
+
+                System.out.println("Next action:");
+                System.out.println("1. Schedule follow-up appointment");
+                System.out.println("2. Send to treatment");
+                System.out.println("3. Send to pharmacy");
+                System.out.println("4. Done");
+
+                int action = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (action) {
+                    case 1 -> apptUI.bookAppointmentUI(
+                                visit.getPatient().getPatientName(), 
+                                visit.getPatient().getPatientPhoneNo(), 
+                                visit.getDoctor().getDoctorName(), 
+                                visit.getSeverityLevel().getSeverity());
+                    default -> System.out.println("Done.");
+                }
+            }
+        } else {
+            System.out.println("Unknown patient type.");
         }
     }
+
 
     
 }
