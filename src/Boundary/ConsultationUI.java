@@ -2,6 +2,9 @@ package Boundary;
 
 import Control.AppointmentManager;
 import Control.ConsultationManager;
+import Control.DoctorManager; //TEMP
+
+import Entity.Doctor;
 import Entity.Appointment;
 import Entity.Visit;
 import adt.ADTHeap;
@@ -21,28 +24,40 @@ public class ConsultationUI {
     private AppointmentUI apptUI;
     private AppointmentManager apptManager;
     private ConsultationManager consultManager;
+    private DoctorManager docManager;
+    private Doctor currentDoc = null;
     private Scanner scanner;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ConsultationUI(ADTHeap<Visit> queue, AppointmentManager apptManager) {
+    public ConsultationUI(ADTHeap<Visit> queue, DoctorManager docManager, AppointmentManager apptManager) {
         this.queue = queue;
+        this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
-        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap());
+        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap(), docManager);
         this.scanner = new Scanner(System.in);
+    }
+    
+    //handle in doctor ui
+    private boolean doctorLogin() {
+        System.out.println("\n--- Doctor Login ---");
+        System.out.print("Enter your ID (e.g. V001): ");
+        String docId = scanner.nextLine().trim();
+        
+        currentDoc = docManager.findDoctor(docId);
 
-        loadDummyAppointments();
+        if (currentDoc != null) {
+            System.out.println("Login successful. Welcome, " + docId + "!");
+            return true;
+        } else {
+            System.out.println("No appointments found for that doctor. Please try again.");
+            return false;
+        }
     }
 
-    private void loadDummyAppointments() {
-        apptManager.bookAppointment("Alice", "012-1231234", "Dr. Tan", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(0));
-        apptManager.bookAppointment("Bob", "012-2231234", "Dr. Lim", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(30));
-        apptManager.bookAppointment("David", "012-2231234", "Dr. Ang", 3, LocalDateTime.now().plusWeeks(1).withHour(10).withMinute(0));
-    }    
-
-    /*DOCTOR MUST LOGIN FIRST TO VIEW OWN INCOMING QUEUE AND APPT AFTER DOC MODULE */
-    public void consultMainMenu() {
-        while (true) {
+    
+    public void consultMainMenu() {       
+        while (true && (doctorLogin() || currentDoc != null)) {
             System.out.println("Total Appointment: " + apptManager.totalAppointments());
             System.out.println("Incoming Appointment: " + apptManager.getIncomingAppointment());
             //get incoming queue from patient & doc
@@ -90,7 +105,7 @@ public class ConsultationUI {
     }
     
     private void consultRecord() {
-        Object currentPatient = consultManager.dispatchNextPatient(); 
+        Object currentPatient = consultManager.dispatchNextPatient(currentDoc); 
 
         if (currentPatient == null) {
             System.out.println("No more patients in queue.");
@@ -102,7 +117,7 @@ public class ConsultationUI {
         if (currentPatient instanceof Appointment appointment) {
             System.out.println("Type     : Appointment");
             System.out.println("Patient  : " + appointment.getPatientName());
-            System.out.println("Doctor   : " + appointment.getDoctorName());
+            System.out.println("Doctor   : " + appointment.getDoctor().getDoctorName());
             System.out.println("Severity : " + appointment.getSeverity());
             System.out.println("Time     : " + appointment.getTime().format(formatter));
 
@@ -122,8 +137,9 @@ public class ConsultationUI {
                     case 1 -> apptUI.bookAppointmentUI(
                                 appointment.getPatientName(), 
                                 appointment.getPhoneNum(), 
-                                appointment.getDoctorName(), 
-                                appointment.getSeverity());
+                                appointment.getDoctor().getDoctorID(), 
+                                appointment.getSeverity(), 
+                                currentDoc);
                     default -> System.out.println("Done.");
                 }
             }
@@ -152,7 +168,8 @@ public class ConsultationUI {
                                 visit.getPatient().getPatientName(), 
                                 visit.getPatient().getPatientPhoneNo(), 
                                 visit.getDoctor().getDoctorName(), 
-                                visit.getSeverityLevel().getSeverity());
+                                visit.getSeverityLevel().getSeverity(),
+                                currentDoc);
                     default -> System.out.println("Done.");
                 }
             }

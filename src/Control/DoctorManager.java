@@ -14,9 +14,8 @@ import java.time.LocalDate;
 public class DoctorManager {
     private ADTHeap<Doctor> doctorHeap;
     
-    public DoctorManager(){
-    // Variables
-      doctorHeap = new ADTHeap<>(false);  // Min-heap for patientCount
+    public DoctorManager(ADTHeap<Doctor> doctorHeap){
+        this.doctorHeap = doctorHeap;
     }
     
   // Functions
@@ -74,15 +73,17 @@ public class DoctorManager {
         }
     }
     
-    public int findDoctor(String toFindID){
+    public Doctor findDoctor(String toFindID){
         try{
-            if (toFindID == null) return -1; // Null check 
+            if (toFindID == null) return null; // Null check 
             for(int i = 0; i < sizeOfDoctHeap(); i++ ){
-                if(doctorHeap.get(i).getDoctorID().equals(toFindID)) return i;  // If same doctorID then return the index
-            } return -1; // No such doctor
+                if(doctorHeap.get(i).getDoctorID().equals(toFindID)) {
+                    return doctorHeap.get(i);
+                }  // If same doctorID then return the index
+            } return null; // No such doctor
         } catch (Exception e){
             System.err.println("Error during findDoctor: " + e.getMessage());
-            return -1;  // Error
+            return null;  // Error
         }
     }
     

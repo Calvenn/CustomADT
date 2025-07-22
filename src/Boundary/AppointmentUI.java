@@ -4,9 +4,11 @@
  */
 package Boundary;
 
+import Entity.Appointment;
+import Entity.Doctor;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
-import Entity.Appointment;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,7 +57,7 @@ public class AppointmentUI {
         }
     }
     
-    void bookAppointmentUI(String patient, String phoneNum, String doctor, int severity) {
+    void bookAppointmentUI(String patient, String phoneNum, String doctor, int severity, Doctor currentDoc) {
         LocalDateTime time = null;
 
         while (true) {
@@ -66,7 +68,7 @@ public class AppointmentUI {
             try {
                 time = LocalDateTime.parse(input, formatter);
 
-                boolean success = apptManager.bookAppointment(patient, phoneNum, doctor, severity, time);
+                boolean success = apptManager.bookAppointment(patient, phoneNum, doctor, severity, time, currentDoc);
                 if (success) {
                     System.out.println("Appointment booked successfully!");
                     break;

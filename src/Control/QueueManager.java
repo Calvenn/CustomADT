@@ -34,19 +34,12 @@ public class QueueManager {
         return visitQueue.isEmpty();
     }
 
-    public QueueManager(ADTHeap<Visit> sharedQueue) {
+    public QueueManager(ADTHeap<Visit> sharedQueue, DoctorManager docManager) {
         this.visitQueue = sharedQueue;
+        this.docManager = docManager;
         queueNumber = 1000;
-        docManager = new DoctorManager();
-        loadDummyDoctors();
         
     }
-    
-    private void loadDummyDoctors() {
-        docManager.addNewDoctor("D001", "John", 30, "012-1231234", "Man", "Head", LocalDate.now());
-        docManager.addNewDoctor("D002", "Spider Man", 25, "012-1231234", "Man", "Doctor", LocalDate.now());
-        docManager.addNewDoctor("D003", "Iron Man", 26, "012-1231234", "Man", "Assistant", LocalDate.now());
-    }    
 
     public Visit createVisit(Patient patient, String symptoms, boolean isLifeThreatening) {
         String visitId = generateVisitId();
