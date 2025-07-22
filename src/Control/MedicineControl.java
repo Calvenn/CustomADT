@@ -75,5 +75,7 @@ public class MedicineControl {
     public Medicine extractLowestStock() {
         return lowStockHeap.extractRoot();
     }
+    
+    //Add/search record medicine
 }
 
