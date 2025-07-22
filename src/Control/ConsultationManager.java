@@ -4,6 +4,7 @@
  */
 package Control;
 
+import Entity.Doctor;
 import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Visit;
@@ -21,26 +22,32 @@ public class ConsultationManager {
     private ADTHeap<Visit> queue;
     private Scanner scanner = new Scanner(System.in);
     
-    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap) {
+    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultationHeap = new ADTHeap<>(true);
     }
 
-    public Object dispatchNextPatient() {
-        System.out.print(queue.size());
+    public Object dispatchNextPatient(Doctor doc) {
         Appointment nextAppt = appointmentHeap.peekRoot();
-        Visit nextWalkIn = queue.peekRoot();
+        Visit nextWalkIn = queue.peekRoot();      
 
-        // If both are empty
+        while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(doc.getDoctorID())) {
+            appointmentHeap.extractRoot(); // skip unrelated doctor
+            nextAppt = appointmentHeap.peekRoot();
+        }
+
+        while (nextWalkIn != null && !nextWalkIn.getDoctor().getDoctorID().equals(doc.getDoctorID())) {
+            queue.extractRoot(); // skip unrelated doctor
+            nextWalkIn = queue.peekRoot();
+        }
+
         if (nextAppt == null && nextWalkIn == null) return null;
         if (nextAppt == null) return queue.extractRoot();
         if (nextWalkIn == null) return appointmentHeap.extractRoot();
 
-        // Check if appointment is today
         boolean isToday = nextAppt.getTime().toLocalDate().equals(LocalDate.now());
 
-        // Dispatch based on severity if appointment is today
         if (isToday) {
             if (nextWalkIn.getSeverityLevel().getSeverity() > nextAppt.getSeverity()) {
                 return queue.extractRoot();
@@ -48,11 +55,9 @@ public class ConsultationManager {
                 return appointmentHeap.extractRoot();
             }
         } else {
-            // Appointment not today → prioritize walk-in
             return queue.extractRoot();
         }
     }
-
         
     public boolean consultationRecord(){
         //check patient flag see whether it is true or not if not thn set the severity in patient module 

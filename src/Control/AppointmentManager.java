@@ -2,6 +2,7 @@ package Control;
 
 import adt.ADTHeap;
 import Entity.Appointment;
+import Entity.Doctor;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -77,7 +78,7 @@ public class AppointmentManager {
         return null;
     }
 
-    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, int severity ,LocalDateTime time) {
+    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, int severity ,LocalDateTime time, Doctor currentDoc) {
         System.out.println("Earliest available ");
         if (time.isBefore(LocalDateTime.now())) {
             System.out.println("Cannot book in the past.");
@@ -98,7 +99,7 @@ public class AppointmentManager {
             }
         }
 
-        Appointment newAppt = new Appointment(patientName, phoneNum,doctorName, severity, time);
+        Appointment newAppt = new Appointment(patientName, phoneNum, currentDoc, severity, time);
         appointmentHeap.insert(newAppt);
         return true;
     }
@@ -111,7 +112,7 @@ public class AppointmentManager {
         Appointment newAppt = new Appointment(
             oldAppt.getPatientName(),
             oldAppt.getPhoneNum(),
-            oldAppt.getDoctorName(),
+            oldAppt.getDoctor(),
                 1,
             newTime
         );

@@ -6,11 +6,13 @@ import adt.ADTHeap;
 import java.util.Scanner;
 
 public class VisitRegistrationUI {
+    private ADTHeap<Visit> visitQueue;
     private Scanner scanner;
     private QueueManager queueManager;
     private PatientManager patientManager;
 
-    public VisitRegistrationUI(QueueManager queueManager, PatientManager patientManager) {
+    public VisitRegistrationUI(ADTHeap<Visit> visitQueue, QueueManager queueManager, PatientManager patientManager) {
+        this.visitQueue = visitQueue;
         this.queueManager = queueManager;
         this.patientManager = patientManager;
         this.scanner = new Scanner(System.in);

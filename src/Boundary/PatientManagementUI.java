@@ -1,18 +1,23 @@
 package Boundary;
 import Control.QueueManager;
 import Control.PatientManager;
+import Control.DoctorManager;
 import Entity.Patient;
 import Entity.Visit;
 import adt.ADTHeap;
 import java.util.Scanner;
 
 public class PatientManagementUI {
+    private ADTHeap<Visit> visitQueue;
+    private DoctorManager docManager;
     private QueueManager queueManager;
     private PatientManager patientManager;
     private Scanner scanner;
 
-    public PatientManagementUI(ADTHeap<Visit> sharedVisitQueue) {
-        queueManager = new QueueManager(sharedVisitQueue);
+    public PatientManagementUI(ADTHeap<Visit> sharedVisitQueue, QueueManager queueManager, DoctorManager docManager) {
+        this.visitQueue = sharedVisitQueue;
+        this.docManager = docManager;
+        this.queueManager = queueManager;
         patientManager = new PatientManager();
         scanner = new Scanner(System.in);
     }
@@ -29,7 +34,7 @@ public class PatientManagementUI {
                     handleNewPatientRegistration();
                     break;
                 case 2:
-                    VisitRegistrationUI visitUI = new VisitRegistrationUI(queueManager, patientManager);
+                    VisitRegistrationUI visitUI = new VisitRegistrationUI(visitQueue, queueManager, patientManager);
                     visitUI.handleVisitRegistration();
                     break;
                 case 3:
