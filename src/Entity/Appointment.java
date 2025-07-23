@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
  * @author calve
  */
 public class Appointment implements Comparable<Appointment>{
+    private static int idNo = 0; 
+    private String apptID;
     private String patientName; // patient id
     private String phoneNum;
     private Doctor doctor;
@@ -18,12 +20,19 @@ public class Appointment implements Comparable<Appointment>{
     private LocalDateTime time;
     
     public Appointment(String patientName, String phoneNum, Doctor doctor, int severity, LocalDateTime time){
+        apptID = "A" + String.format("%04d", generateId()); 
         this.patientName = patientName;
         this.phoneNum = phoneNum;
         this.doctor = doctor;
         this.severity = severity;
         this.time = time;
     }
+    
+    private static int generateId() {
+        idNo += 1; 
+        return idNo; 
+    }
+    
     
     public String getPatientName(){
         return patientName;

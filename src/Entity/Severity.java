@@ -12,6 +12,15 @@ public enum Severity{
         this.severity = severity;
         this.description = description;
     }
+    
+    public static Severity fromValue(int value) {
+        for (Severity s : Severity.values()) {
+            if (s.getSeverity() == value) {
+                return s;
+            }
+        }
+        return null;
+    }
 
     public int getSeverity() {
         return severity;

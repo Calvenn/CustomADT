@@ -18,6 +18,14 @@ public class TreatmentManager {
         return false; 
     }
     
+    public Treatment findTreatment(String treatmentName) {
+        for(int i = 0; i < providedTreatments.size(); i++ ){
+            if(providedTreatments.get(i).getName().equalsIgnoreCase(treatmentName)) {
+                return providedTreatments.get(i);
+            }  
+        } return null;
+    }
+    
 //        if(isNull(treatmentName) || treatmentName.trim().isEmpty()) throw new IllegalArgumentException("Treatment Name cannot be empty.");
 //        if(isNull(description)) throw new IllegalArgumentException("Description cannot be null.");
 //        if(isNull(duration)) throw new IllegalArgumentException("Duration cannot be null.");
