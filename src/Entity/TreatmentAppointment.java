@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
     
     private final String appointmentId; 
-    private String doctorId; //need change to entity afterwards 
-    private final String consultationId;  //need change to entity afterwards 
+    private Doctor doc; //need change to entity afterwards //done
+    private Consultation consult;  //need change to entity afterwards //done
     private final Treatment treatment; 
     private final String room;
     private LocalDateTime treatmentTime;  
@@ -21,10 +21,10 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
     
     private static int idNo = 0; 
     
-    protected TreatmentAppointment(String doctorId, String consultationId, Treatment treatment, String room, LocalDateTime treatmentTime, Severity severity) {
+    public TreatmentAppointment(Doctor doc, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, Severity severity) {
         appointmentId = "T" + String.format("%04d", generateId()); 
-        this.doctorId = doctorId; 
-        this.consultationId = consultationId; 
+        this.doc = doc; 
+        this.consult = consult; 
         this.treatment = treatment; 
         this.room = room; 
         this.treatmentTime = treatmentTime; 
@@ -45,12 +45,12 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
         return appointmentId; 
     }
      
-    public String getDoctorId() {
-        return doctorId; 
+    public Doctor getDoctor() {
+        return doc; 
     }
      
-    public String getConsultationId() {
-        return consultationId; 
+    public Consultation getConsultation() {
+        return consult; 
     }
     
     public Treatment getTreatment() {
@@ -73,8 +73,8 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
         return treatmentStatus;  
     }
      
-    public void setDoctorId(String doctorId) {  //need change to entity afterwards 
-        this.doctorId = doctorId; 
+    public void setDoctor(Doctor doctor) {  
+        this.doc = doctor; 
     }
      
     public void setTreatmentStatus(String treatmentStatus) {
@@ -110,7 +110,7 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
                 Treatment Time: %s
                 Treatment Status: %s
             """, 
-           this.appointmentId, this.doctorId, this.consultationId, this.treatment, this.room, this.treatmentTime, this.treatmentStatus
+           this.appointmentId, this.doc, this.consult, this.treatment, this.room, this.treatmentTime, this.treatmentStatus
         ); 
     }
     

@@ -11,8 +11,10 @@ import Control.AppointmentManager;
 import Control.QueueManager;
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.TreatmentAppointment;
 import Entity.Visit;
 import adt.ADTHeap;
+import adt.ADTQueue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -26,6 +28,7 @@ public class Main {
         ADTHeap<Doctor> sharedDoc = new ADTHeap<>(false);
         ADTHeap<Visit> sharedVisitQueue = new ADTHeap<>(true);
         ADTHeap<Appointment> sharedApptHeap = new ADTHeap<>(false);
+        ADTQueue<TreatmentAppointment> treatmentQueue = new ADTQueue<>();
         
         DoctorManager docManager = new DoctorManager(sharedDoc);
         AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);
@@ -34,7 +37,7 @@ public class Main {
         //loadDummyAppointments(apptManager);
         loadDummyDoctors(docManager);
         
-        ConsultationUI consultUI = new ConsultationUI(sharedVisitQueue, docManager, apptManager);
+        ConsultationUI consultUI = new ConsultationUI(sharedVisitQueue, docManager, apptManager, treatmentQueue);
         PatientManagementUI patientUI = new PatientManagementUI(sharedVisitQueue, queueManager, docManager);
         
         int choice;

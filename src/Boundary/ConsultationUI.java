@@ -3,11 +3,16 @@ package Boundary;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Control.DoctorManager; //TEMP
+import Control.TreatmentManager;
 
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Severity;
 import Entity.Visit;
+import Entity.Treatment;
+import Entity.TreatmentAppointment;
 import adt.ADTHeap;
+import adt.ADTQueue;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,27 +26,30 @@ import java.util.Scanner;
  */
 public class ConsultationUI {
     private final ADTHeap<Visit> queue;
+    private ADTQueue<TreatmentAppointment> treatmentQueue;
     private AppointmentUI apptUI;
     private AppointmentManager apptManager;
     private ConsultationManager consultManager;
     private DoctorManager docManager;
+    private TreatmentManager trtManager;
     private Doctor currentDoc = null;
     private Scanner scanner;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ConsultationUI(ADTHeap<Visit> queue, DoctorManager docManager, AppointmentManager apptManager) {
+    public ConsultationUI(ADTHeap<Visit> queue, DoctorManager docManager, AppointmentManager apptManager, ADTQueue<TreatmentAppointment> treatmentQueue) {
         this.queue = queue;
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
-        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap(), docManager);
+        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap(), docManager, treatmentQueue);
+        this.trtManager = new TreatmentManager();
         this.scanner = new Scanner(System.in);
     }
     
     //handle in doctor ui
     private boolean doctorLogin() {
         System.out.println("\n--- Doctor Login ---");
-        System.out.print("Enter your ID (e.g. V001): ");
+        System.out.print("Enter your ID (e.g. D001): ");
         String docId = scanner.nextLine().trim();
         
         currentDoc = docManager.findDoctor(docId);
@@ -134,12 +142,17 @@ public class ConsultationUI {
                 scanner.nextLine();
 
                 switch (action) {
-                    case 1 -> apptUI.bookAppointmentUI(
+                    case 1 -> {
+                        apptUI.bookAppointmentUI(
                                 appointment.getPatientName(), 
                                 appointment.getPhoneNum(), 
                                 appointment.getDoctor().getDoctorID(), 
                                 appointment.getSeverity(), 
                                 currentDoc);
+                        if(isToPharmacy()) consultManager.toPharmacy();
+                    }
+                    case 2 -> toTreatmentUI(currentDoc);
+                    case 3 -> consultManager.toPharmacy();
                     default -> System.out.println("Done.");
                 }
             }
@@ -164,12 +177,17 @@ public class ConsultationUI {
                 scanner.nextLine();
 
                 switch (action) {
-                    case 1 -> apptUI.bookAppointmentUI(
+                    case 1 ->{ 
+                        apptUI.bookAppointmentUI(
                                 visit.getPatient().getPatientName(), 
                                 visit.getPatient().getPatientPhoneNo(), 
                                 visit.getDoctor().getDoctorName(), 
                                 visit.getSeverityLevel().getSeverity(),
                                 currentDoc);
+                        if(isToPharmacy()) consultManager.toPharmacy();        
+                    }
+                    case 2 -> toTreatmentUI(currentDoc);
+                    case 3 -> consultManager.toPharmacy();
                     default -> System.out.println("Done.");
                 }
             }
@@ -177,7 +195,39 @@ public class ConsultationUI {
             System.out.println("Unknown patient type.");
         }
     }
-
-
     
+    private void toTreatmentUI(Doctor doc){
+        System.out.println("\n--- Select Treatment ---");
+        trtManager.displayAllTreatments();
+        
+        System.out.println("Enter treatment name to assign: ");
+        String name = scanner.nextLine();
+        
+        Treatment selected = trtManager.findTreatment(name);
+        if (selected == null) {
+            System.out.println("Treatment not found.");
+            return;
+        }
+        
+        System.out.println("Enter room: ");
+        String room = scanner.nextLine();
+        
+        LocalDateTime time = LocalDateTime.now();
+        
+        System.out.println("Enter severity (1-3): "); //TEMP
+        int sev = scanner.nextInt();
+        Severity severity = Severity.fromValue(sev);
+        consultManager.toTreatment(doc, selected, room, time ,severity);
+    }
+    
+    private boolean isToPharmacy(){
+        while(true){
+            System.out.println("Does patient need to collect medicine? (Y/N)");
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            if (input.equals("Y")) return true;
+            else if (input.equals("N")) return false;
+            else System.out.println("Please enter Y or N only.");
+        }
+    }  
 }

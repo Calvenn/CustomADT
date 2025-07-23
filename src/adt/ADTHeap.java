@@ -97,6 +97,16 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         return true;
     }
     
+    @Override
+    public boolean contains(E data){
+        for(int i=0; i<size; i++){
+            if(heap[i].equals(data)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /****************helper function**************/
     private void ensureSize(){
         if(size == heap.length){

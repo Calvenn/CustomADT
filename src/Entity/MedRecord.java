@@ -3,16 +3,16 @@ package Entity;
 public class MedRecord {
     private String recordID;
     private String patientName;
-    private String consultationType; // e.g., "General", "Emergency", "Follow-up"
-    private String medID;       // Link to Medicine table
+    private String consultationType; // e.g., "General", "Emergency", "Follow-up" //optional
+    private Medicine medRec;       // Link to Medicine table
     private int quantityTaken;
     private String timestamp;        // DateTime of when the medicine was issued
 
-    public MedRecord(String recordID, String patientName, String consultationType,String medID, int quantityTaken, String timestamp) {
+    public MedRecord(String recordID, String patientName, String consultationType,Medicine medRec, int quantityTaken, String timestamp) {
         this.recordID = recordID;
         this.patientName = patientName;
         this.consultationType = consultationType;
-        this.medID = medID;
+        this.medRec = medRec;
         this.quantityTaken = quantityTaken;
         this.timestamp = timestamp;
     }
@@ -20,7 +20,6 @@ public class MedRecord {
         this.recordID = "";
         this.patientName = "";
         this.consultationType = "";
-        this.medID = "";
         this.quantityTaken = 0;
         this.timestamp = "";
     }
@@ -35,8 +34,8 @@ public class MedRecord {
     public String getConsultationType() {
         return consultationType; 
     }
-    public String getMedID() { 
-        return medID; 
+    public Medicine getMedID() { 
+        return medRec; 
     }
     public int getQuantityTaken() { 
         return quantityTaken; 

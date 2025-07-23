@@ -7,9 +7,15 @@ package Control;
 import Entity.Doctor;
 import Entity.Appointment;
 import Entity.Consultation;
+import Entity.Severity;
 import Entity.Visit;
+import Entity.Treatment;
+import Entity.TreatmentAppointment;
+
 import adt.ADTHeap;
+import adt.ADTQueue;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 /**
@@ -20,12 +26,15 @@ public class ConsultationManager {
     private final ADTHeap<Consultation> consultationHeap;
     private ADTHeap<Appointment> appointmentHeap;
     private ADTHeap<Visit> queue;
+    private ADTQueue<TreatmentAppointment> treatmentQueue;
+    private static Consultation newConsult = null;
     private Scanner scanner = new Scanner(System.in);
     
-    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager) {
+    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager, ADTQueue<TreatmentAppointment> treatmentQueue) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultationHeap = new ADTHeap<>(true);
+        this.treatmentQueue = treatmentQueue;
     }
 
     public Object dispatchNextPatient(Doctor doc) {
@@ -70,13 +79,22 @@ public class ConsultationManager {
         System.out.print("Enter diagnosis/notes: ");
         String notes = scanner.nextLine();
         
-        Consultation newConsult = new Consultation(severity, notes); //patient id later on
-        consultationHeap.insert(newConsult);
+        newConsult = new Consultation(severity, notes); //patient id later on
+        consultationHeap.insert(newConsult); //chg to linkedhashmap afterward
         //docManager.updateDoctor();
         return true;
     }
     
     public void displayAllRecords(){
         consultationHeap.display();
+    }
+    
+    public void toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
+        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time, sev);
+        treatmentQueue.enqueue(trtAppt);
+    }
+    
+    public void toPharmacy(){
+    
     }
 }
