@@ -6,17 +6,27 @@ package Main;
  */
 import Boundary.ConsultationUI;
 import Boundary.PatientManagementUI;
+
 import Control.DoctorManager;
 import Control.AppointmentManager;
+import Control.ConsultationManager;
+import Control.MedicineControl;
 import Control.QueueManager;
+import Control.TreatmentManager;
+
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.MedRecord;
+import Entity.Medicine;
+import Entity.Treatment;
 import Entity.TreatmentAppointment;
 import Entity.Visit;
+
 import adt.ADTHeap;
 import adt.ADTQueue;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Duration; 
 import java.util.Scanner;
 /**
  *
@@ -28,60 +38,83 @@ public class Main {
         ADTHeap<Doctor> sharedDoc = new ADTHeap<>(false);
         ADTHeap<Visit> sharedVisitQueue = new ADTHeap<>(true);
         ADTHeap<Appointment> sharedApptHeap = new ADTHeap<>(false);
-        ADTQueue<TreatmentAppointment> treatmentQueue = new ADTQueue<>();
+        ADTHeap<Treatment> providedTreatments = new ADTHeap<>(true);
+        ADTHeap<Medicine> lowStockMed = new ADTHeap<>(false);
         
+        ADTQueue<TreatmentAppointment> treatmentQueue = new ADTQueue<>();
+        ADTQueue<MedRecord> medCollectQueue = new ADTQueue<>();
+           
         DoctorManager docManager = new DoctorManager(sharedDoc);
         AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);
         QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager);
+        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, treatmentQueue, medCollectQueue);
+        TreatmentManager trtManager = new TreatmentManager(providedTreatments); 
+        MedicineControl medControl = new MedicineControl(lowStockMed);
         
-        //loadDummyAppointments(apptManager);
         loadDummyDoctors(docManager);
-        
-        ConsultationUI consultUI = new ConsultationUI(sharedVisitQueue, docManager, apptManager, treatmentQueue);
+        loadDummyTreatment(trtManager);
+        loadDummyMed(medControl);
+
+        ConsultationUI consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl);
         PatientManagementUI patientUI = new PatientManagementUI(sharedVisitQueue, queueManager, docManager);
-        
+
         int choice;
         do {
             displayMainMenu();
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-            
-            switch(choice) {
-                case 1:
-                    // Patient Management System
-                    patientUI.patientMenu();
+            while (true) {
+                try {
+                    System.out.print("Enter your choice: ");
+                    choice = Integer.parseInt(scanner.nextLine());
+                    if (choice < 1 || choice > 66) {
+                        System.out.println("Invalid choice. Please enter 1 to 3.");
+                        continue;
+                    }
                     break;
-                case 2:
-                    // Consultation System                  
-                    consultUI.consultMainMenu();
-                    break;
-                case 3:
-                    System.out.println("\nThank you for using the Hospital System!");
-                    break;
-                default:
-                    System.out.println("\nInvalid choice. Please try again.");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                }
             }
-        } while (choice != 3);
+
+            switch (choice) {
+                case 1 -> patientUI.patientMenu();
+                case 2 -> consultUI.consultMainMenu();
+                //case 3 -> consultUI.consultMainMenu();
+                //case 4 -> consultUI.consultMainMenu();
+                //case 5 -> consultUI.consultMainMenu();
+                case 6 -> {
+                    System.out.println("Thank you for using the Clinic System!");
+                    System.exit(0);
+                }
+            }
+        } while (choice != 6);
     }
-    
+
     private static void displayMainMenu() {
         System.out.println("\n=== Clinic Management System ===");
         System.out.println("1. Patient Registration System");
-        System.out.println("2. Consultation System");
-        System.out.println("3. Exit");
-        System.out.print("\nEnter your choice: ");
+        System.out.println("2. Doctor Management System");
+        System.out.println("3. Consultation System");
+        System.out.println("4. Treatment System");
+        System.out.println("5. Pharmacy Control System");
+        System.out.println("6. Exit");
     }
-    /*
-    private static void loadDummyAppointments(AppointmentManager apptManager) {
-        apptManager.bookAppointment("Alice", "012-1231234", "Dr. Tan", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(0));
-        apptManager.bookAppointment("Bob", "012-2231234", "Dr. Lim", 2, LocalDateTime.now().plusWeeks(1).withHour(9).withMinute(30));
-        apptManager.bookAppointment("David", "012-2231234", "Dr. Ang", 3, LocalDateTime.now().plusWeeks(1).withHour(10).withMinute(0));
-    } */
-    
+
     private static void loadDummyDoctors(DoctorManager docManager) {
         docManager.addNewDoctor("D001", "John", 30, "012-1231234", "Man", "Head", LocalDate.now());
         docManager.addNewDoctor("D002", "Spider Man", 25, "012-1231234", "Man", "Doctor", LocalDate.now());
         docManager.addNewDoctor("D003", "Iron Man", 26, "012-1231234", "Man", "Assistant", LocalDate.now());
-    }   
-}    
+    }
+
+    private static void loadDummyTreatment(TreatmentManager trtManager) {
+        trtManager.newTreatment("abc", "test1", Duration.ofMinutes(30));
+        trtManager.newTreatment("bcd", "test12", Duration.ofMinutes(20));
+        trtManager.newTreatment("efg", "test123", Duration.ofMinutes(50));
+    }
+
+    private static void loadDummyMed(MedicineControl medControl) {
+        Medicine med = new Medicine("Panadol", "Panadol", "testest", "June", 100);
+        medControl.addMedicine(med);
+    }
+}
+
 

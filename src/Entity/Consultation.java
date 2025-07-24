@@ -11,20 +11,26 @@ package Entity;
 public class Consultation implements Comparable<Consultation>{
     //patient id as foreign key
     private static int idNo = 0; 
-    private String consultationID;
+    private final String consultationID;
+    private final Patient patient;
     private Integer severity;
     private String notes;
     
     
-    public Consultation(int severity, String notes){
-        consultationID = "C" + String.format("%04d", generateId()); 
+    public Consultation(int severity, Patient patient, String notes){
+        this.consultationID = "C" + String.format("%04d", generateId()); 
         this.severity = severity;
+        this.patient = patient;
         this.notes = notes;
     }
     
     private static int generateId() {
         idNo += 1; 
         return idNo; 
+    }
+        
+    public Patient getPatient() {
+        return patient;
     }
     
     public int getSeverity(){

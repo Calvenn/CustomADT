@@ -8,6 +8,10 @@ import java.time.Duration;
 public class TreatmentManager {
     private ADTHeap<Treatment> providedTreatments;
     
+    public TreatmentManager(ADTHeap<Treatment> providedTreatments){
+        this.providedTreatments = providedTreatments;
+    }
+    
     //if treatment names same, return true. else, return false
     public boolean treatmentExist(String treatmentName) {
         for(int i = 0; i < providedTreatments.size(); i++) {

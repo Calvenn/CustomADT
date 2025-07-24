@@ -3,16 +3,16 @@ package Boundary;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Control.DoctorManager; //TEMP
+import Control.MedicineControl;
 import Control.TreatmentManager;
 
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Medicine;
+import Entity.Patient;
 import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
-import Entity.TreatmentAppointment;
-import adt.ADTHeap;
-import adt.ADTQueue;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,24 +25,23 @@ import java.util.Scanner;
  * Author: calve
  */
 public class ConsultationUI {
-    private final ADTHeap<Visit> queue;
-    private ADTQueue<TreatmentAppointment> treatmentQueue;
-    private AppointmentUI apptUI;
-    private AppointmentManager apptManager;
-    private ConsultationManager consultManager;
-    private DoctorManager docManager;
-    private TreatmentManager trtManager;
-    private Doctor currentDoc = null;
-    private Scanner scanner;
+    private final AppointmentUI apptUI;
+    private final AppointmentManager apptManager;
+    private final ConsultationManager consultManager;
+    private final DoctorManager docManager;
+    private final TreatmentManager trtManager;
+    private final MedicineControl medControl;
+    private static Doctor currentDoc = null;
+    private final Scanner scanner;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ConsultationUI(ADTHeap<Visit> queue, DoctorManager docManager, AppointmentManager apptManager, ADTQueue<TreatmentAppointment> treatmentQueue) {
-        this.queue = queue;
+    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl) {
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
-        this.consultManager = new ConsultationManager(queue, apptManager.getAppointmentHeap(), docManager, treatmentQueue);
-        this.trtManager = new TreatmentManager();
+        this.consultManager = consultManager;
+        this.trtManager = trtManager;
+        this.medControl = medControl;
         this.scanner = new Scanner(System.in);
     }
     
@@ -55,17 +54,21 @@ public class ConsultationUI {
         currentDoc = docManager.findDoctor(docId);
 
         if (currentDoc != null) {
-            System.out.println("Login successful. Welcome, " + docId + "!");
+            System.out.println("Login successful. Welcome, " + currentDoc.getDoctorName() + "!");
             return true;
         } else {
-            System.out.println("No appointments found for that doctor. Please try again.");
+            System.out.println("No doctor found. Please try again.");
             return false;
         }
     }
-
     
-    public void consultMainMenu() {       
-        while (true && (doctorLogin() || currentDoc != null)) {
+    public void consultMainMenu() {     
+        if (currentDoc == null && !doctorLogin()) {
+            System.out.println("Login failed.");
+            return;
+        }
+        
+        while (true) {
             System.out.println("Total Appointment: " + apptManager.totalAppointments());
             System.out.println("Incoming Appointment: " + apptManager.getIncomingAppointment());
             //get incoming queue from patient & doc
@@ -75,7 +78,7 @@ public class ConsultationUI {
             System.out.println("2. Appointments");
             System.out.println("3. Back");
 
-            System.out.print("Choose > ");
+            System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // clear newline
 
@@ -122,102 +125,149 @@ public class ConsultationUI {
 
         System.out.println("\n--- Now Consulting ---");
 
+        Patient patient = null;
         if (currentPatient instanceof Appointment appointment) {
+            patient = appointment.getPatient();
             System.out.println("Type     : Appointment");
-            System.out.println("Patient  : " + appointment.getPatientName());
+            System.out.println("Patient  : " + patient.getPatientName());
             System.out.println("Doctor   : " + appointment.getDoctor().getDoctorName());
             System.out.println("Severity : " + appointment.getSeverity());
             System.out.println("Time     : " + appointment.getTime().format(formatter));
-
-            if (consultManager.consultationRecord()) {
-                System.out.println("Record saved.");
-
-                System.out.println("Next action:");
-                System.out.println("1. Schedule follow-up appointment");
-                System.out.println("2. Send to treatment");
-                System.out.println("3. Send to pharmacy");
-                System.out.println("4. Done");
-
-                int action = scanner.nextInt();
-                scanner.nextLine();
-
-                switch (action) {
-                    case 1 -> {
-                        apptUI.bookAppointmentUI(
-                                appointment.getPatientName(), 
-                                appointment.getPhoneNum(), 
-                                appointment.getDoctor().getDoctorID(), 
-                                appointment.getSeverity(), 
-                                currentDoc);
-                        if(isToPharmacy()) consultManager.toPharmacy();
-                    }
-                    case 2 -> toTreatmentUI(currentDoc);
-                    case 3 -> consultManager.toPharmacy();
-                    default -> System.out.println("Done.");
-                }
-            }
-
         } else if (currentPatient instanceof Visit visit) {
+            patient = visit.getPatient();
             System.out.println("Type     : Walk-In");
-            System.out.println("Patient  : " + visit.getPatient().getPatientName());
+            System.out.println("Patient  : " + patient.getPatientName());
             System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
             System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());
             System.out.println("Symptoms : " + visit.getSymptoms());
+        } else {
+            System.out.println("Unknown patient type.");
+            return;
+        }
 
-            if (consultManager.consultationRecord()) {
-                System.out.println("Record saved.");
+        if (consultManager.consultationRecord(patient)) {
+            System.out.println("Record saved.");
 
+            while (true) {
                 System.out.println("Next action:");
                 System.out.println("1. Schedule follow-up appointment");
                 System.out.println("2. Send to treatment");
                 System.out.println("3. Send to pharmacy");
                 System.out.println("4. Done");
+                System.out.print("Choose > ");
 
-                int action = scanner.nextInt();
-                scanner.nextLine();
+                int action;
+                try {
+                    action = Integer.parseInt(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number (1-4).");
+                    continue;
+                }
 
                 switch (action) {
-                    case 1 ->{ 
-                        apptUI.bookAppointmentUI(
-                                visit.getPatient().getPatientName(), 
-                                visit.getPatient().getPatientPhoneNo(), 
-                                visit.getDoctor().getDoctorName(), 
-                                visit.getSeverityLevel().getSeverity(),
-                                currentDoc);
-                        if(isToPharmacy()) consultManager.toPharmacy();        
+                    case 1 -> {
+                        String docId = currentPatient instanceof Appointment appt ? 
+                                       appt.getDoctor().getDoctorID() : 
+                                       ((Visit) currentPatient).getDoctor().getDoctorID();
+
+                        int sev = currentPatient instanceof Appointment appt ?
+                                  appt.getSeverity() :
+                                  ((Visit) currentPatient).getSeverityLevel().getSeverity();
+
+                        apptUI.bookAppointmentUI(patient, docId, sev, currentDoc);
+
+                        if (isToPharmacy()) {
+                            toPharmacyUI(currentDoc, patient);
+                        }
+                        return;
                     }
-                    case 2 -> toTreatmentUI(currentDoc);
-                    case 3 -> consultManager.toPharmacy();
-                    default -> System.out.println("Done.");
+                    case 2 -> {
+                        toTreatmentUI(currentDoc);
+                        return;
+                    }
+                    case 3 -> {
+                        toPharmacyUI(currentDoc, patient);
+                        return;
+                    }
+                    case 4 -> {
+                        System.out.println("Done.");
+                        return;
+                    }
+                    default -> System.out.println("Please choose a valid option (1-4).");
                 }
             }
-        } else {
-            System.out.println("Unknown patient type.");
         }
     }
     
-    private void toTreatmentUI(Doctor doc){
-        System.out.println("\n--- Select Treatment ---");
-        trtManager.displayAllTreatments();
-        
-        System.out.println("Enter treatment name to assign: ");
-        String name = scanner.nextLine();
-        
-        Treatment selected = trtManager.findTreatment(name);
-        if (selected == null) {
-            System.out.println("Treatment not found.");
-            return;
+    private void toTreatmentUI(Doctor doc) {
+        while (true) {
+            System.out.println("\n--- Select Treatment ---");
+            trtManager.displayAllTreatments();
+
+            System.out.println("Enter treatment name to assign: ");
+            String name = scanner.nextLine();
+
+            Treatment selected = trtManager.findTreatment(name);
+            if (selected == null) {
+                System.out.println("Treatment not found. Please try again.\n");
+                continue;
+            }
+
+            System.out.println("Enter room: ");
+            String room = scanner.nextLine();
+
+            System.out.println("Enter severity (1-3): ");
+            int sev;
+            try {
+                sev = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number. Please enter 1-3.");
+                continue;
+            }
+
+            Severity severity = Severity.fromValue(sev);
+
+            LocalDateTime time = LocalDateTime.now();
+            if (consultManager.toTreatment(doc, selected, room, time, severity)) {
+                System.out.println("Treatment recorded.");
+                break;
+            } else {
+                System.out.println("Failed to assign treatment. Please try again.");
+            }
         }
-        
-        System.out.println("Enter room: ");
-        String room = scanner.nextLine();
-        
-        LocalDateTime time = LocalDateTime.now();
-        
-        System.out.println("Enter severity (1-3): "); //TEMP
-        int sev = scanner.nextInt();
-        Severity severity = Severity.fromValue(sev);
-        consultManager.toTreatment(doc, selected, room, time ,severity);
+    }
+    
+    private void toPharmacyUI(Doctor doc, Patient patient) {
+        while (true) {
+            System.out.println("\n--- Medicine Record ---");
+            medControl.displayAllStock();
+
+            System.out.println("Enter Medicine Name/ID: ");
+            String medName = scanner.nextLine();
+
+            Medicine selected = medControl.findMedicine(medName);
+            if (selected == null) {
+                System.out.println("Medicine not found. Please try again.\n");
+                continue;
+            }
+
+            System.out.println("Quantity taken: ");
+            int qty;
+            try {
+                qty = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid quantity. Please enter a number.");
+                continue;
+            }
+
+            LocalDateTime time = LocalDateTime.now();
+            if (consultManager.toPharmacy(doc, patient, selected, qty, time)) {
+                System.out.println("Medicine collection recorded.");
+                break;
+            } else {
+                System.out.println("Failed to record. Please check and try again.");
+            }
+        }
     }
     
     private boolean isToPharmacy(){

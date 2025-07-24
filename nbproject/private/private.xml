@@ -4,15 +4,16 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Control/ConsultationManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/TreatmentAppointment.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/Appointment.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Control/AppointmentManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/Treatment.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Main/Main.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Control/QueueManager.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Boundary/AppointmentUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/Consultation.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Control/DoctorManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Boundary/ConsultationUI.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Boundary/VisitRegistrationUI.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Boundary/PatientManagementUI.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/Doctor.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Control/TreatmentManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/HeapInterface/src/Entity/Severity.java</file>
         </group>
     </open-files>
 </project-private>

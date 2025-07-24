@@ -7,6 +7,9 @@ package Control;
 import Entity.Doctor;
 import Entity.Appointment;
 import Entity.Consultation;
+import Entity.MedRecord;
+import Entity.Medicine;
+import Entity.Patient;
 import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
@@ -24,17 +27,21 @@ import java.util.Scanner;
  */
 public class ConsultationManager {
     private final ADTHeap<Consultation> consultationHeap;
-    private ADTHeap<Appointment> appointmentHeap;
-    private ADTHeap<Visit> queue;
-    private ADTQueue<TreatmentAppointment> treatmentQueue;
-    private static Consultation newConsult = null;
-    private Scanner scanner = new Scanner(System.in);
+    private final ADTHeap<Appointment> appointmentHeap;
+    private final ADTHeap<Visit> queue;
     
-    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager, ADTQueue<TreatmentAppointment> treatmentQueue) {
+    private final ADTQueue<TreatmentAppointment> treatmentQueue;
+    private final ADTQueue<MedRecord> medCollectQueue;
+    
+    private static Consultation newConsult = null;
+    private final Scanner scanner = new Scanner(System.in);
+    
+    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager, ADTQueue<TreatmentAppointment> treatmentQueue, ADTQueue<MedRecord> medCollectQueue) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultationHeap = new ADTHeap<>(true);
         this.treatmentQueue = treatmentQueue;
+        this.medCollectQueue = medCollectQueue;
     }
 
     public Object dispatchNextPatient(Doctor doc) {
@@ -68,10 +75,7 @@ public class ConsultationManager {
         }
     }
         
-    public boolean consultationRecord(){
-        //check patient flag see whether it is true or not if not thn set the severity in patient module 
-        
-        //get severity table from patient
+    public boolean consultationRecord(Patient patient){
         System.out.print("Enter severity level: ");
         int severity = scanner.nextInt();
         scanner.nextLine();
@@ -79,7 +83,7 @@ public class ConsultationManager {
         System.out.print("Enter diagnosis/notes: ");
         String notes = scanner.nextLine();
         
-        newConsult = new Consultation(severity, notes); //patient id later on
+        newConsult = new Consultation(severity, patient, notes); //patient id later on
         consultationHeap.insert(newConsult); //chg to linkedhashmap afterward
         //docManager.updateDoctor();
         return true;
@@ -89,12 +93,30 @@ public class ConsultationManager {
         consultationHeap.display();
     }
     
-    public void toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
+    public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
+        if (doc == null || treatment == null || room == null || time == null || sev == null) {
+            System.out.println("Missing required information for treatment appointment.");
+            return false;
+        }     
+        
         TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time, sev);
         treatmentQueue.enqueue(trtAppt);
+        return true;
     }
     
-    public void toPharmacy(){
-    
+    public boolean toPharmacy(Doctor doc, Patient patient, Medicine med, int qty, LocalDateTime time){
+        if (doc == null || patient == null || med == null || time == null) {
+            System.out.println("Missing data for medicine dispensing.");
+            return false;
+        }
+        
+        if (qty <= 0) {
+            System.out.println("Quantity must be greater than 0.");
+            return false;
+        }
+        
+        MedRecord medCollect = new MedRecord(patient, doc, med, qty, time);
+        medCollectQueue.enqueue(medCollect);
+        return true;
     }
 }

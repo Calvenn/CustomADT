@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 public class MedicineControl {
     private ADTHeap<Medicine> lowStockHeap;
 
-    public MedicineControl() {
-        lowStockHeap = new ADTHeap<>(false); // Min-Heap by default
+    public MedicineControl(ADTHeap<Medicine> lowStockHeap) {
+        this.lowStockHeap = lowStockHeap;
     }
 
     public void addMedicine(Medicine med) {
@@ -22,9 +22,7 @@ public class MedicineControl {
 
     // Display all medicines in heap (unsorted)
     public void displayAllStock() {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            System.out.println(lowStockHeap.get(i)); 
-        }
+        lowStockHeap.display();
     }
     
     public boolean updateStock(String batchID, int newStock) {// this one only same batch of med in same expiry date
@@ -42,6 +40,16 @@ public class MedicineControl {
         return false; // not found
     }
     
+    public Medicine findMedicine(String medToFind) {
+        for (int i = 0; i < lowStockHeap.size(); i++) {
+            Medicine med = lowStockHeap.get(i);
+            if (med.getMedID ().equals(medToFind) || med.getName().equalsIgnoreCase(medToFind)) {
+                return med;
+            }
+        }
+      return null;
+    }
+
     public boolean removeExpiredMedicine(String batchID) {
         for (int i = 0; i < lowStockHeap.size(); i++) {
             Medicine med = lowStockHeap.get(i);
@@ -57,17 +65,6 @@ public class MedicineControl {
         LocalDate exp = LocalDate.parse(med.getExpiryDate(), 
                 DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         return exp.isBefore(today);
-    }
-
-    public Medicine findMedicineByID(String medID) {
-        //use hashMap for this to store same med but diff batch??
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
-            if (med.getMedID ().equals(medID)) {
-                return med;
-            }
-        }
-        return null;
     }
     
     // Extract the most urgent (lowest stock) medicine

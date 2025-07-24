@@ -7,7 +7,7 @@ package Boundary;
 import Entity.Appointment;
 import Entity.Doctor;
 import Control.AppointmentManager;
-import Control.ConsultationManager;
+import Entity.Patient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,7 +57,7 @@ public class AppointmentUI {
         }
     }
     
-    void bookAppointmentUI(String patient, String phoneNum, String doctor, int severity, Doctor currentDoc) {
+    void bookAppointmentUI(Patient patient, String doctor, int severity, Doctor currentDoc) {
         LocalDateTime time = null;
 
         while (true) {
@@ -68,7 +68,7 @@ public class AppointmentUI {
             try {
                 time = LocalDateTime.parse(input, formatter);
 
-                boolean success = apptManager.bookAppointment(patient, phoneNum, doctor, severity, time, currentDoc);
+                boolean success = apptManager.bookAppointment(patient, doctor, severity, time, currentDoc);
                 if (success) {
                     System.out.println("Appointment booked successfully!");
                     break;
@@ -81,7 +81,6 @@ public class AppointmentUI {
         }
     }
 
-    
     private void updateAppointmentUI() {
         System.out.print("Enter patient phone number: ");
         String phoneNum = scanner.nextLine();
@@ -109,7 +108,7 @@ public class AppointmentUI {
         Appointment appt = apptManager.findPatienInfo(phoneNum, formatter);
 
         if(appt != null){
-            if(getConfirmation("Are you sure want to cancel patient " + appt.getPatientName() + " at " + appt.getTime() + " ?")){
+            if(getConfirmation("Are you sure want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getTime() + " ?")){
                 boolean success = apptManager.cancelAppointment(appt, formatter);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }

@@ -12,17 +12,15 @@ import java.time.format.DateTimeFormatter;
 public class Appointment implements Comparable<Appointment>{
     private static int idNo = 0; 
     private String apptID;
-    private String patientName; // patient id
-    private String phoneNum;
+    private Patient patient;
     private Doctor doctor;
     private int severity;
     private String doctorName; //chg to doc id after integration
     private LocalDateTime time;
     
-    public Appointment(String patientName, String phoneNum, Doctor doctor, int severity, LocalDateTime time){
+    public Appointment(Patient patient, Doctor doctor, int severity, LocalDateTime time){
         apptID = "A" + String.format("%04d", generateId()); 
-        this.patientName = patientName;
-        this.phoneNum = phoneNum;
+        this.patient = patient;
         this.doctor = doctor;
         this.severity = severity;
         this.time = time;
@@ -33,15 +31,10 @@ public class Appointment implements Comparable<Appointment>{
         return idNo; 
     }
     
-    
-    public String getPatientName(){
-        return patientName;
+    public Patient getPatient(){
+        return patient;
     }
-    
-    public String getPhoneNum(){
-        return phoneNum;
-    }
-    
+   
     public Doctor getDoctor(){
         return doctor;
     }
@@ -52,10 +45,6 @@ public class Appointment implements Comparable<Appointment>{
     
     public LocalDateTime getTime(){
         return time;
-    }
-    
-    public void setPatientName(String patientName){
-        this.patientName = patientName;
     }
     
     public void setDoctorName(String doctorName){
@@ -80,7 +69,7 @@ public class Appointment implements Comparable<Appointment>{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return "Appointment Details:\n"
              + " Date & Time : " + time.format(formatter) + "\n"
-             + " Patient     : " + patientName + " (" + phoneNum + ")\n"
+            // + " Patient     : " + patientName + " (" + phoneNum + ")\n"
              + " Doctor      : " + doctor.getDoctorName() + "\n"
              + " Severity    : " + severity;
     }
