@@ -3,6 +3,7 @@ package Control;
 import adt.ADTHeap;
 import Entity.Appointment;
 import Entity.Doctor;
+import Entity.Patient;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,8 +70,8 @@ public class AppointmentManager {
     public Appointment findPatienInfo(String phoneNum, DateTimeFormatter f){
         for(int i=0; i< appointmentHeap.size();i++){
             Appointment appt = appointmentHeap.get(i);
-            if (appt.getPhoneNum().equals(phoneNum)){
-                System.out.println("Patient Name: " + appt.getPatientName());
+            if (appt.getPatient().getPatientPhoneNo().equals(phoneNum)){
+                System.out.println("Patient Name: " + appt.getPatient().getPatientName());
                 System.out.println("Current appointment: " + appt.getTime().format(f));
                 return appt;
             }
@@ -78,7 +79,7 @@ public class AppointmentManager {
         return null;
     }
 
-    public boolean bookAppointment(String patientName, String phoneNum ,String doctorName, int severity ,LocalDateTime time, Doctor currentDoc) {
+    public boolean bookAppointment(Patient patient,String doctorName, int severity ,LocalDateTime time, Doctor currentDoc) {
         System.out.println("Earliest available ");
         if (time.isBefore(LocalDateTime.now())) {
             System.out.println("Cannot book in the past.");
@@ -99,7 +100,7 @@ public class AppointmentManager {
             }
         }
 
-        Appointment newAppt = new Appointment(patientName, phoneNum, currentDoc, severity, time);
+        Appointment newAppt = new Appointment(patient, currentDoc, severity, time);
         appointmentHeap.insert(newAppt);
         return true;
     }
@@ -110,10 +111,9 @@ public class AppointmentManager {
     
     public boolean updateAppointment(Appointment oldAppt, LocalDateTime newTime, DateTimeFormatter f) {
         Appointment newAppt = new Appointment(
-            oldAppt.getPatientName(),
-            oldAppt.getPhoneNum(),
+            oldAppt.getPatient(),
             oldAppt.getDoctor(),
-                1,
+                1, //ammendmentttttttttttttttttttttttt
             newTime
         );
         return appointmentHeap.update(oldAppt, newAppt); // ✅ Fixed

@@ -5,8 +5,8 @@ import adt.ADTHeap;
 public class MedicineControl {
     private ADTHeap<Medicine> lowStockHeap;
 
-    public MedicineControl() {
-        lowStockHeap = new ADTHeap<>(false); // Min-Heap by default
+    public MedicineControl(ADTHeap<Medicine> lowStockHeap) {
+        this.lowStockHeap = lowStockHeap;
     }
 
     // Add a new medicine
@@ -27,9 +27,7 @@ public class MedicineControl {
 
     // Display all medicines in heap (unsorted)
     public void displayAllStock() {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            System.out.println(lowStockHeap.get(i)); 
-        }
+        lowStockHeap.display();
     }
     
     public boolean updateStock(String medID, int newStock) {
@@ -50,10 +48,10 @@ public class MedicineControl {
         return false; // not found
     }
     
-    public Medicine findMedicineByID(String medID) {
+    public Medicine findMedicine(String medToFind) {
         for (int i = 0; i < lowStockHeap.size(); i++) {
             Medicine med = lowStockHeap.get(i);
-            if (med.getMedID ().equals(medID)) {
+            if (med.getMedID ().equals(medToFind) || med.getName().equalsIgnoreCase(medToFind)) {
                 return med;
             }
         }
