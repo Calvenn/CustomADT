@@ -77,8 +77,12 @@ public class Main {
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
-                case 2 -> consultUI.consultMainMenu();
-                //case 3 -> consultUI.consultMainMenu();
+                //case 2 -> consultUI.consultMainMenu();
+                case 3 -> {
+                    System.out.println("Treatment queue: " + treatmentQueue.size());
+                    System.out.println("Med Collection queue: " + medCollectQueue.size());
+                    consultUI.consultMainMenu();
+                }
                 //case 4 -> consultUI.consultMainMenu();
                 //case 5 -> consultUI.consultMainMenu();
                 case 6 -> {

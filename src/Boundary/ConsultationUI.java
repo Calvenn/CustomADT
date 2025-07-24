@@ -77,6 +77,7 @@ public class ConsultationUI {
             System.out.println("1. Handle Consultation");
             System.out.println("2. Appointments");
             System.out.println("3. Back");
+            System.out.println("4. Log Out");
 
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
@@ -87,6 +88,11 @@ public class ConsultationUI {
                 case 2 -> apptUI.apptMenu();
                 case 3 -> {
                     System.out.println("Returning to main menu...");
+                    return;
+                }
+                case 4 -> {
+                    System.out.println("Thank You " + currentDoc.getDoctorName());
+                    currentDoc = null;
                     return;
                 }
                 default -> System.out.println("Invalid choice.\n");
