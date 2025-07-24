@@ -2,9 +2,10 @@ package Entity;
 
 public class Medicine implements Comparable<Medicine>{
     private String medID;
+    private String batchID;
     private String name;
     private String desc;
-    private String expiryDate;
+    private String expiryDate; //format:"yyyy-MM-dd"
     private int stock; 
     
     public Medicine(){
@@ -17,14 +18,27 @@ public class Medicine implements Comparable<Medicine>{
     
     public Medicine(String medID, String name, String desc, String expiryDate,int stock){
         this.medID = medID;
+        this.batchID = medID + "-" + expiryDate.replaceAll("-","");
         this.name = name;
         this.desc = desc;
         this.expiryDate = expiryDate;
         this.stock = stock;
     }
     
+    public Medicine(Medicine original){
+        this.medID = original.medID;
+        this.batchID = original.batchID;
+        this.name = original.name;
+        this.desc = original.desc;
+        this.expiryDate = original.expiryDate;
+        this.stock = original.stock;
+    }
+    
     public String getMedID(){
         return medID;
+    }
+    public String getBatchID(){
+        return batchID;
     }
     public String getName(){
         return name;
