@@ -15,8 +15,8 @@ import Entity.Visit;
 import Entity.Treatment;
 import Entity.TreatmentAppointment;
 
-import adt.ADTHeap;
-import adt.ADTQueue;
+import adt.Heap;
+import adt.Queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -26,20 +26,20 @@ import java.util.Scanner;
  * @author calve
  */
 public class ConsultationManager {
-    private final ADTHeap<Consultation> consultationHeap;
-    private final ADTHeap<Appointment> appointmentHeap;
-    private final ADTHeap<Visit> queue;
+    private final Heap<Consultation> consultationHeap;
+    private final Heap<Appointment> appointmentHeap;
+    private final Heap<Visit> queue;
     
-    private final ADTQueue<TreatmentAppointment> treatmentQueue;
-    private final ADTQueue<MedRecord> medCollectQueue;
+    private final Queue<TreatmentAppointment> treatmentQueue;
+    private final Queue<MedRecord> medCollectQueue;
     
     private static Consultation newConsult = null;
     private final Scanner scanner = new Scanner(System.in);
     
-    public ConsultationManager(ADTHeap<Visit> queue, ADTHeap<Appointment> appointmentHeap, DoctorManager docManager, ADTQueue<TreatmentAppointment> treatmentQueue, ADTQueue<MedRecord> medCollectQueue) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
-        this.consultationHeap = new ADTHeap<>(true);
+        this.consultationHeap = new Heap<>(true);
         this.treatmentQueue = treatmentQueue;
         this.medCollectQueue = medCollectQueue;
     }

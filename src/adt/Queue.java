@@ -9,12 +9,12 @@ package adt;
  *
  * @author calve
  */
-public class ADTQueue<E> implements QueueInterface<E>{
+public class Queue<E> implements QueueInterface<E>{
     private static final int SIZE = 100;
     private Object[] items;
     private int front, back;
     
-    public ADTQueue(){
+    public Queue(){
         items = new Object[SIZE];
         front = 0;
         back = 0;

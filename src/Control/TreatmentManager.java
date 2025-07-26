@@ -1,14 +1,14 @@
 package Control;
-import adt.ADTHeap; 
+import adt.Heap; 
 import Entity.Treatment; 
 import java.time.Duration; 
 
 //input data format validation should be in boundary, business logic validation in control 
 
 public class TreatmentManager {
-    private ADTHeap<Treatment> providedTreatments;
+    private Heap<Treatment> providedTreatments;
     
-    public TreatmentManager(ADTHeap<Treatment> providedTreatments){
+    public TreatmentManager(Heap<Treatment> providedTreatments){
         this.providedTreatments = providedTreatments;
     }
     

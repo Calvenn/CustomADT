@@ -1,6 +1,6 @@
 package Control;
 import Entity.Doctor;
-import adt.ADTHeap;
+import adt.Heap;
 import java.time.LocalDate;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
@@ -12,9 +12,9 @@ import java.time.LocalDate;
  * @author tanjixian
  */
 public class DoctorManager {
-    private ADTHeap<Doctor> doctorHeap;
+    private Heap<Doctor> doctorHeap;
     
-    public DoctorManager(ADTHeap<Doctor> doctorHeap){
+    public DoctorManager(Heap<Doctor> doctorHeap){
         this.doctorHeap = doctorHeap;
     }
     
