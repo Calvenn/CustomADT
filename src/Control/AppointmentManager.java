@@ -1,6 +1,6 @@
 package Control;
 
-import adt.ADTHeap;
+import adt.Heap;
 import Entity.Appointment;
 import Entity.Doctor;
 import Entity.Patient;
@@ -16,15 +16,15 @@ import java.time.format.DateTimeFormatter;
  * Author: calve
  */
 public class AppointmentManager {
-    private final ADTHeap<Appointment> appointmentHeap;
+    private final Heap<Appointment> appointmentHeap;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
 
     public AppointmentManager() {
-        appointmentHeap = new ADTHeap<>(false); 
+        appointmentHeap = new Heap<>(false); 
     }
     
-    public AppointmentManager(ADTHeap<Appointment> sharedHeap) {
+    public AppointmentManager(Heap<Appointment> sharedHeap) {
         this.appointmentHeap = sharedHeap;
     }
 
@@ -139,7 +139,7 @@ public class AppointmentManager {
         return appointmentHeap.get(index);
     }
     
-    public ADTHeap<Appointment> getAppointmentHeap() {
+    public Heap<Appointment> getAppointmentHeap() {
         return appointmentHeap;
     }
 }

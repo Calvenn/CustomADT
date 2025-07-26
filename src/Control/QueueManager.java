@@ -5,7 +5,7 @@ import Entity.Severity;
 import Entity.Doctor;
 import Control.DoctorManager;
 import Boundary.ConsultationUI;
-import adt.ADTHeap;
+import adt.Heap;
 import java.time.LocalDate;
 
 /*1. Initialize max heap
@@ -27,14 +27,14 @@ import java.time.LocalDate;
  */
 
 public class QueueManager {
-    private ADTHeap<Visit> visitQueue;
+    private Heap<Visit> visitQueue;
     private int queueNumber;
     private DoctorManager docManager;
     public boolean isEmpty() {
         return visitQueue.isEmpty();
     }
 
-    public QueueManager(ADTHeap<Visit> sharedQueue, DoctorManager docManager) {
+    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         queueNumber = 1000;

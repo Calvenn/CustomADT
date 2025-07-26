@@ -1,13 +1,13 @@
 package Control;
 import Entity.Medicine;
-import adt.ADTHeap;
+import adt.Heap;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class MedicineControl {
-    private ADTHeap<Medicine> lowStockHeap;
+    private Heap<Medicine> lowStockHeap;
 
-    public MedicineControl(ADTHeap<Medicine> lowStockHeap) {
+    public MedicineControl(Heap<Medicine> lowStockHeap) {
         this.lowStockHeap = lowStockHeap;
     }
 

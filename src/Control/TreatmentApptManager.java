@@ -1,5 +1,5 @@
 package Control;
-import adt.ADTHeap; 
+import adt.Heap; 
 import Entity.TreatmentAppointment; 
 import Entity.Treatment; 
 import Entity.Severity; 
@@ -18,7 +18,7 @@ import Entity.Severity;
 
 
 public class TreatmentApptManager {
-    private ADTHeap<TreatmentAppointment> treatmentHistory; 
+    private Heap<TreatmentAppointment> treatmentHistory; 
     
     public boolean newTreatmentAppt() {
         

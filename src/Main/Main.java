@@ -22,8 +22,8 @@ import Entity.Treatment;
 import Entity.TreatmentAppointment;
 import Entity.Visit;
 
-import adt.ADTHeap;
-import adt.ADTQueue;
+import adt.Heap;
+import adt.Queue;
 
 import java.time.LocalDate;
 import java.time.Duration; 
@@ -35,14 +35,14 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ADTHeap<Doctor> sharedDoc = new ADTHeap<>(false);
-        ADTHeap<Visit> sharedVisitQueue = new ADTHeap<>(true);
-        ADTHeap<Appointment> sharedApptHeap = new ADTHeap<>(false);
-        ADTHeap<Treatment> providedTreatments = new ADTHeap<>(true);
-        ADTHeap<Medicine> lowStockMed = new ADTHeap<>(false);
+        Heap<Doctor> sharedDoc = new Heap<>(false);
+        Heap<Visit> sharedVisitQueue = new Heap<>(true);
+        Heap<Appointment> sharedApptHeap = new Heap<>(false);
+        Heap<Treatment> providedTreatments = new Heap<>(true);
+        Heap<Medicine> lowStockMed = new Heap<>(false);
         
-        ADTQueue<TreatmentAppointment> treatmentQueue = new ADTQueue<>();
-        ADTQueue<MedRecord> medCollectQueue = new ADTQueue<>();
+        Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
+        Queue<MedRecord> medCollectQueue = new Queue<>();
            
         DoctorManager docManager = new DoctorManager(sharedDoc);
         AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);

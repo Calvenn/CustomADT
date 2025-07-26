@@ -4,17 +4,17 @@ import Control.PatientManager;
 import Control.DoctorManager;
 import Entity.Patient;
 import Entity.Visit;
-import adt.ADTHeap;
+import adt.Heap;
 import java.util.Scanner;
 
 public class PatientManagementUI {
-    private ADTHeap<Visit> visitQueue;
+    private Heap<Visit> visitQueue;
     private DoctorManager docManager;
     private QueueManager queueManager;
     private PatientManager patientManager;
     private Scanner scanner;
 
-    public PatientManagementUI(ADTHeap<Visit> sharedVisitQueue, QueueManager queueManager, DoctorManager docManager) {
+    public PatientManagementUI(Heap<Visit> sharedVisitQueue, QueueManager queueManager, DoctorManager docManager) {
         this.visitQueue = sharedVisitQueue;
         this.docManager = docManager;
         this.queueManager = queueManager;

@@ -2,16 +2,16 @@ package Boundary;
 import Control.PatientManager;
 import Control.QueueManager;
 import Entity.Visit;
-import adt.ADTHeap;
+import adt.Heap;
 import java.util.Scanner;
 
 public class VisitRegistrationUI {
-    private ADTHeap<Visit> visitQueue;
+    private Heap<Visit> visitQueue;
     private Scanner scanner;
     private QueueManager queueManager;
     private PatientManager patientManager;
 
-    public VisitRegistrationUI(ADTHeap<Visit> visitQueue, QueueManager queueManager, PatientManager patientManager) {
+    public VisitRegistrationUI(Heap<Visit> visitQueue, QueueManager queueManager, PatientManager patientManager) {
         this.visitQueue = visitQueue;
         this.queueManager = queueManager;
         this.patientManager = patientManager;
