@@ -2,6 +2,12 @@ package adt;
 public class List<E> implements ListInterface<E>{
     private E[] array;
     private int numOfEntries;
+    private static final int DEFAULT_CAPACITY = 100;
+    
+    public List() {
+    array = (E[]) new Object[DEFAULT_CAPACITY];
+    numOfEntries = 0;
+    }
     
     @Override
     public boolean add(E data){
