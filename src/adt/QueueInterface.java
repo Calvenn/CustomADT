@@ -13,6 +13,7 @@ public interface QueueInterface<E> {
     void enqueue(E data);
     E dequeue();
     E peek();
+    E remove(E data);
     void display();
     boolean isEmpty();
     int size();

@@ -4,6 +4,8 @@ import adt.Heap;
 import Entity.Appointment;
 import Entity.Doctor;
 import Entity.Patient;
+import adt.LinkedHashMap;
+import adt.Queue;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,15 +19,17 @@ import java.time.format.DateTimeFormatter;
  */
 public class AppointmentManager {
     private final Heap<Appointment> appointmentHeap;
+    private LinkedHashMap<String, Queue<Appointment>> missAppt;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
-    private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
+    private final LocalTime WORK_END = LocalTime.of(20, 0);    // 17:00 //RMB CHANGEEEEEEEEEE
 
     public AppointmentManager() {
         appointmentHeap = new Heap<>(false); 
     }
     
-    public AppointmentManager(Heap<Appointment> sharedHeap) {
+    public AppointmentManager(Heap<Appointment> sharedHeap, LinkedHashMap<String, Queue<Appointment>> missAppt) {
         this.appointmentHeap = sharedHeap;
+        this.missAppt = missAppt;
     }
 
     public boolean isWithinWorkingHours(LocalDateTime time) {
@@ -79,13 +83,7 @@ public class AppointmentManager {
         return null;
     }
 
-    public boolean bookAppointment(Patient patient,String doctorName, int severity ,LocalDateTime time, Doctor currentDoc) {
-        System.out.println("Earliest available ");
-        if (time.isBefore(LocalDateTime.now())) {
-            System.out.println("Cannot book in the past.");
-            return false;
-        }
-
+    public boolean bookAppointment(Patient patient, int severity ,LocalDateTime time, Doctor currentDoc) {
         if (!isWithinWorkingHours(time)) {
             System.out.println("Time is outside working hours (08:00 to 17:00).");
             return false;
@@ -113,7 +111,7 @@ public class AppointmentManager {
         Appointment newAppt = new Appointment(
             oldAppt.getPatient(),
             oldAppt.getDoctor(),
-                1, //ammendmentttttttttttttttttttttttt
+            oldAppt.getSeverity(),
             newTime
         );
         return appointmentHeap.update(oldAppt, newAppt); // ✅ Fixed
@@ -122,17 +120,45 @@ public class AppointmentManager {
     public void displayAllAppointments() {
         appointmentHeap.display();
     }
-
-    public Appointment getIncomingAppointment() {
-        return appointmentHeap.peekRoot();
-    }
     
-    public Appointment getNextAppointment() {
-        return appointmentHeap.extractRoot();
+    public void displayAllAppointmentByDoctor(String docId){
+        boolean found = false;
+        for (int i = 0; i < appointmentHeap.size(); i++) {
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)) {
+                System.out.println(appt); 
+                found = true;
+            }
+        }
+        if(!found){
+            System.out.println("No appointment found");
+        }
     }
 
-    public int totalAppointments() {
-        return appointmentHeap.size();
+    public Appointment getIncomingAppointment(String docId) {
+        Appointment earliest = null;
+
+        for (int i = 0; i < appointmentHeap.size(); i++) {
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)) {
+                if (earliest == null) {
+                    earliest = appt;
+                }
+            }
+        }
+
+        return earliest;
+    }
+
+    public int totalAppointments(String docId) {
+        int totalAppt = 0;
+        for (int i = 0; i < appointmentHeap.size(); i++) {
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)) {
+                totalAppt++;
+            }
+        }
+        return totalAppt;
     }
 
     public Appointment getAppointment(int index) {
@@ -142,6 +168,66 @@ public class AppointmentManager {
     public Heap<Appointment> getAppointmentHeap() {
         return appointmentHeap;
     }
-}
+    
+    public void checkMissedAppt(String docId) {
+        if (!missAppt.containsKey(docId)) {
+            missAppt.put(docId, new Queue<>());
+        }
 
-//HOW TO ENSURE SMOOTH FLOW BETWEEN CONSULTATION & PHARMANCY????
+        Queue<Appointment> docQueue = missAppt.get(docId);
+
+        for (int i = 0; i < appointmentHeap.size(); i++) {
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)
+                    && (appt.getTime().isBefore(LocalDateTime.now()) || appt.getTime().equals(LocalDateTime.now()))) {
+                docQueue.enqueue(appt);
+                appointmentHeap.remove(appt);
+                System.out.println("Missed appointment moved to queue for " + docId);
+            }
+        }
+    }
+
+    public int getNumMissedAppt(String docId) {
+        if (missAppt.containsKey(docId)) {
+            return missAppt.get(docId).size();
+        }
+        return 0;
+    }
+    
+    public void displayAllMissedAppt(Doctor doc) {
+        if (missAppt.containsKey(doc.getDoctorID())) {
+            missAppt.display();
+        }
+    }
+    
+    public Appointment getMissedAppt(Doctor doc, String changedIC) {
+        Appointment found = null;
+        if (missAppt.containsKey(doc.getDoctorID())) {
+            found = missAppt.get(doc.getDoctorID()).peek();
+            if(found.getPatient().getPatientIC().equals(changedIC)){
+                return found;
+            }
+        }
+        return null;
+    }
+    
+    public boolean removeMissedAppt(Doctor doc, String patientIC) {
+        if (!missAppt.containsKey(doc.getDoctorID())) return false;
+
+        Queue<Appointment> originalQueue = missAppt.get(doc.getDoctorID());
+        Queue<Appointment> tempQueue = new Queue<>();
+        boolean removed = false;
+
+        while (!originalQueue.isEmpty()) {
+            Appointment appt = originalQueue.dequeue();
+            if (!removed && appt.getPatient().getPatientIC().equals(patientIC)) {
+                removed = true; // skip adding it to tempQueue
+            } else {
+                tempQueue.enqueue(appt);
+            }
+        }
+
+        missAppt.put(doc.getDoctorID(), tempQueue);
+        return removed;
+    }
+}
