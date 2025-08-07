@@ -14,8 +14,10 @@ import Control.MedicineControl;
 import Control.QueueManager;
 import Control.TreatmentManager;
 
+import Entity.Patient; //testing purpose
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Consultation;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Treatment;
@@ -23,10 +25,13 @@ import Entity.TreatmentAppointment;
 import Entity.Visit;
 
 import adt.Heap;
+import adt.LinkedHashMap;
 import adt.Queue;
 
 import java.time.LocalDate;
 import java.time.Duration; 
+import java.time.LocalDateTime; // testing purpose
+import java.time.Month;
 import java.util.Scanner;
 /**
  *
@@ -43,17 +48,21 @@ public class Main {
         
         Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
         Queue<MedRecord> medCollectQueue = new Queue<>();
+        
+        LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
+        LinkedHashMap<String, Consultation> consultLog = new LinkedHashMap<>();
            
         DoctorManager docManager = new DoctorManager(sharedDoc);
-        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);
+        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap, missAppt);
         QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager);
-        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, treatmentQueue, medCollectQueue);
+        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, consultLog, treatmentQueue, medCollectQueue);
         TreatmentManager trtManager = new TreatmentManager(providedTreatments); 
         MedicineControl medControl = new MedicineControl(lowStockMed);
         
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medControl);
+        loadDummyAppt(apptManager, docManager);
 
         ConsultationUI consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl);
         PatientManagementUI patientUI = new PatientManagementUI(sharedVisitQueue, queueManager, docManager);
@@ -118,6 +127,13 @@ public class Main {
     private static void loadDummyMed(MedicineControl medControl) {
         Medicine med = new Medicine("Panadol", "Panadol", "testest", "June", 100);
         medControl.addMedicine(med);
+    }
+    
+    private static void loadDummyAppt(AppointmentManager apptManager, DoctorManager docManager) {
+        Patient patient = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
+        Doctor doc = docManager.findDoctor("D001");
+        apptManager.bookAppointment(patient, 1, LocalDateTime.now(), doc);
+        apptManager.bookAppointment(patient, 2, LocalDateTime.of(2025, Month.DECEMBER, 12, 12, 30), doc);
     }
 }
 

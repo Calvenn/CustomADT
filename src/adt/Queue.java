@@ -9,63 +9,104 @@ package adt;
  *
  * @author calve
  */
-public class Queue<E> implements QueueInterface<E>{
+public class Queue<E> implements QueueInterface<E> {
     private static final int SIZE = 100;
     private Object[] items;
-    private int front, back;
-    
-    public Queue(){
+    private int front;
+    private int back;
+    private int count;
+
+    public Queue() {
         items = new Object[SIZE];
         front = 0;
         back = 0;
+        count = 0;
     }
-    
+
     @Override
-    public void enqueue(E data){
-        if(isFull()){
+    public void enqueue(E data) {
+        if (isFull()) {
             System.out.println("Queue is full");
             return;
         }
-        items[back++] = data;
+        items[back] = data;
+        back = (back + 1) % SIZE;
+        count++;
     }
-    
+
     @Override
-    public E dequeue(){
+    public E dequeue() {
         if (isEmpty()) {
             System.out.println("Queue is empty!");
             return null;
         }
-        return (E) items[front++];
+        E removed = (E) items[front];
+        front = (front + 1) % SIZE;
+        count--;
+        return removed;
     }
-    
+
     @Override
-    public E peek(){
+    public E peek() {
         if (isEmpty()) {
             System.out.println("Queue is empty!");
             return null;
         }
         return (E) items[front];
     }
-    
+
     @Override
-    public void display(){
-        for(int i = front; i < back; i++){
-            System.out.println(items[i]);
+    public void display() {
+        if (isEmpty()) {
+            System.out.println("Queue is empty!");
+            return;
+        }
+        System.out.println("Queue contents:");
+        for (int i = 0; i < count; i++) {
+            int index = (front + i) % SIZE;
+            System.out.println(items[index]);
         }
     }
-    
+
     @Override
-    public int size(){
-        return back - front;
+    public E remove(E data) {
+        if (isEmpty()) {
+            return null;
+        }
+
+        int i = front;
+        for (int j = 0; j < count; j++) {
+            if (items[i].equals(data)) {
+                // Shift elements left
+                for (int k = j; k < count - 1; k++) {
+                    int from = (front + k + 1) % SIZE;
+                    int to = (front + k) % SIZE;
+                    items[to] = items[from];
+                }
+
+                // Update back and count
+                back = (back - 1 + SIZE) % SIZE;
+                items[back] = null;     
+                count--;
+                return data;
+            }
+            i = (i + 1) % SIZE;
+        }
+
+        return null;
     }
-    
+
     @Override
-    public boolean isEmpty(){
-        return front == back;
+    public int size() {
+        return count;
     }
-    
-    /*Helper function*/
-    public boolean isFull(){
-        return back == SIZE;
+
+    @Override
+    public boolean isEmpty() {
+        return count == 0;
+    }
+
+    public boolean isFull() {
+        return count == SIZE;
     }
 }
