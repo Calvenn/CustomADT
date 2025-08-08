@@ -7,7 +7,7 @@ public interface ListInterface<E> {
     
     E remove(int position);
     
-    E getEntry(int position);
+    E get(int position);
     
     boolean replace(int position, E data);
     
