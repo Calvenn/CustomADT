@@ -71,12 +71,11 @@ public class Visit implements Comparable<Visit> {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return
-            "Visit ID        : " + visitId + "\n" +
-            "Symptoms        : " + symptoms + "\n" +
-            "Severity Level  : " + severityLevel + "\n" +
-            "Doctor          : " + doctor.getDoctorName() + "\n" +
-            "Register Time   : " + registrationTime.format(formatter) + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("| %-10s | %-14s | %-14s | %-17s | %-30s |\n", visitId, severityLevel, doctor.getDoctorName(), registrationTime.format(formatter), symptoms));
+        sb.append("-".repeat(101));
+
+        return sb.toString();
     }
 
     @Override
