@@ -1,39 +1,43 @@
 package Control;
 import Entity.Medicine;
+import Entity.MedRecord;
 import adt.Heap;
+import adt.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class MedicineControl {
-    private Heap<Medicine> lowStockHeap;
+    private Heap<Medicine> medHeap;
+    private List<MedRecord> medRecords;
 
-    public MedicineControl(Heap<Medicine> lowStockHeap) {
-        this.lowStockHeap = lowStockHeap;
+    public MedicineControl(Heap <Medicine> medHeap) {
+        this.medRecords = new List<>();
+        this.medHeap = medHeap;
     }
 
     public void addMedicine(Medicine med) {
-        lowStockHeap.insert(med);
+        medHeap.insert(med);
     }
 
     public Medicine peekLowestStock() {
-        return lowStockHeap.peekRoot();
+        return medHeap.peekRoot();
     }
 
 
     // Display all medicines in heap (unsorted)
     public void displayAllStock() {
-        lowStockHeap.display();
+        medHeap.display();
     }
     
     public boolean updateStock(String batchID, int newStock) {// this one only same batch of med in same expiry date
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
             if (med.getBatchID().equals(batchID)) {
                 
-                lowStockHeap.remove(med);
+                medHeap.remove(med);
                 Medicine updatedMed = new Medicine(med);
                 updatedMed.setStock(newStock);  
-                lowStockHeap.insert(updatedMed);
+                medHeap.insert(updatedMed);
                 return true;
             }
         }
@@ -41,8 +45,8 @@ public class MedicineControl {
     }
     
     public Medicine findMedicine(String medToFind) {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
             if (med.getMedID ().equals(medToFind) || med.getName().equalsIgnoreCase(medToFind)) {
                 return med;
             }
@@ -51,10 +55,10 @@ public class MedicineControl {
     }
 
     public boolean removeExpiredMedicine(String batchID) {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
             if (med.getBatchID().equals(batchID)) {
-                return lowStockHeap.remove(med);
+                return medHeap.remove(med);
             }
         }
         return false;
@@ -70,7 +74,7 @@ public class MedicineControl {
     // Extract the most urgent (lowest stock) medicine
     //??
     public Medicine extractLowestStock() {
-        return lowStockHeap.extractRoot();
+        return medHeap.extractRoot();
     }
     
     //Add/search record medicine
