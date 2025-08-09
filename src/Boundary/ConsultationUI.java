@@ -8,6 +8,7 @@ import Control.TreatmentManager;
 
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Consultation;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Severity;
@@ -192,18 +193,22 @@ public class ConsultationUI {
                                   ((Visit) currentPatient).getSeverityLevel().getSeverity();
 
                         apptUI.bookAppointmentUI(patient, sev, currentDoc);
+                        Consultation.numOfFollowUp++;
 
                         if (isToPharmacy()) {
                             toPharmacyUI(currentDoc, patient);
+                            Consultation.numOfPharmacy++;
                         }
                         return;
                     }
                     case 2 -> {
                         toTreatmentUI(currentDoc);
+                        Consultation.numOfTreatment++;
                         return;
                     }
                     case 3 -> {
                         toPharmacyUI(currentDoc, patient);
+                        Consultation.numOfPharmacy++;
                         return;
                     }
                     case 4 -> {
@@ -305,19 +310,17 @@ public class ConsultationUI {
             System.out.print("Do you want to sort by patient IC? (y/any key to exit): ");
             String choice = scanner.nextLine();
 
-            while(true){
-                if(choice.equalsIgnoreCase("y")){
+            if (choice.equalsIgnoreCase("y")) {
+                while (true) {
                     System.out.print("Please enter patient IC (press 'x' to exit): ");
                     String searchedIC = scanner.nextLine();
-                    
-                    if(searchedIC.equalsIgnoreCase("x")) return;
 
-                    if(!consultManager.displayRecordsByIC(searchedIC)){
-                           System.out.println("Patient IC " + searchedIC + " not found");
+                    if (searchedIC.equalsIgnoreCase("x")) return;
+
+                    if (!consultManager.displayRecordsByIC(searchedIC)) {
+                        System.out.println("Patient IC " + searchedIC + " not found");
                     }
-                } else {
-                    return;
-                }                           
+                }
             }
         }
     }
