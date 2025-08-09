@@ -36,10 +36,13 @@ public class ConsultationManager {
     private final Queue<TreatmentAppointment> treatmentQueue;
     private final Queue<MedRecord> medCollectQueue;
     
-        private final LinkedHashMap<String, List<Consultation>> consultLog;
+    private final LinkedHashMap<String, List<Consultation>> consultLog;
     
     private static Consultation newConsult = null;
     private final Scanner scanner = new Scanner(System.in);
+    
+    private Visit currentlyProcessing;
+    private Visit nextPatient;
     
     public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
         this.queue = queue;
@@ -48,6 +51,21 @@ public class ConsultationManager {
         this.treatmentQueue = treatmentQueue;
         this.medCollectQueue = medCollectQueue;
     }
+    
+    /*
+    public Visit processNextPatient() {
+        if (currentlyProcessing == null && !queue.isEmpty()) {
+            // Set the first patient as currently processing (don't remove from queue)
+            currentlyProcessing = queue.get(0);
+            
+            return currentlyProcessing;
+        }
+        return null;
+    }
+
+    public Visit getCurrentlyProcessing() {
+        return currentlyProcessing;
+    }*/
 
     public Object dispatchNextPatient() {
         Appointment nextAppt = appointmentHeap.peekRoot();
@@ -140,7 +158,7 @@ public class ConsultationManager {
         }
 
         for (int i = 1; i <= consultations.size(); i++) {
-            record = consultations.getEntry(i);
+            record = consultations.get(i);
             System.out.println(record);
         }
 
@@ -156,7 +174,7 @@ public class ConsultationManager {
 
         boolean found = false;
         for (int i = 1; i <= consultations.size(); i++) {
-            Consultation c = consultations.getEntry(i);
+            Consultation c = consultations.get(i);
             if (c.getPatient().getPatientIC().equals(searchedIC)) {
                 System.out.println(c);
                 found = true;

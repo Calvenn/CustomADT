@@ -5,8 +5,8 @@ import adt.Heap;
 public class MedicineControl {
     private Heap<Medicine> medHeap;
 
-    public MedicineControl() {
-        medHeap = new Heap<>(false);
+    public MedicineControl(Heap<Medicine> lowStockMed) {
+        this.medHeap = lowStockMed;
     }
 
     public void addMedicine(Medicine med) {//

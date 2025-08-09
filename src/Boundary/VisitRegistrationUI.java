@@ -268,6 +268,7 @@ public class VisitRegistrationUI {
         System.out.println("-".repeat(58));
     }
 
+    
     private void handleProcessNextPatient() {
         System.out.println("\n=== Process Next Patient ===");
 
