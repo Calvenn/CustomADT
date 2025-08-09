@@ -1,16 +1,14 @@
 package Entity;
 
 public enum Severity{
-    EMERGENCY(3, "Immediate attention required"),
-    URGENT(2, "Urgent attention required"),
-    MILD(1, "Standard attention required"),;
+    EMERGENCY(3),
+    URGENT(2),
+    MILD(1),;
 
     private final int severity;
-    private final String description;
     
-    Severity(int severity, String description) {
+    Severity(int severity) {
         this.severity = severity;
-        this.description = description;
     }
     
     public static Severity fromValue(int value) {
@@ -26,12 +24,8 @@ public enum Severity{
         return severity;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     @Override
     public String toString() {
-        return this.name() + " (" + description + ")";
+        return this.name();
     }
 }

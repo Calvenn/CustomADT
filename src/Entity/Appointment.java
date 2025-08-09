@@ -15,7 +15,6 @@ public class Appointment implements Comparable<Appointment>{
     private Patient patient;
     private Doctor doctor;
     private int severity;
-    private String doctorName; //chg to doc id after integration
     private LocalDateTime time;
     
     public Appointment(Patient patient, Doctor doctor, int severity, LocalDateTime time){
@@ -45,10 +44,6 @@ public class Appointment implements Comparable<Appointment>{
     
     public LocalDateTime getTime(){
         return time;
-    }
-    
-    public void setDoctorName(String doctorName){
-        this.doctorName = doctorName;
     }
     
     public void setSeverity(int severity){

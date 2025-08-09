@@ -6,16 +6,20 @@ package Main;
  */
 import Boundary.ConsultationUI;
 import Boundary.PatientManagementUI;
+import Boundary.ReportUI;
 
 import Control.DoctorManager;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
+import Control.ConsultationReport;
 import Control.MedicineControl;
 import Control.QueueManager;
 import Control.TreatmentManager;
 
+import Entity.Patient; //testing purpose
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Consultation;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Treatment;
@@ -23,10 +27,14 @@ import Entity.TreatmentAppointment;
 import Entity.Visit;
 
 import adt.Heap;
+import adt.LinkedHashMap;
+import adt.List;
 import adt.Queue;
 
 import java.time.LocalDate;
 import java.time.Duration; 
+import java.time.LocalDateTime; // testing purpose
+import java.time.Month;
 import java.util.Scanner;
 /**
  *
@@ -43,20 +51,28 @@ public class Main {
         
         Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
         Queue<MedRecord> medCollectQueue = new Queue<>();
+        
+        LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
+        LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
            
         DoctorManager docManager = new DoctorManager(sharedDoc);
-        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap);
+        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap, missAppt);
         QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager);
-        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, treatmentQueue, medCollectQueue);
+        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, consultLog, treatmentQueue, medCollectQueue);
         TreatmentManager trtManager = new TreatmentManager(providedTreatments); 
         MedicineControl medControl = new MedicineControl(lowStockMed);
         
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medControl);
+        loadDummyAppt(apptManager, docManager);
+        loadDummyConsult(consultManager, docManager, consultLog);
+        
+        ConsultationReport consultReport = new ConsultationReport(consultLog);
 
         ConsultationUI consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl);
         PatientManagementUI patientUI = new PatientManagementUI(sharedVisitQueue, queueManager, docManager);
+        ReportUI reportUI = new ReportUI(consultReport);
 
         int choice;
         do {
@@ -65,7 +81,7 @@ public class Main {
                 try {
                     System.out.print("Enter your choice: ");
                     choice = Integer.parseInt(scanner.nextLine());
-                    if (choice < 1 || choice > 66) {
+                    if (choice < 1 || choice > 8) {
                         System.out.println("Invalid choice. Please enter 1 to 3.");
                         continue;
                     }
@@ -85,7 +101,8 @@ public class Main {
                 }
                 //case 4 -> consultUI.consultMainMenu();
                 //case 5 -> consultUI.consultMainMenu();
-                case 6 -> {
+                case 6 -> reportUI.reportMainMenu();
+                case 7 -> {
                     System.out.println("Thank you for using the Clinic System!");
                     System.exit(0);
                 }
@@ -100,7 +117,8 @@ public class Main {
         System.out.println("3. Consultation System");
         System.out.println("4. Treatment System");
         System.out.println("5. Pharmacy Control System");
-        System.out.println("6. Exit");
+        System.out.println("6. Report");
+        System.out.println("7. Exit");
     }
 
     private static void loadDummyDoctors(DoctorManager docManager) {
@@ -118,6 +136,32 @@ public class Main {
     private static void loadDummyMed(MedicineControl medControl) {
         Medicine med = new Medicine("Panadol", "Panadol", "testest", "June", 100);
         medControl.addMedicine(med);
+    }
+    
+    private static void loadDummyAppt(AppointmentManager apptManager, DoctorManager docManager) {
+        Patient patient = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
+        Doctor doc = docManager.findDoctor("D001");
+        apptManager.bookAppointment(patient, 1, LocalDateTime.now(), doc);
+        apptManager.bookAppointment(patient, 2, LocalDateTime.of(2025, Month.DECEMBER, 12, 12, 30), doc);
+    }
+    
+    private static void loadDummyConsult(ConsultationManager consult, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
+        Patient p1 = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
+        Patient p2 = new Patient("050707070707", "Bob", "0124282783", 20, 'M', "Bayan Lepas");
+        Patient p3 = new Patient("050808070808", "Nana", "0124282783", 20, 'M', "Bayan Lepas");
+        
+        Doctor doc1 = docManager.findDoctor("D001");
+        Doctor doc2 = docManager.findDoctor("D002");
+        
+        List<Consultation> doc1Consults = new List<>();
+        doc1Consults.add(new Consultation(1,p1, "Flu", doc1));
+        Consultation.numOfFollowUp++;
+        doc1Consults.add(new Consultation(3,p2, "Fever",  doc2));
+        Consultation.numOfTreatment++;
+        doc1Consults.add(new Consultation(2,p3, "Flu", doc2));
+        Consultation.numOfFollowUp++;
+        
+        consultLog.put(doc1.getDoctorID(), doc1Consults);
     }
 }
 

@@ -15,3 +15,4 @@ public interface ListInterface<E> {
     
     boolean isEmpty();
 }
+

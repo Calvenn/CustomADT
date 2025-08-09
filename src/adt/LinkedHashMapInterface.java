@@ -17,4 +17,6 @@ public interface LinkedHashMapInterface<K, V> {
     void display();
     int size();
     boolean isEmpty();
+    Object[] getKeys();
+    Object[] getValues();
 }

@@ -16,6 +16,8 @@ import Entity.Treatment;
 import Entity.TreatmentAppointment;
 
 import adt.Heap;
+import adt.LinkedHashMap;
+import adt.List;
 import adt.Queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,34 +28,37 @@ import java.util.Scanner;
  * @author calve
  */
 public class ConsultationManager {
-    private final Heap<Consultation> consultationHeap;
+    public Doctor currentDoc;
+    
     private final Heap<Appointment> appointmentHeap;
     private final Heap<Visit> queue;
     
     private final Queue<TreatmentAppointment> treatmentQueue;
     private final Queue<MedRecord> medCollectQueue;
     
+        private final LinkedHashMap<String, List<Consultation>> consultLog;
+    
     private static Consultation newConsult = null;
     private final Scanner scanner = new Scanner(System.in);
     
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
-        this.consultationHeap = new Heap<>(true);
+        this.consultLog = consultLog;
         this.treatmentQueue = treatmentQueue;
         this.medCollectQueue = medCollectQueue;
     }
 
-    public Object dispatchNextPatient(Doctor doc) {
+    public Object dispatchNextPatient() {
         Appointment nextAppt = appointmentHeap.peekRoot();
         Visit nextWalkIn = queue.peekRoot();      
 
-        while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(doc.getDoctorID())) {
+        while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
             nextAppt = appointmentHeap.peekRoot();
         }
 
-        while (nextWalkIn != null && !nextWalkIn.getDoctor().getDoctorID().equals(doc.getDoctorID())) {
+        while (nextWalkIn != null && !nextWalkIn.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
             queue.extractRoot(); // skip unrelated doctor
             nextWalkIn = queue.peekRoot();
         }
@@ -75,23 +80,28 @@ public class ConsultationManager {
         }
     }
         
-    public boolean consultationRecord(Patient patient){
+    public boolean consultationRecord(Patient patient) {
         System.out.print("Enter severity level: ");
         int severity = scanner.nextInt();
         scanner.nextLine();
-        
+
         System.out.print("Enter diagnosis/notes: ");
         String notes = scanner.nextLine();
-        
-        newConsult = new Consultation(severity, patient, notes); //patient id later on
-        consultationHeap.insert(newConsult); //chg to linkedhashmap afterward
-        //docManager.updateDoctor();
+
+        newConsult = new Consultation(severity, patient, notes, currentDoc); 
+
+        // Get existing consultation list for doctor
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+
+        if (consultations == null) {
+            consultations = new List<>(); 
+        }
+
+        consultations.add(newConsult);
+        consultLog.put(currentDoc.getDoctorID(), consultations);
         return true;
     }
-    
-    public void displayAllRecords(){
-        consultationHeap.display();
-    }
+
     
     public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
         if (doc == null || treatment == null || room == null || time == null || sev == null) {
@@ -118,5 +128,41 @@ public class ConsultationManager {
         MedRecord medCollect = new MedRecord(patient, doc, med, qty, time);
         medCollectQueue.enqueue(medCollect);
         return true;
+    }
+    
+    public boolean displayAllRecordsByDoctor(Doctor doc) {
+        Consultation record = null;
+        System.out.println("GET Doctor ID: " + doc.getDoctorID());
+        List<Consultation> consultations = consultLog.get(doc.getDoctorID());
+        if (consultations == null || consultations.isEmpty()) {
+            System.out.println("No consultation records found for Doctor " + doc.getDoctorID());
+            return false;
+        }
+
+        for (int i = 1; i <= consultations.size(); i++) {
+            record = consultations.getEntry(i);
+            System.out.println(record);
+        }
+
+        return true;
+    }
+
+    public boolean displayRecordsByIC(String searchedIC) {
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+        if (consultations == null || consultations.isEmpty()) {
+            System.out.println("No consultation records found.");
+            return false;
+        }
+
+        boolean found = false;
+        for (int i = 1; i <= consultations.size(); i++) {
+            Consultation c = consultations.getEntry(i);
+            if (c.getPatient().getPatientIC().equals(searchedIC)) {
+                System.out.println(c);
+                found = true;
+            }
+        }
+
+        return found;
     }
 }

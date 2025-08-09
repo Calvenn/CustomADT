@@ -8,6 +8,7 @@ import Control.TreatmentManager;
 
 import Entity.Doctor;
 import Entity.Appointment;
+import Entity.Consultation;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Severity;
@@ -54,6 +55,7 @@ public class ConsultationUI {
         currentDoc = docManager.findDoctor(docId);
 
         if (currentDoc != null) {
+            consultManager.currentDoc = currentDoc;
             System.out.println("Login successful. Welcome, " + currentDoc.getDoctorName() + "!");
             return true;
         } else {
@@ -69,8 +71,22 @@ public class ConsultationUI {
         }
         
         while (true) {
-            System.out.println("Total Appointment: " + apptManager.totalAppointments());
-            System.out.println("Incoming Appointment: " + apptManager.getIncomingAppointment());
+            apptManager.checkMissedAppt(currentDoc.getDoctorID());
+            System.out.println(apptManager.totalAppointments(currentDoc.getDoctorID()) == 0?
+                    "No appointment found"
+                    : "\nTotal Appointment: " + apptManager.totalAppointments(currentDoc.getDoctorID()));
+            System.out.println(apptManager.getIncomingAppointment(currentDoc.getDoctorID()) == null?
+                   "No incoming appointment found"
+                    : "Incoming Appointment: " + apptManager.getIncomingAppointment(currentDoc.getDoctorID()));
+            System.out.println(
+                    apptManager.getNumMissedAppt(currentDoc.getDoctorID()) == 0? 
+                    "No appointment missed" 
+                    : "Miss Appointment: " + apptManager.getNumMissedAppt(currentDoc.getDoctorID()));
+            if(apptManager.getNumMissedAppt(currentDoc.getDoctorID()) != 0){
+                apptUI.missedFlag = true;
+            } else {
+                apptUI.missedFlag = false;
+            }
             //get incoming queue from patient & doc
             
             System.out.println("\n--- Consultation Menu ---");
@@ -85,7 +101,7 @@ public class ConsultationUI {
 
             switch (choice) {
                 case 1 -> consultationMenu();
-                case 2 -> apptUI.apptMenu();
+                case 2 -> apptUI.apptMenu(currentDoc);
                 case 3 -> {
                     System.out.println("Returning to main menu...");
                     return;
@@ -112,7 +128,7 @@ public class ConsultationUI {
         
         switch (choice) {
             case 1 -> consultRecord(); 
-            case 2 -> consultManager.displayAllRecords();
+            case 2 -> displayRecordUI();
             case 3 -> {
                 System.out.println("Returning to main menu...");
                 return;
@@ -122,7 +138,7 @@ public class ConsultationUI {
     }
     
     private void consultRecord() {
-        Object currentPatient = consultManager.dispatchNextPatient(currentDoc); 
+        Object currentPatient = consultManager.dispatchNextPatient(); 
 
         if (currentPatient == null) {
             System.out.println("No more patients in queue.");
@@ -172,27 +188,27 @@ public class ConsultationUI {
 
                 switch (action) {
                     case 1 -> {
-                        String docId = currentPatient instanceof Appointment appt ? 
-                                       appt.getDoctor().getDoctorID() : 
-                                       ((Visit) currentPatient).getDoctor().getDoctorID();
-
                         int sev = currentPatient instanceof Appointment appt ?
                                   appt.getSeverity() :
                                   ((Visit) currentPatient).getSeverityLevel().getSeverity();
 
-                        apptUI.bookAppointmentUI(patient, docId, sev, currentDoc);
+                        apptUI.bookAppointmentUI(patient, sev, currentDoc);
+                        Consultation.numOfFollowUp++;
 
                         if (isToPharmacy()) {
                             toPharmacyUI(currentDoc, patient);
+                            Consultation.numOfPharmacy++;
                         }
                         return;
                     }
                     case 2 -> {
                         toTreatmentUI(currentDoc);
+                        Consultation.numOfTreatment++;
                         return;
                     }
                     case 3 -> {
                         toPharmacyUI(currentDoc, patient);
+                        Consultation.numOfPharmacy++;
                         return;
                     }
                     case 4 -> {
@@ -285,5 +301,27 @@ public class ConsultationUI {
             else if (input.equals("N")) return false;
             else System.out.println("Please enter Y or N only.");
         }
-    }  
+    } 
+    
+    private void displayRecordUI(){
+        if(!consultManager.displayAllRecordsByDoctor(currentDoc)){
+            System.out.println("No record found.");
+        } else {
+            System.out.print("Do you want to sort by patient IC? (y/any key to exit): ");
+            String choice = scanner.nextLine();
+
+            if (choice.equalsIgnoreCase("y")) {
+                while (true) {
+                    System.out.print("Please enter patient IC (press 'x' to exit): ");
+                    String searchedIC = scanner.nextLine();
+
+                    if (searchedIC.equalsIgnoreCase("x")) return;
+
+                    if (!consultManager.displayRecordsByIC(searchedIC)) {
+                        System.out.println("Patient IC " + searchedIC + " not found");
+                    }
+                }
+            }
+        }
+    }
 }
