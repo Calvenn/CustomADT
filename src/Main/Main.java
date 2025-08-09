@@ -13,6 +13,7 @@ import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Control.ConsultationReport;
 import Control.MedicineControl;
+import Control.PatientManager;
 import Control.QueueManager;
 import Control.TreatmentManager;
 
@@ -55,9 +56,10 @@ public class Main {
         LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
         LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
            
+        PatientManager patientManager = new PatientManager();
         DoctorManager docManager = new DoctorManager(sharedDoc);
         AppointmentManager apptManager = new AppointmentManager(sharedApptHeap, missAppt);
-        QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager);
+        QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager, patientManager);
         ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, consultLog, treatmentQueue, medCollectQueue);
         TreatmentManager trtManager = new TreatmentManager(providedTreatments); 
         MedicineControl medControl = new MedicineControl(lowStockMed);
@@ -134,7 +136,7 @@ public class Main {
     }
 
     private static void loadDummyMed(MedicineControl medControl) {
-        Medicine med = new Medicine("Panadol", "Panadol", "testest", "June", 100);
+        Medicine med = new Medicine("Panadol", "Panadol", "testest", 100);
         medControl.addMedicine(med);
     }
     

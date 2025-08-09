@@ -138,7 +138,13 @@ public class ConsultationUI {
     }
     
     private void consultRecord() {
-        Object currentPatient = consultManager.dispatchNextPatient(); 
+        Object currentPatient = null;
+        System.out.print("Do you want to call next patient? (y/any key for no): ");
+        String choice = scanner.nextLine();
+        
+        if(choice.equalsIgnoreCase("y")){          
+            currentPatient = consultManager.dispatchNextPatient();
+        }
 
         if (currentPatient == null) {
             System.out.println("No more patients in queue.");
@@ -158,6 +164,7 @@ public class ConsultationUI {
         } else if (currentPatient instanceof Visit visit) {
             patient = visit.getPatient();
             System.out.println("Type     : Walk-In");
+            System.out.println("Visit ID : " + visit.getVisitId());
             System.out.println("Patient  : " + patient.getPatientName());
             System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
             System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());

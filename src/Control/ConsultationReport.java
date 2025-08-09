@@ -67,7 +67,7 @@ public class ConsultationReport {
             List<Consultation> consultationList = (List<Consultation>) obj;
 
             for (int i = 1; i <= consultationList.size(); i++) {
-                c = consultationList.getEntry(i);
+                c = consultationList.get(i);
                 if (c == null || c.getNotes() == null || c.getNotes().trim().isEmpty()) continue;
 
                 String diagnosis = c.getNotes().trim().toLowerCase();
