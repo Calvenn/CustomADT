@@ -157,11 +157,13 @@ public class AppointmentUI {
         
         if(getConfirmation("Are you sure want to change appointment to " + newTime.format(formatter) + " ?")){
            boolean success = apptManager.bookAppointment(a.getPatient(), a.getSeverity(),newTime, doc);
-           System.out.println(success ? 
-                   "Appointment updated." : 
-                   "Not found or update failed. Please try again");
-           if(apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())){
-               System.out.println("Successful");
+           if(success){
+               System.out.println("Appointment Updated");
+               if(!apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())){
+                    System.out.println("Removed Unsucessful.Please try again");
+                }
+           }else{
+               System.out.println("Not found or update failed. Please try again");
            }
         }
     }
