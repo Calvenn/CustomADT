@@ -142,4 +142,30 @@ public class LinkedHashMap<K,V> implements LinkedHashMapInterface<K,V>{
             current = current.nextInOrder;
         }
     }
+    
+    @Override
+    // Return an array of keys in insertion order
+    public Object[] getKeys() {
+        Object[] keys = new Object[size];
+        Node<K, V> current = head;
+        int i = 0;
+        while (current != null) {
+            keys[i++] = current.key;
+            current = current.nextInOrder;
+        }
+        return keys;
+    }
+
+    @Override
+    // Return an array of values in insertion order
+    public Object[] getValues() {
+        Object[] values = new Object[size];
+        Node<K, V> current = head;
+        int i = 0;
+        while (current != null) {
+            values[i++] = current.value;
+            current = current.nextInOrder;
+        }
+        return values;
+    }
 }

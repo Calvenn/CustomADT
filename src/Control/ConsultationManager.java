@@ -17,6 +17,7 @@ import Entity.TreatmentAppointment;
 
 import adt.Heap;
 import adt.LinkedHashMap;
+import adt.List;
 import adt.Queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,12 +36,12 @@ public class ConsultationManager {
     private final Queue<TreatmentAppointment> treatmentQueue;
     private final Queue<MedRecord> medCollectQueue;
     
-    private final LinkedHashMap<String, Consultation> consultLog;
+        private final LinkedHashMap<String, List<Consultation>> consultLog;
     
     private static Consultation newConsult = null;
     private final Scanner scanner = new Scanner(System.in);
     
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, Consultation> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultLog = consultLog;
@@ -79,19 +80,28 @@ public class ConsultationManager {
         }
     }
         
-    public boolean consultationRecord(Patient patient){
+    public boolean consultationRecord(Patient patient) {
         System.out.print("Enter severity level: ");
         int severity = scanner.nextInt();
         scanner.nextLine();
-        
+
         System.out.print("Enter diagnosis/notes: ");
         String notes = scanner.nextLine();
-        
+
         newConsult = new Consultation(severity, patient, notes, currentDoc); 
-        consultLog.put(currentDoc.getDoctorID(),newConsult); 
-        //docManager.updateDoctor();
+
+        // Get existing consultation list for doctor
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+
+        if (consultations == null) {
+            consultations = new List<>(); 
+        }
+
+        consultations.add(newConsult);
+        consultLog.put(currentDoc.getDoctorID(), consultations);
         return true;
     }
+
     
     public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
         if (doc == null || treatment == null || room == null || time == null || sev == null) {
@@ -120,23 +130,39 @@ public class ConsultationManager {
         return true;
     }
     
-    public boolean displayAllRecordsByDoctor(Doctor doc){
-        for(int i = 0; i< consultLog.size(); i++){
-            Consultation c = consultLog.get(doc.getDoctorID());
-            System.out.println(c);
-            return true;
+    public boolean displayAllRecordsByDoctor(Doctor doc) {
+        Consultation record = null;
+        System.out.println("GET Doctor ID: " + doc.getDoctorID());
+        List<Consultation> consultations = consultLog.get(doc.getDoctorID());
+        if (consultations == null || consultations.isEmpty()) {
+            System.out.println("No consultation records found for Doctor " + doc.getDoctorID());
+            return false;
         }
-        return false;
+
+        for (int i = 1; i <= consultations.size(); i++) {
+            record = consultations.getEntry(i);
+            System.out.println(record);
+        }
+
+        return true;
     }
-    
-    public boolean displayRecordsByIC(String searchedIC){
-        for(int i = 0; i< consultLog.size(); i++){
-            Consultation c = consultLog.get(currentDoc.getDoctorID());
-            if(c.getPatient().getPatientIC().equals(searchedIC)){
+
+    public boolean displayRecordsByIC(String searchedIC) {
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+        if (consultations == null || consultations.isEmpty()) {
+            System.out.println("No consultation records found.");
+            return false;
+        }
+
+        boolean found = false;
+        for (int i = 1; i <= consultations.size(); i++) {
+            Consultation c = consultations.getEntry(i);
+            if (c.getPatient().getPatientIC().equals(searchedIC)) {
                 System.out.println(c);
-                return true;
+                found = true;
             }
         }
-        return false;
+
+        return found;
     }
 }
