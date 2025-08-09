@@ -45,7 +45,7 @@ public class List<E> implements ListInterface<E>{
     }
     
     @Override
-    public E getEntry(int position){
+    public E get(int position){
         E data = null;
         
         if(position >= 1 && position <= numOfEntries){
