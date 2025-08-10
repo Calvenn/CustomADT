@@ -1,6 +1,8 @@
 package Control;
 import Entity.Patient;
 import adt.LinkedHashMap;
+import exception.InvalidInputException;
+import exception.TryCatchThrowFromFile;
 
 /*  1. store patient in an array
     2. search for patient by ic number
@@ -18,9 +20,9 @@ public class PatientManager {
         patientMap = new LinkedHashMap<>();
         
         // Pre-load sample data
-        Patient alice = new Patient("050101070101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
-        Patient bob = new Patient("050202070202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
-        Patient charlie = new Patient("050303070303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
+        Patient alice = new Patient("050101-07-0101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
+        Patient bob = new Patient("050202-07-0202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
+        Patient charlie = new Patient("050303-07-0303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
         
         patientMap.put(alice.getPatientIC(), alice);
         patientMap.put(bob.getPatientIC(), bob);
@@ -34,56 +36,42 @@ public class PatientManager {
         return patientMap.containsKey(ic);
     }
 
-    public Patient registerNewPatient(String ic, String name, String phone, int age, char gender, String address) {
-        if (ic == null || ic.trim().isEmpty()) {
-            System.out.println("IC number cannot be empty!");
-            return null;
-        }
-        
+    public Patient registerNewPatient(String ic, String name, String phone, String ageStr, char gender, String address) throws InvalidInputException {
+        int age = Integer.parseInt(ageStr);
+
         if (isPatientExist(ic)) {
-            System.out.println("Patient with IC " + ic + " already exists!");
-            return null;
+            throw new InvalidInputException("Patient with IC " + ic + " already exists!");
         }
-        
+
         Patient patient = new Patient(ic, name, phone, age, gender, address);
-        return addNewPatient(patient) ? patient : null;
+        if (!addNewPatient(patient)) {
+            throw new InvalidInputException("Failed to add patient. Please try again.");
+        }
+
+        return patient;
     }
 
-    public boolean addNewPatient(Patient patient) {
-        if (patient == null) {
-            System.out.println("Patient object cannot be null!");
-            return false;
+    public boolean addNewPatient(Patient patient) throws InvalidInputException {
+        TryCatchThrowFromFile.validateNotNull(patient);
+        TryCatchThrowFromFile.validateIC(patient.getPatientIC());
+
+        if (isPatientExist(patient.getPatientIC())) {
+            throw new InvalidInputException("Patient with IC " + patient.getPatientIC() + " already exists!");
         }
-        
-        String ic = patient.getPatientIC();
-        if (ic == null || ic.trim().isEmpty()) {
-            System.out.println("Patient IC cannot be empty!");
-            return false;
-        }
-        
-        if (isPatientExist(ic)) {
-            System.out.println("Patient with IC " + ic + " already exists!");
-            return false;
-        }
-        
-        patientMap.put(ic, patient);
+
+        patientMap.put(patient.getPatientIC(), patient);
         return true;
     }
 
     public Patient findPatientByIC(String patientIC) {
-        if (patientIC == null || patientIC.trim().isEmpty()) {
+        if (patientIC == null || patientIC.isEmpty()) {
             return null;
         }
         return patientMap.get(patientIC);
     }
 
     public void displayPatientDetails(Patient patient) {
-        if (patient != null) {
-            System.out.println("=== Patient Details ===");
-            System.out.println(patient.toString());
-        } else {
-            System.out.println("Patient not found!");
-        }
+        patientMap.display();
     }
     
     //update existing patient information
@@ -93,7 +81,6 @@ public class PatientManager {
         }
         
         if (!isPatientExist(ic)) {
-            System.out.println("Patient with IC " + ic + " does not exist!");
             return false;
         }
         
@@ -120,22 +107,17 @@ public class PatientManager {
         return patientMap.isEmpty();
     }
     
-    //display all patients in insertion order
-    public void displayAllPatients() {
-        if (isEmpty()) {
-            System.out.println("No patients in the system.");
-            return;
+    // Return all patients in insertion order without printing
+    public Patient[] getAllPatients() {
+        Object[] values = patientMap.getValues();
+        Patient[] patients = new Patient[values.length];
+        for (int i = 0; i < values.length; i++) {
+            patients[i] = (Patient) values[i];
         }
-        
-        System.out.println("=== All Patients (Insertion Order) ===");
-        System.out.println("Total Patients: " + getTotalPatients());
-        System.out.println("======================================");
-        patientMap.display();
-        System.out.println("======================================");
+        return patients;
     }
-    
+
     public void clearAllPatients() {
         patientMap.clear();
-        System.out.println("All patients have been cleared from the system.");
     }
 }
