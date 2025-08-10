@@ -30,6 +30,8 @@ public class DoctorManager {
     public Doctor getMinWorkDoctor(){
         Doctor minWorkDoctor = doctorHeap.extractRoot();
         return minWorkDoctor;
+        
+        //manual
     }
     
     // Peek lowest patientCount doctor
@@ -45,7 +47,15 @@ public class DoctorManager {
             }
         } catch (Exception e){
             System.err.println("Error during findDoctor: " + e.getMessage());
+        }   
+    }
+    
+    public String[] peekAllDoctorID() {
+        String[] allDocIDs = new String[doctorHeap.size()];
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            allDocIDs[i] = doctorHeap.get(i).getDoctorID();
         }
+        return allDocIDs;
     }
     
     // Update doctor workload/patientCount, used after consultation

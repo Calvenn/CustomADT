@@ -4,13 +4,19 @@ import Entity.Patient;
 import Entity.Severity;
 import Entity.Doctor;
 import Control.PatientManager;
+import Entity.Appointment;
+import Entity.Consultation;
 import adt.Heap;
 import adt.LinkedHashMap;
+import adt.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class QueueManager {
     private Heap<Visit> visitQueue;
+    private Heap<Appointment> apptQueue;
+    
     private int queueNumber;
     private DoctorManager docManager;
     private PatientManager patientManager; // Added PatientManager reference
@@ -21,6 +27,7 @@ public class QueueManager {
     private CompletedVisit[] processedVisits;
     private int processedCount;
     private LinkedHashMap<String, CompletedVisit> completedVisits = new LinkedHashMap<>();
+    private LinkedHashMap<String, List<Consultation>> consultLog;
 
     private Visit currentlyProcessing;
     private Visit nextPatient;
@@ -30,7 +37,7 @@ public class QueueManager {
         private Visit visit;
         private LocalDateTime completionTime;
         private long consultationDuration; // in minutes
-        private String doctorNotes;
+        private String doctorNotes;       
         
         public CompletedVisit(Visit visit, LocalDateTime completionTime, long duration, String notes) {
             this.visit = visit;
@@ -54,7 +61,7 @@ public class QueueManager {
     }
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, PatientManager patientManager) {
+    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, PatientManager patientManager, LinkedHashMap<String, List<Consultation>> consultLog) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         this.patientManager = patientManager; // Initialize PatientManager
@@ -64,10 +71,52 @@ public class QueueManager {
         this.severityCount = new LinkedHashMap<>();
         this.processedVisits = new CompletedVisit[MAX_PROCESSED_VISITS];
         this.processedCount = 0;
+        this.consultLog = consultLog;
+        this.apptQueue = new Heap<>(false);
         
         // Initialize severity counters
         for (Severity severity : Severity.values()) {
             severityCount.put(severity, 0);
+        }
+    }
+    
+    public void loadVisit() {
+        String[] allDocID = docManager.peekAllDoctorID();
+        Appointment consultAppt = null;
+
+        for (int i = 0; i < allDocID.length; i++) { 
+            List<Consultation> consultations = consultLog.get(allDocID[i]);
+
+            if (consultations == null) continue;
+
+            for (int j = 1; j <= consultations.size(); j++) {
+                consultAppt = consultations.get(j);
+
+                if (consultAppt instanceof Consultation) {
+                    if (consultAppt == null || consultAppt.getDateTime() == null) continue; 
+                    Consultation appt = (Consultation) consultAppt;
+
+                    if (consultAppt.getDateTime() != null) {
+                        LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
+                        apptQueue.insert(appt);
+
+                        if (apptDate.equals(LocalDate.now())) {
+                            boolean exists = false;
+                            for (int k = 0; k < visitQueue.size(); k++) { 
+                                Visit v = visitQueue.get(k);
+                                if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!exists) {
+                                createVisit(consultAppt.getPatient(), appt.getDisease(), false, true);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -75,15 +124,14 @@ public class QueueManager {
         return visitQueue.isEmpty();
     }
 
-    public Visit createVisit(Patient patient, String symptoms, boolean isLifeThreatening) {
-        String visitId = generateVisitId();
+    public Visit createVisit(Patient patient, String symptoms, boolean isLifeThreatening, boolean isAppt) {
+        String visitId = generateId(isAppt);
         Severity severityLevel = Entity.Symptoms.assessSeverity(symptoms, isLifeThreatening);
 
         Doctor doctor = docManager.getMinWorkDoctor();
         Visit visit = new Visit(visitId, patient, symptoms, severityLevel, doctor);
         docManager.updateDoctor(doctor);
         visitQueue.insert(visit);
-
         refreshQueueComposition();
         updateNextPatient();
 
@@ -94,8 +142,8 @@ public class QueueManager {
         return visitQueue.size();
     }
 
-    private String generateVisitId() {
-        return "V" + String.format("%03d", queueNumber++);
+    private String generateId(boolean isAppt) {
+        return isAppt? "A" + String.format("%03d", queueNumber++) : "V" + String.format("%03d", queueNumber++);
     }
 
     public void displayQueueDetails() {

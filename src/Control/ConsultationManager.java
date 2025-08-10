@@ -21,6 +21,7 @@ import adt.List;
 import adt.Queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 /**
@@ -39,37 +40,24 @@ public class ConsultationManager {
     private final LinkedHashMap<String, List<Consultation>> consultLog;
     
     private static Consultation newConsult = null;
-    private final Scanner scanner = new Scanner(System.in);
+    private final AppointmentManager apptManager;
     
-    private Visit currentlyProcessing;
-    private Visit nextPatient;
-    
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue, AppointmentManager apptManager) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultLog = consultLog;
         this.treatmentQueue = treatmentQueue;
         this.medCollectQueue = medCollectQueue;
+        this.apptManager = apptManager;
     }
-    
-    /*
-    public Visit processNextPatient() {
-        if (currentlyProcessing == null && !queue.isEmpty()) {
-            // Set the first patient as currently processing (don't remove from queue)
-            currentlyProcessing = queue.get(0);
-            
-            return currentlyProcessing;
-        }
-        return null;
-    }
-
-    public Visit getCurrentlyProcessing() {
-        return currentlyProcessing;
-    }*/
 
     public Object dispatchNextPatient() {
+        System.out.println(queue.size());
         Appointment nextAppt = appointmentHeap.peekRoot();
-        Visit nextWalkIn = queue.peekRoot();      
+        Visit nextWalkIn = queue.peekRoot();  
+        
+        System.out.println(nextAppt);
+        System.out.println(nextWalkIn);
 
         while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
@@ -85,41 +73,31 @@ public class ConsultationManager {
         if (nextAppt == null) return queue.extractRoot();
         if (nextWalkIn == null) return appointmentHeap.extractRoot();
 
-        boolean isToday = nextAppt.getTime().toLocalDate().equals(LocalDate.now());
+        boolean isToday = nextAppt.getDateTime().toLocalDate().equals(LocalDate.now());
 
-        if (isToday) {
-            if (nextWalkIn.getSeverityLevel().getSeverity() > nextAppt.getSeverity()) {
-                return queue.extractRoot();
-            } else {
-                return appointmentHeap.extractRoot();
-            }
-        } else {
+        if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > nextAppt.getSeverity()) {
             return queue.extractRoot();
+        } else {
+            System.out.println("Appt queue extracted");
+            return appointmentHeap.extractRoot();  // Extract appointment otherwise           
         }
     }
         
-    public boolean consultationRecord(Patient patient) {
-        System.out.print("Enter severity level: ");
-        int severity = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Enter diagnosis/notes: ");
-        String notes = scanner.nextLine();
-
-        newConsult = new Consultation(severity, patient, notes, currentDoc); 
-
+    public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes) {
         // Get existing consultation list for doctor
         List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
-
-        if (consultations == null) {
-            consultations = new List<>(); 
+        
+        if(id == null){
+            newConsult = new Consultation(severity, patient, diagnosis, notes, currentDoc, null); 
+            consultations.add(newConsult);
+            consultLog.put(currentDoc.getDoctorID(), consultations);
+            return newConsult;
+        } else {
+            newConsult = new Consultation(id, severity, patient, diagnosis, notes, currentDoc, null);
+            apptManager.bookAppointment(newConsult, null);
+            return newConsult;
         }
-
-        consultations.add(newConsult);
-        consultLog.put(currentDoc.getDoctorID(), consultations);
-        return true;
     }
-
     
     public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
         if (doc == null || treatment == null || room == null || time == null || sev == null) {
@@ -161,7 +139,6 @@ public class ConsultationManager {
             record = consultations.get(i);
             System.out.println(record);
         }
-
         return true;
     }
 

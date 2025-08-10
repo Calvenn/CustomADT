@@ -9,25 +9,17 @@ import java.time.format.DateTimeFormatter;
  *
  * @author calve
  */
-public class Appointment implements Comparable<Appointment>{
-    private static int idNo = 0; 
-    private String apptID;
+public abstract class Appointment implements Comparable<Appointment>{
     private Patient patient;
     private Doctor doctor;
     private int severity;
-    private LocalDateTime time;
+    private LocalDateTime dateTime;
     
     public Appointment(Patient patient, Doctor doctor, int severity, LocalDateTime time){
-        apptID = "A" + String.format("%04d", generateId()); 
         this.patient = patient;
         this.doctor = doctor;
         this.severity = severity;
-        this.time = time;
-    }
-    
-    private static int generateId() {
-        idNo += 1; 
-        return idNo; 
+        this.dateTime = time;
     }
     
     public Patient getPatient(){
@@ -42,8 +34,8 @@ public class Appointment implements Comparable<Appointment>{
         return severity;
     }
     
-    public LocalDateTime getTime(){
-        return time;
+    public LocalDateTime getDateTime(){
+        return dateTime;
     }
     
     public void setSeverity(int severity){
@@ -51,21 +43,31 @@ public class Appointment implements Comparable<Appointment>{
     }
     
     public void setTime(LocalDateTime time){
-        this.time = time;
+        this.dateTime = time;
     }
     
     //@Override
     public int compareTo(Appointment other){
-        return this.time.compareTo(other.time);
+        return this.dateTime.compareTo(other.dateTime);
     }
     
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return "Appointment Details:\n"
-             + " Date & Time : " + time.format(formatter) + "\n"
-            // + " Patient     : " + patientName + " (" + phoneNum + ")\n"
+             + " Date & Time : " + dateTime.format(formatter) + "\n"
              + " Doctor      : " + doctor.getDoctorName() + "\n"
              + " Severity    : " + severity;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Appointment other = (Appointment) obj;
+        return this.getPatient().getPatientIC().equals(other.getPatient().getPatientIC())
+            && this.getDoctor().getDoctorID().equals(other.getDoctor().getDoctorID());
+    }
+    
+    public abstract String getAppointmentType();
 }
