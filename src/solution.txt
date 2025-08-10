@@ -1,0 +1,49 @@
+================================================================================
+                            SIMPLE VALIDATION SOLUTIONS
+================================================================================
+
+NULL VALUE ERROR:
+This field cannot be empty. 
+Enter a value in this field.
+
+================================================================================
+
+INTEGER ERROR:
+Please enter a valid whole number (digits only).
+
+================================================================================
+
+RANGE ERROR:
+Please enter a number within the allowed range.
+Number is between the specified min and max.
+
+================================================================================
+
+PHONE ERROR:
+Please enter a valid phone number.
+Format: 012-3456789
+
+================================================================================
+
+IC ERROR:
+Please enter a valid IC number.
+Format: 123456-12-1234
+
+================================================================================
+
+DATE TIME ERROR:
+Please enter a valid date.
+Format: dd-MM-yyyy HH:mm
+
+================================================================================
+
+GENDER ERROR:
+Please enter F or M only.
+Choosing one of the two options.
+
+================================================================================
+
+GENERAL ERROR:
+Please check your input.
+
+================================================================================

@@ -1,7 +1,5 @@
 package Entity;
 
-import java.time.format.DateTimeFormatter;
-
 public class Patient{
     private String patientIC;
     private String patientName;
@@ -69,11 +67,17 @@ public class Patient{
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(String.format("| %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n", patientIC, patientName, patientPhoneNo, patientAge, patientGender, patientAddress));
-        sb.append("-".repeat(111)).append("\n");
-        
-        return sb.toString();
+        return String.format(
+            "\n%-10s: %s" +
+            "\n%-10s: %s" +
+            "\n%-10s: %d" +
+            "\n%-10s: %c" +
+            "\n%-10s: %s\n",
+            "Name", patientName,
+            "Phone No", patientPhoneNo,
+            "Age", patientAge,
+            "Gender", patientGender,
+            "Address", patientAddress
+        );
     }
 }

@@ -7,6 +7,9 @@ import Entity.Visit;
 import adt.Heap;
 import java.util.Scanner;
 
+import exception.InvalidInputException;
+import exception.TryCatchThrowFromFile;
+import exception.ValidationUtility;
 
 public class PatientManagementUI {
     private Heap<Visit> visitQueue;
@@ -27,14 +30,28 @@ public class PatientManagementUI {
         int choice;
         do {
             displayMenu();
-            choice = getIntInput("Enter your choice: ");
+            
+            while (true) {
+                try {
+                    System.out.print("Enter your choice: ");
+                    String input = scanner.nextLine().trim();
+                    
+                    // Use your validation system directly
+                    TryCatchThrowFromFile.validateIntegerRange(input, 0, 8);
+                    choice = Integer.parseInt(input);
+                    break; // Valid input, exit the input loop
+                    
+                } catch (InvalidInputException e) {
+                    ValidationUtility.printErrorWithSolution(e);
+                }
+            }
 
             switch (choice) {
                 case 1:
                     handleNewPatientRegistration();
                     break;
                 case 2:
-                    handleVisitRegistration(); // Updated to call the visit registration method
+                    handleVisitRegistration();
                     break;
                 case 3:
                     handleSearchPatient();
@@ -54,17 +71,14 @@ public class PatientManagementUI {
                 case 8:
                     handleClearAllPatients();
                     break;
-                case 9:
-                    System.out.println("\nThank you for using Patient Management System!");
+                case 0:
                     break;
-                default:
-                    System.out.println("\nInvalid choice. Please try again.");
             }
             
-            if (choice != 9) {
-                pauseForUser ();
+            if (choice != 0) {
+                pauseForUser();
             }
-        } while (choice != 9);
+        } while (choice != 0);
     }
 
     private void displayMenu() {
@@ -79,13 +93,8 @@ public class PatientManagementUI {
         System.out.println("6. Display All Patients");
         System.out.println("7. Patient Statistics");
         System.out.println("8. Clear All Patients");
-        System.out.println("9. Exit");
+        System.out.println("0. Exit");
         System.out.println("=".repeat(40));
-    }
-
-    public void patientTableHeader() {
-        System.out.println(String.format("| %-15s | %-20s | %-15s | %-5s | %-8s | %-40s |\n", "IC", "Name", "Phone Number", "Age", "Gender", "Address"));
-        System.out.print("-".repeat(111));
     }
 
     private void handleNewPatientRegistration() {
@@ -93,32 +102,90 @@ public class PatientManagementUI {
         System.out.println("    NEW PATIENT REGISTRATION");
         System.out.println("=".repeat(35));
 
-        String ic = getStringInput("Enter IC number: ");
-        
-        if (ic.trim().isEmpty()) {
-            System.out.println("\nIC number cannot be empty!");
-            return;
+        String ic;
+        while (true) {
+            System.out.print("Enter IC number: ");
+            ic = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validateIC(ic);
+                if (patientManager.isPatientExist(ic)) {
+                    System.out.println("Patient already exists!");
+                    patientManager.displayPatientDetails(patientManager.findPatientByIC(ic));
+                    return; // stop registration
+                }
+                break; // valid IC
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
         }
 
-        Patient existing = patientManager.findPatientByIC(ic);
-        if (existing != null) {
-            System.out.println("\nPatient already exists!");
-            patientManager.displayPatientDetails(existing);
-            return;
+        String name;
+        while (true) {
+            System.out.print("\nEnter name: ");
+            name = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validateNotNull(name);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
         }
 
-        String name = getStringInput("Enter name: ");
-        String phone = getStringInput("Enter phone number: ");
-        int age = getIntInput("Enter age: ");
-        char gender = getGenderInput();
-        String address = getStringInput("Enter address: ");
+        String phone;
+        while (true) {
+            System.out.print("\nEnter phone number: ");
+            phone = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validatePhone(phone);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
 
-        Patient newPatient = patientManager.registerNewPatient(ic, name, phone, age, gender, address);
-        if (newPatient != null) {
+        String ageStr;
+        while (true) {
+            System.out.print("\nEnter age: ");
+            ageStr = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validatePositiveInteger(ageStr);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        char gender;
+        while (true) {
+            System.out.print("\nEnter gender (M/F): ");
+            gender = scanner.nextLine().charAt(0);
+            try {
+                TryCatchThrowFromFile.validateGender(gender);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        String address;
+        while (true) {
+            System.out.print("\nEnter address: ");
+            address = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validateNotNull(address);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        Patient newPatient = null;
+        try {
+            newPatient = patientManager.registerNewPatient(ic, name, phone, ageStr, gender, address);
             System.out.println("\nPatient registered successfully!");
             patientManager.displayPatientDetails(newPatient);
-        } else {
-            System.out.println("\nCannot register new patient.");
+        } catch (InvalidInputException e) {
+            ValidationUtility.printErrorWithSolution(e);
         }
     }
 
@@ -131,24 +198,34 @@ public class PatientManagementUI {
         visitUI.visitsMenu();
     }
 
-    private void handleSearchPatient() {
+    private Patient handleSearchPatient() {
         System.out.println("\n" + "=".repeat(30));
         System.out.println("      SEARCH PATIENT");
         System.out.println("=".repeat(30));
-        
-        String ic = getStringInput("Enter IC number to search: ");
-        
-        if (ic.trim().isEmpty()) {
-            System.out.println("\nIC number cannot be empty!");
-            return;
-        }
-        
-        Patient patient = patientManager.findPatientByIC(ic);
-        if (patient != null) {
-            System.out.println("\nPatient found!");
-            patientManager.displayPatientDetails(patient);
-        } else {
-            System.out.println("\nPatient not found with IC: " + ic);
+
+        Patient patient = null;
+
+        while (true) {
+            try {
+                System.out.print("Enter IC number to search: ");
+                String ic = scanner.nextLine();
+
+                // Validate IC format
+                TryCatchThrowFromFile.validateIC(ic);
+
+                // Find patient
+                patient = patientManager.findPatientByIC(ic);
+                if (patient != null) {
+                    System.out.println("\nPatient found!");
+                    patientManager.displayPatientDetails(patient);
+                    return patient;
+                } else {
+                    throw new InvalidInputException("Patient not found with IC " + ic);
+                }
+
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
         }
     }
 
@@ -156,41 +233,125 @@ public class PatientManagementUI {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("    UPDATE PATIENT INFORMATION");
         System.out.println("=".repeat(35));
-        
-        String ic = getStringInput("Enter IC number of patient to update: ");
-        
-        if (ic.trim().isEmpty()) {
-            System.out.println("\nIC number cannot be empty!");
-            return;
+
+        Patient existingPatient = null;
+
+        // 1. Get valid IC and find patient
+        while (true) {
+            try {
+                System.out.print("Enter IC number of patient to update: ");
+                String ic = scanner.nextLine();
+                TryCatchThrowFromFile.validateIC(ic);
+
+                existingPatient = patientManager.findPatientByIC(ic);
+                if (existingPatient == null) {
+                    throw new InvalidInputException("Patient not found with IC: " + ic);
+                }
+                break; // found and valid
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
         }
-        
-        Patient existingPatient = patientManager.findPatientByIC(ic);
-        if (existingPatient == null) {
-            System.out.println("\nPatient not found with IC: " + ic);
-            return;
-        }
-        
+
+        // 2. Show current details
         System.out.println("\nCurrent patient details:");
         patientManager.displayPatientDetails(existingPatient);
-        
         System.out.println("\nEnter new information (press Enter to keep current value):");
-        
-        String newName = getOptionalStringInput("New name [" + existingPatient.getPatientName() + "]: ");
-        String newPhone = getOptionalStringInput("New phone [" + existingPatient.getPatientPhoneNo() + "]: ");
-        String ageStr = getOptionalStringInput("New age [" + existingPatient.getPatientAge() + "]: ");
-        String genderStr = getOptionalStringInput("New gender [" + existingPatient.getPatientGender() + "]: ");
-        String newAddress = getOptionalStringInput("New address [" + existingPatient.getPatientAddress() + "]: ");
-        
-        // Use existing values if no new input provided
-        String finalName = newName.isEmpty() ? existingPatient.getPatientName() : newName;
-        String finalPhone = newPhone.isEmpty() ? existingPatient.getPatientPhoneNo() : newPhone;
-        int finalAge = ageStr.isEmpty() ? existingPatient.getPatientAge() : Integer.parseInt(ageStr);
-        char finalGender = genderStr.isEmpty() ? existingPatient.getPatientGender() : genderStr.toUpperCase().charAt(0);
-        String finalAddress = newAddress.isEmpty() ? existingPatient.getPatientAddress() : newAddress;
-        
-        Patient updatedPatient = new Patient(ic, finalName, finalPhone, finalAge, finalGender, finalAddress);
-        
-        if (patientManager.updatePatient(ic, updatedPatient)) {
+
+        // Name
+        String finalName;
+        while (true) {
+            try {
+                System.out.print("New name [" + existingPatient.getPatientName() + "]: ");
+                String input = scanner.nextLine();
+                if (input.trim().isEmpty()) {
+                    finalName = existingPatient.getPatientName();
+                    break;
+                }
+                TryCatchThrowFromFile.validateNotNull(input);
+                finalName = input;
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        // Phone
+        String finalPhone;
+        while (true) {
+            try {
+                System.out.print("New phone [" + existingPatient.getPatientPhoneNo() + "]: ");
+                String input = scanner.nextLine();
+                if (input.trim().isEmpty()) {
+                    finalPhone = existingPatient.getPatientPhoneNo();
+                    break;
+                }
+                TryCatchThrowFromFile.validatePhone(input);
+                finalPhone = input;
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        // Age
+        int finalAge;
+        while (true) {
+            try {
+                System.out.print("New age [" + existingPatient.getPatientAge() + "]: ");
+                String input = scanner.nextLine();
+                if (input.trim().isEmpty()) {
+                    finalAge = existingPatient.getPatientAge();
+                    break;
+                }
+                TryCatchThrowFromFile.validatePositiveInteger(input);
+                finalAge = Integer.parseInt(input);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        // Gender
+        char finalGender;
+        while (true) {
+            try {
+                System.out.print("New gender [" + existingPatient.getPatientGender() + "]: ");
+                String input = scanner.nextLine();
+                if (input.trim().isEmpty()) {
+                    finalGender = existingPatient.getPatientGender();
+                    break;
+                }
+                TryCatchThrowFromFile.validateGender(input.toUpperCase().charAt(0));
+                finalGender = input.toUpperCase().charAt(0);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        // Address
+        String finalAddress;
+        while (true) {
+            try {
+                System.out.print("New address [" + existingPatient.getPatientAddress() + "]: ");
+                String input = scanner.nextLine();
+                if (input.trim().isEmpty()) {
+                    finalAddress = existingPatient.getPatientAddress();
+                    break;
+                }
+                TryCatchThrowFromFile.validateNotNull(input);
+                finalAddress = input;
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+
+        // 3. Update patient
+        Patient updatedPatient = new Patient(existingPatient.getPatientIC(), finalName, finalPhone, finalAge, finalGender, finalAddress);
+
+        if (patientManager.updatePatient(existingPatient.getPatientIC(), updatedPatient)) {
             System.out.println("\nPatient information updated successfully!");
             patientManager.displayPatientDetails(updatedPatient);
         } else {
@@ -202,34 +363,34 @@ public class PatientManagementUI {
         System.out.println("\n" + "=".repeat(30));
         System.out.println("      DELETE PATIENT");
         System.out.println("=".repeat(30));
-        
-        String ic = getStringInput("Enter IC number of patient to delete: ");
-        
-        if (ic.trim().isEmpty()) {
-            System.out.println("\nIC number cannot be empty!");
-            return;
-        }
-        
-        Patient patient = patientManager.findPatientByIC(ic);
-        if (patient == null) {
-            System.out.println("\nPatient not found with IC: " + ic);
-            return;
-        }
-        
-        System.out.println("\nPatient to be deleted:");
-        patientManager.displayPatientDetails(patient);
-        
-        String confirmation = getStringInput("\nAre you sure you want to delete this patient? (YES/no): ");
-        
-        if (confirmation.equalsIgnoreCase("YES")) {
-            Patient removedPatient = patientManager.removePatient(ic);
-            if (removedPatient != null) {
-                System.out.println("\nPatient deleted successfully!");
-            } else {
-                System.out.println("\nFailed to delete patient.");
+
+        // Step 1: Reuse search logic to get the patient
+        Patient patient = handleSearchPatient(); // This must return Patient
+
+        // Step 2: Confirm deletion (loop until valid Y/N)
+        while (true) {
+            try {
+                System.out.print("\nAre you sure you want to delete this patient? (Y/N): ");
+                char input = scanner.nextLine().charAt(0);
+
+                // Validate Y/N using your method
+                TryCatchThrowFromFile.validateYesOrNo(input);
+
+                if (input == 'Y') {
+                    Patient removedPatient = patientManager.removePatient(patient.getPatientIC());
+                    if (removedPatient != null) {
+                        System.out.println("\nPatient deleted successfully!");
+                    } else {
+                        System.out.println("\nFailed to delete patient.");
+                    }
+                } else { // 'N'
+                    System.out.println("\nPatient deletion cancelled.");
+                }
+                break; // Exit loop after valid response
+
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
             }
-        } else {
-            System.out.println("\nPatient deletion cancelled.");
         }
     }
 
@@ -237,12 +398,33 @@ public class PatientManagementUI {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("        ALL PATIENTS");
         System.out.println("=".repeat(35));
-        
+
         if (patientManager.isEmpty()) {
             System.out.println("\nNo patients in the system.");
-        } else {
-            patientManager.displayAllPatients();
+            return;
         }
+
+        System.out.println("Total Patients: " + patientManager.getTotalPatients());
+        patientTableHeader();
+
+        Patient[] patients = patientManager.getAllPatients();
+        for (Patient patient : patients) {
+            System.out.printf("| %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
+                patient.getPatientIC(),
+                patient.getPatientName(),
+                patient.getPatientPhoneNo(),
+                patient.getPatientAge(),
+                patient.getPatientGender(),
+                patient.getPatientAddress()
+            );
+            System.out.println("-".repeat(122));
+        }
+    }
+
+    public void patientTableHeader() {
+        System.out.println("-".repeat(122));
+        System.out.println(String.format("| %-15s | %-20s | %-15s | %-5s | %-8s | %-40s |", "Patient IC", "Patient Name", "Phone Number", "Age", "Gender", "Address"));
+        System.out.println("-".repeat(122));
     }
 
     private void handlePatientStatistics() {
@@ -263,58 +445,37 @@ public class PatientManagementUI {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("      CLEAR ALL PATIENTS");
         System.out.println("=".repeat(35));
-        
+
         if (patientManager.isEmpty()) {
             System.out.println("\nNo patients to clear.");
             return;
         }
-        
+
         System.out.println("Current total patients: " + patientManager.getTotalPatients());
-        String confirmation = getStringInput("\nAre you sure you want to clear ALL patients? This cannot be undone! (Y/N): ");
-        
-        if (confirmation.equalsIgnoreCase("Y")) {
-            patientManager.clearAllPatients();
-            System.out.println("\nAll patients have been cleared from the system.");
-        } else {
-            System.out.println("\nClear operation cancelled.");
-        }
-    }
 
-    // Helper methods for input handling
-    private String getStringInput(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine().trim();
-    }
-    
-    private String getOptionalStringInput(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine().trim();
-    }
-
-    private int getIntInput(String prompt) {
         while (true) {
             try {
-                System.out.print(prompt);
-                int value = scanner.nextInt();
-                scanner.nextLine(); // Clear buffer
-                return value;
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-                scanner.nextLine(); // Clear invalid input
-            }
-        }
-    }
+                System.out.print("\nAre you sure you want to clear ALL patients? This cannot be undone! (Y/N): ");
+                String input = scanner.nextLine().trim().toUpperCase();
 
-    private char getGenderInput() {
-        while (true) {
-            String input = getStringInput("Enter gender (M/F): ");
-            if (!input.isEmpty()) {
-                char gender = input.toUpperCase().charAt(0);
-                if (gender == 'M' || gender == 'F') {
-                    return gender;
+                if (input.isEmpty()) {
+                    throw new InvalidInputException("Input cannot be empty.");
                 }
+
+                char confirmation = input.charAt(0);
+                TryCatchThrowFromFile.validateYesOrNo(confirmation);
+
+                if (confirmation == 'Y') {
+                    patientManager.clearAllPatients();
+                    System.out.println("\nAll patients have been cleared from the system.");
+                } else {
+                    System.out.println("\nClear operation cancelled.");
+                }
+                break; // Exit loop after valid response
+
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
             }
-            System.out.println("Invalid input. Please enter 'M' for Male or 'F' for Female.");
         }
     }
 
