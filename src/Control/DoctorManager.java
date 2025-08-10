@@ -2,6 +2,7 @@ package Control;
 import Entity.Doctor;
 import adt.Heap;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. Then use updateDoctor(Doctor minWorkDoctor), to update the doctor back into heap
@@ -30,8 +31,6 @@ public class DoctorManager {
     public Doctor getMinWorkDoctor(){
         Doctor minWorkDoctor = doctorHeap.extractRoot();
         return minWorkDoctor;
-        
-        //manual
     }
     
     // Peek lowest patientCount doctor
@@ -39,7 +38,7 @@ public class DoctorManager {
         return doctorHeap.peekRoot();
     }
          
-    // View all Doctor, return their id, name and worload
+    // View all Doctor, return their id, name and work load
     public void viewAllDoctor(){
         try{
             for(int i = 0; i < doctorHeap.size(); i++){
@@ -47,21 +46,20 @@ public class DoctorManager {
             }
         } catch (Exception e){
             System.err.println("Error during findDoctor: " + e.getMessage());
-        }   
-    }
-    
-    public String[] peekAllDoctorID() {
-        String[] allDocIDs = new String[doctorHeap.size()];
-        for (int i = 0; i < doctorHeap.size(); i++) {
-            allDocIDs[i] = doctorHeap.get(i).getDoctorID();
         }
-        return allDocIDs;
     }
     
-    // Update doctor workload/patientCount, used after consultation
-    public void updateDoctor(Doctor minWorkDoctor){
+    // Update doctor workload/patientCount, used after !APPOINTED NEW TASK!
+    public void updateDoctorInc(Doctor minWorkDoctor){
         int currCount = minWorkDoctor.getPatientCount();
         minWorkDoctor.setPatientCount(++currCount);
+        doctorHeap.insert(minWorkDoctor);
+    }
+
+    // Update doctor workload/patientCount, used after !DOCTOR FINISH ITS TASK!
+    public void updateDoctorDec(Doctor minWorkDoctor){
+        int currCount = minWorkDoctor.getPatientCount();
+        if (currCount > 0) minWorkDoctor.setPatientCount(--currCount);
         doctorHeap.insert(minWorkDoctor);
     }
     
