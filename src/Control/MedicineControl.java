@@ -1,74 +1,65 @@
 package Control;
 import Entity.Medicine;
-import adt.ADTHeap;
+import adt.Heap;
 
 public class MedicineControl {
-    private ADTHeap<Medicine> lowStockHeap;
+    private Heap<Medicine> medHeap;
 
-    public MedicineControl() {
-        lowStockHeap = new ADTHeap<>(false); // Min-Heap by default
+    public MedicineControl(Heap<Medicine> lowStockMed) {
+        this.medHeap = lowStockMed;
     }
 
-    // Add a new medicine
-    public void addMedicine(Medicine med) {
-        lowStockHeap.insert(med);
-    }
-
-    // Peek the lowest stock medicine
-    public Medicine peekLowestStock() {
-        return lowStockHeap.peekRoot();
-    }
-
-    // Extract the most urgent (lowest stock) medicine
-    //??
-    public Medicine extractLowestStock() {
-        return lowStockHeap.extractRoot();
-    }
-
-    // Display all medicines in heap (unsorted)
-    public void displayAllStock() {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            System.out.println(lowStockHeap.get(i)); 
-        }
+    public void addMedicine(Medicine med) {//
+        medHeap.insert(med);
     }
     
-    public boolean updateStock(String medID, int newStock) {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
+    public boolean updateStock(String medID, int newStock) {//
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
             if (med.getMedID().equals(medID)) {
-                // Remove the original object using the data-based remove()
-                lowStockHeap.remove(med);
-
-                // Create a new object or update stock (if mutable)
-                med.setStock(newStock);  // assuming Medicine class has setStock()
-
-                // Re-insert updated version to maintain heap property
-                lowStockHeap.insert(med);
+                Medicine newMed = new Medicine(med);
+                newMed.setStock(newStock);
+                medHeap.update(med,newMed);
                 return true;
             }
         }
-        return false; // not found
+        return false;
+    }
+
+    public boolean removeMedicine(String medID) {//
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
+            if (med.getMedID().equals(medID)) {
+                return medHeap.remove(med);
+            }
+        }
+        return false;
     }
     
-    public Medicine findMedicineByID(String medID) {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
-            if (med.getMedID ().equals(medID)) {
+    
+    public Medicine peekLowestStock() {//
+        return medHeap.peekRoot();
+    }
+    public void displayAllStock() {//
+        medHeap.display();
+    }
+    public Medicine extractLowestStock() {//
+        return medHeap.extractRoot();
+    }
+    
+    public Medicine findMedicine(String medToFind) {//search by name or id
+        for (int i = 0; i < medHeap.size(); i++) {
+            Medicine med = medHeap.get(i);
+            if (med.getMedID ().equals(medToFind) ||
+            med.getName().equalsIgnoreCase(medToFind)) {
                 return med;
             }
         }
-        return null;
-    }
-    
-    public boolean removeExpiredMedicine(String expiryDate) {
-        for (int i = 0; i < lowStockHeap.size(); i++) {
-            Medicine med = lowStockHeap.get(i);
-            if (med.getExpiryDate().equals(expiryDate)) {
-                return lowStockHeap.remove(med); // remove by data
-            }
-        }
-        return false; // No match found
+      return null;
     }
 
+    public int getSize() {//
+        return medHeap.size();
+    }
 }
 

@@ -1,7 +1,7 @@
 package Control;
 import Entity.Doctor;
-import adt.ADTHeap;
-import java.util.Date;
+import adt.Heap;
+import java.time.LocalDate;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. Then use updateDoctor(Doctor minWorkDoctor), to update the doctor back into heap
@@ -12,15 +12,16 @@ import java.util.Date;
  * @author tanjixian
  */
 public class DoctorManager {
+    private Heap<Doctor> doctorHeap;
     
-  // Variables
-    ADTHeap<Doctor> doctorHeap = new ADTHeap<>(false);  // Min-heap for patientCount
-
+    public DoctorManager(Heap<Doctor> doctorHeap){
+        this.doctorHeap = doctorHeap;
+    }
     
   // Functions
     // Create a new doctor and insert into heap, boolean to ensure success or fail
-    public boolean addNewDoctor(String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, Date dateJoined){
-        Doctor newDoctor = new Doctor(doctorName, doctorAge, doctorPhoneNo, doctorGender, position, dateJoined);
+    public boolean addNewDoctor(String doctorID, String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, LocalDate dateJoined){
+        Doctor newDoctor = new Doctor(doctorID, doctorName, doctorAge, doctorPhoneNo, doctorGender, position, dateJoined);
         doctorHeap.insert(newDoctor);
         return true;
     }
@@ -29,6 +30,8 @@ public class DoctorManager {
     public Doctor getMinWorkDoctor(){
         Doctor minWorkDoctor = doctorHeap.extractRoot();
         return minWorkDoctor;
+        
+        //manual
     }
     
     // Peek lowest patientCount doctor
@@ -44,7 +47,15 @@ public class DoctorManager {
             }
         } catch (Exception e){
             System.err.println("Error during findDoctor: " + e.getMessage());
+        }   
+    }
+    
+    public String[] peekAllDoctorID() {
+        String[] allDocIDs = new String[doctorHeap.size()];
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            allDocIDs[i] = doctorHeap.get(i).getDoctorID();
         }
+        return allDocIDs;
     }
     
     // Update doctor workload/patientCount, used after consultation
@@ -72,21 +83,22 @@ public class DoctorManager {
         }
     }
     
-    public int findDoctor(String toFindID){
+    public Doctor findDoctor(String toFindID){
         try{
-            if (toFindID == null) return -1; // Null check 
+            if (toFindID == null) return null; // Null check 
             for(int i = 0; i < sizeOfDoctHeap(); i++ ){
-                if(doctorHeap.get(i).getDoctorID().equals(toFindID)) return i;  // If same doctorID then return the index
-            } return -1; // No such doctor
+                if(doctorHeap.get(i).getDoctorID().equals(toFindID)) {
+                    return doctorHeap.get(i);
+                }  // If same doctorID then return the index
+            } return null; // No such doctor
         } catch (Exception e){
             System.err.println("Error during findDoctor: " + e.getMessage());
-            return -1;  // Error
+            return null;  // Error
         }
     }
     
     // Remove Doctor (from doctorHeap)
     public void removeDoctor(Doctor toRemove){
         doctorHeap.remove(toRemove);
-    }   
-    
+    } 
 }

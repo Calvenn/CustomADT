@@ -1,47 +1,54 @@
 package Entity;
 
-public class MedRecord {
-    private String recordID;
-    private String patientName;
-    private String consultationType; // e.g., "General", "Emergency", "Follow-up"
-    private String medID;       // Link to Medicine table
-    private int quantityTaken;
-    private String timestamp;        // DateTime of when the medicine was issued
+import java.time.LocalDateTime;
 
-    public MedRecord(String recordID, String patientName, String consultationType,String medID, int quantityTaken, String timestamp) {
-        this.recordID = recordID;
-        this.patientName = patientName;
-        this.consultationType = consultationType;
-        this.medID = medID;
+public class MedRecord {
+    private static int idNo = 0; 
+    private String recordID;
+    private Patient patient;
+    private Doctor doc;
+    private Medicine medRec;       // Link to Medicine table
+    private int quantityTaken;  
+    private LocalDateTime timestamp;        // DateTime of when the medicine was issued
+
+    public MedRecord(Patient patient, Doctor doc, Medicine medRec, int quantityTaken, LocalDateTime timestamp) {
+        this.recordID = "MR" + String.format("%04d", generateId()); 
+        this.patient = patient;
+        this.doc = doc;
+        this.medRec = medRec;
         this.quantityTaken = quantityTaken;
         this.timestamp = timestamp;
     }
+    
     public MedRecord() {
         this.recordID = "";
-        this.patientName = "";
-        this.consultationType = "";
-        this.medID = "";
+        this.patient = null;
+        this.doc = null;
         this.quantityTaken = 0;
-        this.timestamp = "";
+        this.timestamp = LocalDateTime.now();
     }
-
+    
+    private static int generateId() {
+        idNo += 1; 
+        return idNo; 
+    }
     
     public String getRecordID() { 
         return recordID; 
     }
-    public String getPatientName() {
-        return patientName; 
+    public Patient getPatient() {
+        return patient; 
     }
-    public String getConsultationType() {
-        return consultationType; 
+    public Doctor getDoctor() {
+        return doc; 
     }
-    public String getMedID() { 
-        return medID; 
+    public Medicine getMedID() { 
+        return medRec; 
     }
     public int getQuantityTaken() { 
         return quantityTaken; 
     }
-    public String getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp; 
     }
 }

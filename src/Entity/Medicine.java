@@ -4,23 +4,27 @@ public class Medicine implements Comparable<Medicine>{
     private String medID;
     private String name;
     private String desc;
-    private String expiryDate;
     private int stock; 
     
     public Medicine(){
         medID = "";
         name = "";
         desc = "";
-        expiryDate = "";
         stock = 0;
     }
     
-    public Medicine(String medID, String name, String desc, String expiryDate,int stock){
+    public Medicine(String medID, String name, String desc,int stock){
         this.medID = medID;
         this.name = name;
         this.desc = desc;
-        this.expiryDate = expiryDate;
         this.stock = stock;
+    }
+    
+    public Medicine(Medicine original){
+        this.medID = original.medID;
+        this.name = original.name;
+        this.desc = original.desc;
+        this.stock = original.stock;
     }
     
     public String getMedID(){
@@ -31,9 +35,6 @@ public class Medicine implements Comparable<Medicine>{
     }
     public String getDesc(){
         return desc;
-    }
-    public String getExpiryDate(){
-        return expiryDate;
     }
     public int getStock(){
         return stock;
@@ -47,9 +48,6 @@ public class Medicine implements Comparable<Medicine>{
     }
     public void setDesc(String desc){
         this.desc = desc;
-    }
-    public void setExpiryDate(String expiryDate){
-        this.expiryDate = expiryDate;
     }
     public void setStock(int stock){
         this.stock = stock;

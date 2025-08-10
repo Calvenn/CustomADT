@@ -9,14 +9,14 @@ import java.util.Arrays;
  * @author calve
  * @param <E> any comparable type
  */
-public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
+public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     private static final int DEFAULT_SIZE = 20;
     private E[] heap;
     private int size;
     private boolean isMaxHeap = true; //Default is max heap
     //to use min heap init like this -> ADTHeap<Integer> maxHeap = new ADTHeap<>(false);
     
-    public ADTHeap(boolean isMaxHeap){
+    public Heap(boolean isMaxHeap){
         this.heap = (E[]) new Comparable[DEFAULT_SIZE];
         this.size = 0;
         this.isMaxHeap = isMaxHeap;
@@ -95,6 +95,16 @@ public class ADTHeap<E extends Comparable<E>> implements HeapInterface<E> {
         heapDown(index);
         heapUp(index);
         return true;
+    }
+    
+    @Override
+    public boolean contains(E data){
+        for(int i=0; i<size; i++){
+            if(heap[i].equals(data)){
+                return true;
+            }
+        }
+        return false;
     }
     
     /****************helper function**************/

@@ -6,14 +6,16 @@ public class Visit implements Comparable<Visit> {
     private String visitId;
     private Patient patient;
     private String symptoms;
-    private Severity severityLevel;
+    public Severity severityLevel;
+    private Doctor doctor;
     private LocalDateTime registrationTime;
 
-    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel) {
+    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel, Doctor doctor) {
         this.visitId = visitId;
         this.patient = patient;
         this.symptoms = symptoms;
         this.severityLevel = severityLevel;
+        this.doctor = doctor;
         this.registrationTime = LocalDateTime.now();
     }
     
@@ -48,6 +50,14 @@ public class Visit implements Comparable<Visit> {
     public void setSeverityLevel(Severity severityLevel) {
         this.severityLevel = severityLevel;
     }
+    
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
 
     public LocalDateTime getRegistrationTime() {
         return registrationTime;
@@ -61,11 +71,11 @@ public class Visit implements Comparable<Visit> {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return
-            "Visit ID        : " + visitId + "\n" +
-            "Symptoms        : " + symptoms + "\n" +
-            "Severity Level  : " + severityLevel + "\n" +
-            "Register Time   : " + registrationTime.format(formatter) + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("| %-10s | %-14s | %-14s | %-17s | %-30s |\n", visitId, severityLevel, doctor.getDoctorName(), registrationTime.format(formatter), symptoms));
+        sb.append("-".repeat(101));
+
+        return sb.toString();
     }
 
     @Override

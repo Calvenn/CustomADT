@@ -1,13 +1,12 @@
 package Entity;
 
-public class Patient implements Comparable<Patient>{
+public class Patient{
     private String patientIC;
     private String patientName;
     private String patientPhoneNo;
     private int patientAge;
     private char patientGender;
     private String patientAddress;
-    private boolean isAppt;
 
     public Patient(String patientIC, String patientName, String patientPhoneNo, int patientAge, char patientGender, String patientAddress) {
         this.patientIC = patientIC;
@@ -16,7 +15,6 @@ public class Patient implements Comparable<Patient>{
         this.patientAge = patientAge;
         this.patientGender = patientGender;
         this.patientAddress = patientAddress;
-        this.isAppt = false;
     }
     
     public String getPatientIC() {
@@ -66,27 +64,20 @@ public class Patient implements Comparable<Patient>{
     public void setPatientAddress(String patientAddress) {
         this.patientAddress = patientAddress;
     }
-
-    public boolean isAppt() {
-        return isAppt;
-    }
-
-    public void setAppt(boolean isAppt) {
-        this.isAppt = isAppt;
-    }
-
-    @Override
-    public int compareTo(Patient other) {
-        return this.patientName.compareTo(other.patientName);
-    }
-
+    
     @Override
     public String toString() {
-        return 
-            "Name           : " + patientName + "\n" +
-            "Phone Number   : " + patientPhoneNo + "\n" +
-            "Age           : " + patientAge + "\n" +
-            "Gender        : " + patientGender + "\n" +
-            "Address       : " + patientAddress;
+        return String.format(
+            "\n%-10s: %s" +
+            "\n%-10s: %s" +
+            "\n%-10s: %d" +
+            "\n%-10s: %c" +
+            "\n%-10s: %s\n",
+            "Name", patientName,
+            "Phone No", patientPhoneNo,
+            "Age", patientAge,
+            "Gender", patientGender,
+            "Address", patientAddress
+        );
     }
 }

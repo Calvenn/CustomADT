@@ -4,9 +4,12 @@
  */
 package Boundary;
 
-import Control.AppointmentManager;
-import Control.ConsultationManager;
 import Entity.Appointment;
+import Entity.Doctor;
+import Control.AppointmentManager;
+import Entity.Consultation;
+import Entity.Patient;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +23,7 @@ import java.util.Scanner;
 public class AppointmentUI {
     private AppointmentManager apptManager;
     private Scanner scanner;
+    protected boolean missedFlag;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
     public AppointmentUI(AppointmentManager shared) {
@@ -27,35 +31,54 @@ public class AppointmentUI {
         scanner = new Scanner(System.in);     
     }
     
-    public void apptMenu() {
+    public void apptMenu(Doctor currentDoc) {
         while (true) {
-            System.out.println("Total Appointment: " + apptManager.totalAppointments());
-            System.out.println("Incoming Appointment " + apptManager.getIncomingAppointment());
+            //System.out.println("Total Appointment: " + apptManager.totalAppointments());
+            //System.out.println("Incoming Appointment " + apptManager.getIncomingAppointment());
             
             System.out.println("\n--- Appointment Menu ---");
             System.out.println("1. View Appointments");
             System.out.println("2. Update Appointment");
             System.out.println("3. Delete Appointment");
-            System.out.println("4. Back");
+            System.out.print(missedFlag == true? 
+                    "4. Reschedule Miss Appointment"
+                    :"");
+            System.out.println(missedFlag == false? 
+                    "4. Back"
+                    :"\n5. Back");
 
             System.out.print("Choose > ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // clear newline
 
-            switch (choice) {
-                case 1 -> apptManager.displayAllAppointments();
-                case 2 -> updateAppointmentUI();
-                case 3 -> cancelAppointmentUI();
-                case 4 ->{
-                    System.out.println("Returning to main menu");
-                    return;
+            if (!missedFlag) {
+                switch (choice) {
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
+                    case 2 -> updateAppointmentUI();
+                    case 3 -> cancelAppointmentUI();
+                    case 4 -> {
+                        System.out.println("Returning to main menu");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice.\n");
                 }
-                default -> System.out.println("Invalid choice.\n");
+            } else {
+                switch (choice) {
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
+                    case 2 -> updateAppointmentUI();
+                    case 3 -> cancelAppointmentUI();
+                    case 4 -> rescheduleMissedApptUI(currentDoc);
+                    case 5 -> {
+                        System.out.println("Returning to main menu");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice.\n");
+                }
             }
         }
     }
     
-    void bookAppointmentUI(String patient, String phoneNum, String doctor, int severity) {
+    void bookAppointmentUI(Consultation consultAppt) {
         LocalDateTime time = null;
 
         while (true) {
@@ -65,8 +88,12 @@ public class AppointmentUI {
 
             try {
                 time = LocalDateTime.parse(input, formatter);
+                
+                if (time.isBefore(LocalDateTime.now())) {
+                    System.out.println("Cannot book in the past.");
+                }
 
-                boolean success = apptManager.bookAppointment(patient, phoneNum, doctor, severity, time);
+                boolean success = apptManager.bookAppointment(consultAppt, time);
                 if (success) {
                     System.out.println("Appointment booked successfully!");
                     break;
@@ -79,12 +106,11 @@ public class AppointmentUI {
         }
     }
 
-    
-    private void updateAppointmentUI() {
-        System.out.print("Enter patient phone number: ");
-        String phoneNum = scanner.nextLine();
+    protected void updateAppointmentUI() {
+        System.out.print("Enter patient IC number: ");
+        String ic = scanner.nextLine();
         
-        Appointment oldData = apptManager.findPatienInfo(phoneNum, formatter);
+        Appointment oldData = apptManager.findPatienInfo(ic);
         
         if(oldData != null){
             System.out.print("Enter new appointment time (yyyy-MM-dd HH:mm): ");
@@ -92,27 +118,56 @@ public class AppointmentUI {
             LocalDateTime newTime = LocalDateTime.parse(newTimeStr, formatter);
             
             if(getConfirmation("Are you sure want to change appointment to " + newTime.format(formatter) + " ?")){
-                boolean success = apptManager.updateAppointment(oldData, newTime, formatter);
+                boolean success = apptManager.updateAppointment(oldData, newTime);
                 System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");  
             }
         } else {
-            System.out.println("Phone Number " + phoneNum + " not found. Please try again");
+            System.out.println("IC Number " + ic + " not found. Please try again");
         }
     }
 
     private void cancelAppointmentUI() {
-        System.out.print("Enter patient phone number: ");
-        String phoneNum = scanner.nextLine();
+        System.out.print("Enter patient IC number: ");
+        String ic = scanner.nextLine();
 
-        Appointment appt = apptManager.findPatienInfo(phoneNum, formatter);
+        Appointment appt = apptManager.findPatienInfo(ic);
 
         if(appt != null){
-            if(getConfirmation("Are you sure want to cancel patient " + appt.getPatientName() + " at " + appt.getTime() + " ?")){
-                boolean success = apptManager.cancelAppointment(appt, formatter);
+            System.out.println("Patient Name: " + appt.getPatient().getPatientName());
+            System.out.println("Current appointment: " + appt.getDateTime().format(formatter));
+            
+            if(getConfirmation("Are you sure want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime() + " ?")){
+                boolean success = apptManager.cancelAppointment(appt);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }
         } else {
-            System.out.println("Phone Number " + phoneNum + " not found. Please try again");
+            System.out.println("IC Number " + ic + " not found. Please try again");
+        }
+    }
+    
+    private void rescheduleMissedApptUI(Doctor doc){
+        apptManager.displayAllMissedAppt(doc);
+        System.out.print("Enter patient IC to change appointment date: ");
+        String changedIC = scanner.nextLine();
+        
+        Appointment a = apptManager.getMissedAppt(doc, changedIC);
+        if(a == null) System.out.println("Patient IC " + changedIC + " not found");
+        System.out.println(a);
+        
+        System.out.print("Please enter new date and time to reschedule (yyyy-MM-dd HH:mm): ");
+        String newTimeStr = scanner.nextLine();
+        LocalDateTime newTime = LocalDateTime.parse(newTimeStr, formatter);
+        
+        if(getConfirmation("Are you sure want to change appointment to " + newTime.format(formatter) + " ?")){
+           boolean success = apptManager.bookAppointment(a, newTime);
+           if(success){
+               System.out.println("Appointment Updated");
+               if(!apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())){
+                    System.out.println("Removed Unsucessful.Please try again");
+                }
+           }else{
+               System.out.println("Not found or update failed. Please try again");
+           }
         }
     }
     

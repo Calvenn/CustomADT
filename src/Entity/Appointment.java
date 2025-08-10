@@ -9,49 +9,33 @@ import java.time.format.DateTimeFormatter;
  *
  * @author calve
  */
-public class Appointment implements Comparable<Appointment>{
-    private String patientName; // patient id
-    private String phoneNum;
-    private String doctorID;
+public abstract class Appointment implements Comparable<Appointment>{
+    private Patient patient;
+    private Doctor doctor;
     private int severity;
-    private String doctorName; //chg to doc id after integration
-    private LocalDateTime time;
+    private LocalDateTime dateTime;
     
-    public Appointment(String patientName, String phoneNum, String doctorName, int severity, LocalDateTime time){
-        this.patientName = patientName;
-        this.phoneNum = phoneNum;
-        this.doctorID = "D001"; //FOR TESTING PURPOSE
+    public Appointment(Patient patient, Doctor doctor, int severity, LocalDateTime time){
+        this.patient = patient;
+        this.doctor = doctor;
         this.severity = severity;
-        this.doctorName = doctorName;
-        this.time = time;
+        this.dateTime = time;
     }
     
-    public String getPatientName(){
-        return patientName;
+    public Patient getPatient(){
+        return patient;
     }
-    
-    public String getPhoneNum(){
-        return phoneNum;
-    }
-    
-    public String getDoctorName(){
-        return doctorName;
+   
+    public Doctor getDoctor(){
+        return doctor;
     }
     
     public int getSeverity(){
         return severity;
     }
     
-    public LocalDateTime getTime(){
-        return time;
-    }
-    
-    public void setPatientName(String patientName){
-        this.patientName = patientName;
-    }
-    
-    public void setDoctorName(String doctorName){
-        this.doctorName = doctorName;
+    public LocalDateTime getDateTime(){
+        return dateTime;
     }
     
     public void setSeverity(int severity){
@@ -59,21 +43,31 @@ public class Appointment implements Comparable<Appointment>{
     }
     
     public void setTime(LocalDateTime time){
-        this.time = time;
+        this.dateTime = time;
     }
     
     //@Override
     public int compareTo(Appointment other){
-        return this.time.compareTo(other.time);
+        return this.dateTime.compareTo(other.dateTime);
     }
     
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return "Appointment Details:\n"
-             + " Date & Time : " + time.format(formatter) + "\n"
-             + " Patient     : " + patientName + " (" + phoneNum + ")\n"
-             + " Doctor      : " + doctorName + "\n"
+             + " Date & Time : " + dateTime.format(formatter) + "\n"
+             + " Doctor      : " + doctor.getDoctorName() + "\n"
              + " Severity    : " + severity;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Appointment other = (Appointment) obj;
+        return this.getPatient().getPatientIC().equals(other.getPatient().getPatientIC())
+            && this.getDoctor().getDoctorID().equals(other.getDoctor().getDoctorID());
+    }
+    
+    public abstract String getAppointmentType();
 }

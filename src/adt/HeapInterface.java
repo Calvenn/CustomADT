@@ -36,4 +36,8 @@ public interface HeapInterface<E extends Comparable<E>>{
     //@return whether data sucessfully delete
     boolean remove(E data);
     
+    //@param data to be find
+    //@return whether data is found
+    boolean contains(E data);
+    
 }
