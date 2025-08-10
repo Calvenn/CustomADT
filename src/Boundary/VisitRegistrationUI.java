@@ -109,7 +109,7 @@ public class VisitRegistrationUI {
         boolean isLifeThreatening = askLifeThreatening();
         String symptoms = getStringInput("\nPlease describe the symptoms:");
 
-        Visit visit = queueManager.createVisit(patient, symptoms, isLifeThreatening);
+        Visit visit = queueManager.createVisit(patient, symptoms, isLifeThreatening, false);
 
         System.out.println("\nVisit Registration Successful!");
         visitsTableHeader();

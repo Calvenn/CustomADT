@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  *
  * @author calve
  */
-public class Consultation implements Comparable<Consultation>{
+public class Consultation extends Appointment{
     //for report purpose
     public static int numOfFollowUp = 0;
     public static int numOfPharmacy = 0;
@@ -18,21 +18,25 @@ public class Consultation implements Comparable<Consultation>{
     
     //patient id as foreign key
     private static int idNo = 0; 
-    private final String consultationID;
-    private final Patient patient;
-    private final Doctor doc;
-    private Integer severity;
+    private final String consultationID; //C0001
+    private String disease;
     private String notes;
-    private LocalDateTime time;
+    private LocalDateTime createdAt;
     
-    
-    public Consultation(int severity, Patient patient, String notes, Doctor doc){
+    public Consultation(int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime apptDateTime){
+        super(patient, doc, severity, apptDateTime);
         this.consultationID = "C" + String.format("%04d", generateId()); 
-        this.severity = severity;
-        this.patient = patient;
+        this.disease = disease;
         this.notes = notes;
-        this.doc = doc;
-        this.time = time.now();
+        this.createdAt = createdAt.now();
+    }
+    
+    public Consultation(String consultationID, int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime apptDateTime) {
+        super(patient, doc, severity, apptDateTime);
+        this.consultationID = consultationID;
+        this.disease = disease;
+        this.notes = notes;
+        this.createdAt = LocalDateTime.now();
     }
     
     private static int generateId() {
@@ -43,45 +47,35 @@ public class Consultation implements Comparable<Consultation>{
     public String getID(){
         return consultationID;
     }
-        
-    public Patient getPatient() {
-        return patient;
-    }
     
-    public int getSeverity(){
-        return severity;
+    public String getDisease(){
+        return disease;
     }
     
     public String getNotes(){
         return notes;
     }
     
-    public Doctor getDoc() {
-        return doc;
-    }
-    
-    public void setSeverity(){
-        this.severity = severity;
-    }
-    
     public void setNotes(){
         this.notes = notes;
     }
     
-    //@Override
-    public int compareTo(Consultation other){
-        return this.severity.compareTo(other.severity);
+    @Override
+    public String getAppointmentType() {
+        return "Consultation";
     }
-    
+
     @Override
     public String toString() {
         return "\n=== Consultation Record ===\n"
              + "Consultation ID  : " + consultationID + "\n"
              + "Patient Name     : " + getPatient().getPatientName() + "\n"
              + "Patient IC       : " + getPatient().getPatientIC() + "\n"
-             + "Severity Level   : " + severity + "\n"
-             + "Diagnosis/Notes  : " + notes + "\n"
-             + "Doctor In Charge : " + getDoc().getDoctorName() + "\n"
+             + "Severity Level   : " + super.getSeverity() + "\n"
+             + "Diagnosis        : " + disease + "\n"
+             + "Notes            : " + notes + "\n"   
+             + "Doctor In Charge : " + super.getDoctor().getDoctorName() + "\n"
+             + "Appointment Time : " + super.getDateTime() + "\n"
              + "===========================\n";
     }
 }

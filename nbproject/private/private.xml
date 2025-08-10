@@ -3,15 +3,20 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/ConsultationReport.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Visit.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/VisitRegistrationUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/QueueManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/adt/LinkedHashMap.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/ConsultationUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Appointment.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/ReportUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/AppointmentManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/ConsultationManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Main/Main.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/adt/Heap.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/AppointmentUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/DoctorManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Consultation.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/adt/List.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/adt/LinkedHashMap.java</file>
         </group>
     </open-files>
 </project-private>
