@@ -213,7 +213,7 @@ public class ConsultationUI {
             System.out.println("Enter treatment name to assign: ");
             String name = scanner.nextLine();
 
-            Treatment selected = trtManager.findTreatment(name);
+            Treatment selected = trtManager.findTreatmentName(name);
             if (selected == null) {
                 System.out.println("Treatment not found. Please try again.\n");
                 continue;
