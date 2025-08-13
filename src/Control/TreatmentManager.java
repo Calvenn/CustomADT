@@ -8,21 +8,32 @@ import java.time.Duration;
 public class TreatmentManager {
     private Heap<Treatment> providedTreatments;
     
+    public TreatmentManager() {
+        providedTreatments = new Heap<>(true); 
+    }
+    
     public TreatmentManager(Heap<Treatment> providedTreatments){
         this.providedTreatments = providedTreatments;
     }
     
     //if treatment names same, return true. else, return false
-    public boolean treatmentExist(String treatmentName) {
+    public void treatmentExist(String treatmentName) {
         for(int i = 0; i < providedTreatments.size(); i++) {
             if(providedTreatments.get(i).getName().trim().equalsIgnoreCase(treatmentName)) {
-                return true; 
+                throw new IllegalArgumentException("Treatment already exist."); 
             }
         }
-        return false; 
     }
     
-    public Treatment findTreatment(String treatmentName) {
+    public Treatment findTreatmentID(String treatmentId) {
+        for(int i = 0; i < providedTreatments.size(); i++ ){
+            if(providedTreatments.get(i).getTreatmentId().equalsIgnoreCase(treatmentId)) {
+                return providedTreatments.get(i);
+            }  
+        } return null;
+    }
+    
+    public Treatment findTreatmentName(String treatmentName) {
         for(int i = 0; i < providedTreatments.size(); i++ ){
             if(providedTreatments.get(i).getName().equalsIgnoreCase(treatmentName)) {
                 return providedTreatments.get(i);
@@ -41,10 +52,7 @@ public class TreatmentManager {
     
     //trigger to add new treatment to heap list 
     public boolean newTreatment(String treatmentName, String description, Duration duration) {
-        treatmentName = treatmentName.trim(); 
-        if(treatmentExist(treatmentName)) throw new IllegalArgumentException("Treatment already exist."); 
-        
-        Treatment newTreatment = new Treatment(treatmentName, description, duration); 
+        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration); 
         providedTreatments.insert(newTreatment); 
         return true; 
     }

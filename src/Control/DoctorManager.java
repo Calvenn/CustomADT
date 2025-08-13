@@ -2,6 +2,7 @@ package Control;
 import Entity.Doctor;
 import adt.Heap;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. Then use updateDoctor(Doctor minWorkDoctor), to update the doctor back into heap
@@ -37,7 +38,7 @@ public class DoctorManager {
         return doctorHeap.peekRoot();
     }
          
-    // View all Doctor, return their id, name and worload
+    // View all Doctor, return their id, name and work load
     public void viewAllDoctor(){
         try{
             for(int i = 0; i < doctorHeap.size(); i++){
@@ -48,10 +49,17 @@ public class DoctorManager {
         }
     }
     
-    // Update doctor workload/patientCount, used after consultation
-    public void updateDoctor(Doctor minWorkDoctor){
+    // Update doctor workload/patientCount, used after !APPOINTED NEW TASK!
+    public void updateDoctorInc(Doctor minWorkDoctor){
         int currCount = minWorkDoctor.getPatientCount();
         minWorkDoctor.setPatientCount(++currCount);
+        doctorHeap.insert(minWorkDoctor);
+    }
+
+    // Update doctor workload/patientCount, used after !DOCTOR FINISH ITS TASK!
+    public void updateDoctorDec(Doctor minWorkDoctor){
+        int currCount = minWorkDoctor.getPatientCount();
+        if (currCount > 0) minWorkDoctor.setPatientCount(--currCount);
         doctorHeap.insert(minWorkDoctor);
     }
     

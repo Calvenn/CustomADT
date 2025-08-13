@@ -13,6 +13,7 @@ import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Control.ConsultationReport;
 import Control.MedicineControl;
+import Control.PatientManager;
 import Control.QueueManager;
 import Control.TreatmentManager;
 
@@ -45,7 +46,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Heap<Doctor> sharedDoc = new Heap<>(false);
         Heap<Visit> sharedVisitQueue = new Heap<>(true);
-        Heap<Appointment> sharedApptHeap = new Heap<>(false);
+        //Heap<Appointment> consultAppt = new Heap<>(false);
         Heap<Treatment> providedTreatments = new Heap<>(true);
         Heap<Medicine> lowStockMed = new Heap<>(false);
         
@@ -55,17 +56,18 @@ public class Main {
         LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
         LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
            
+        PatientManager patientManager = new PatientManager();
         DoctorManager docManager = new DoctorManager(sharedDoc);
-        AppointmentManager apptManager = new AppointmentManager(sharedApptHeap, missAppt);
-        QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager);
-        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, consultLog, treatmentQueue, medCollectQueue);
+        QueueManager queueManager = new QueueManager(sharedVisitQueue, docManager, patientManager, consultLog);
+        AppointmentManager apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
+        ConsultationManager consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(), docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
         TreatmentManager trtManager = new TreatmentManager(providedTreatments); 
         MedicineControl medControl = new MedicineControl(lowStockMed);
         
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medControl);
-        loadDummyAppt(apptManager, docManager);
+        //loadDummyAppt(apptManager, docManager);
         loadDummyConsult(consultManager, docManager, consultLog);
         
         ConsultationReport consultReport = new ConsultationReport(consultLog);
@@ -76,8 +78,9 @@ public class Main {
 
         int choice;
         do {
-            displayMainMenu();
             while (true) {
+            queueManager.loadVisit();
+            displayMainMenu();
                 try {
                     System.out.print("Enter your choice: ");
                     choice = Integer.parseInt(scanner.nextLine());
@@ -134,35 +137,37 @@ public class Main {
     }
 
     private static void loadDummyMed(MedicineControl medControl) {
-        Medicine med = new Medicine("Panadol", "Panadol", "testest", "June", 100);
+        Medicine med = new Medicine("Panadol", "Panadol", "testest", 100);
         medControl.addMedicine(med);
     }
-    
+    /*
     private static void loadDummyAppt(AppointmentManager apptManager, DoctorManager docManager) {
         Patient patient = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
         Doctor doc = docManager.findDoctor("D001");
-        apptManager.bookAppointment(patient, 1, LocalDateTime.now(), doc);
-        apptManager.bookAppointment(patient, 2, LocalDateTime.of(2025, Month.DECEMBER, 12, 12, 30), doc);
-    }
+        //apptManager.bookAppointment(patient, 1, LocalDateTime.now(), doc);
+        //apptManager.bookAppointment(patient, 2, LocalDateTime.of(2025, Month.DECEMBER, 12, 12, 30), doc);
+    }*/
     
     private static void loadDummyConsult(ConsultationManager consult, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
         Patient p1 = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
         Patient p2 = new Patient("050707070707", "Bob", "0124282783", 20, 'M', "Bayan Lepas");
         Patient p3 = new Patient("050808070808", "Nana", "0124282783", 20, 'M', "Bayan Lepas");
-        
-        Doctor doc1 = docManager.findDoctor("D001");
+
+        Doctor doc1 = docManager.findDoctor("D001"); // JOHN
         Doctor doc2 = docManager.findDoctor("D002");
-        
+
         List<Consultation> doc1Consults = new List<>();
-        doc1Consults.add(new Consultation(1,p1, "Flu", doc1));
+        doc1Consults.add(new Consultation(1, p1, "Flu", null, doc1, null));
         Consultation.numOfFollowUp++;
-        doc1Consults.add(new Consultation(3,p2, "Fever",  doc2));
+
+        List<Consultation> doc2Consults = new List<>();
+        doc2Consults.add(new Consultation(3, p2, "Fever", null, doc2, LocalDateTime.of(2025, Month.AUGUST, 9, 15, 30)));
         Consultation.numOfTreatment++;
-        doc1Consults.add(new Consultation(2,p3, "Flu", doc2));
-        Consultation.numOfFollowUp++;
-        
+
         consultLog.put(doc1.getDoctorID(), doc1Consults);
+        consultLog.put(doc2.getDoctorID(), doc2Consults);
     }
+
 }
 
 

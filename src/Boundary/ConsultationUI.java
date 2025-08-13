@@ -71,13 +71,13 @@ public class ConsultationUI {
         }
         
         while (true) {
-            apptManager.checkMissedAppt(currentDoc.getDoctorID());
             System.out.println(apptManager.totalAppointments(currentDoc.getDoctorID()) == 0?
                     "No appointment found"
                     : "\nTotal Appointment: " + apptManager.totalAppointments(currentDoc.getDoctorID()));
             System.out.println(apptManager.getIncomingAppointment(currentDoc.getDoctorID()) == null?
                    "No incoming appointment found"
                     : "Incoming Appointment: " + apptManager.getIncomingAppointment(currentDoc.getDoctorID()));
+            apptManager.checkMissedAppt(currentDoc.getDoctorID());
             System.out.println(
                     apptManager.getNumMissedAppt(currentDoc.getDoctorID()) == 0? 
                     "No appointment missed" 
@@ -87,7 +87,6 @@ public class ConsultationUI {
             } else {
                 apptUI.missedFlag = false;
             }
-            //get incoming queue from patient & doc
             
             System.out.println("\n--- Consultation Menu ---");
             System.out.println("1. Handle Consultation");
@@ -138,7 +137,13 @@ public class ConsultationUI {
     }
     
     private void consultRecord() {
-        Object currentPatient = consultManager.dispatchNextPatient(); 
+        Object currentPatient = null;
+        System.out.print("Do you want to call next patient? (y/any key for no): ");
+        String choice = scanner.nextLine();
+        
+        if(choice.equalsIgnoreCase("y")){          
+            currentPatient = consultManager.dispatchNextPatient();
+        }
 
         if (currentPatient == null) {
             System.out.println("No more patients in queue.");
@@ -146,28 +151,40 @@ public class ConsultationUI {
         }
 
         System.out.println("\n--- Now Consulting ---");
-
+        String id = null;
         Patient patient = null;
-        if (currentPatient instanceof Appointment appointment) {
-            patient = appointment.getPatient();
-            System.out.println("Type     : Appointment");
-            System.out.println("Patient  : " + patient.getPatientName());
-            System.out.println("Doctor   : " + appointment.getDoctor().getDoctorName());
-            System.out.println("Severity : " + appointment.getSeverity());
-            System.out.println("Time     : " + appointment.getTime().format(formatter));
-        } else if (currentPatient instanceof Visit visit) {
-            patient = visit.getPatient();
+        if(currentPatient instanceof Visit visit){
             System.out.println("Type     : Walk-In");
-            System.out.println("Patient  : " + patient.getPatientName());
+            System.out.println("Visit ID : " + visit.getVisitId());
+            System.out.println("Patient  : " + visit.getPatient().getPatientName());
             System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
             System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());
             System.out.println("Symptoms : " + visit.getSymptoms());
-        } else {
-            System.out.println("Unknown patient type.");
-            return;
+            patient = visit.getPatient();
+        } else if (currentPatient instanceof Consultation appt){
+            id = appt.getID();
+            System.out.println("Type   : Appointment");
+            System.out.println("ID       : " + id);
+            System.out.println("Patient  : " + appt.getPatient().getPatientName());
+            System.out.println("Doctor   : " + appt.getDoctor().getDoctorName());
+            System.out.println("Severity : " + appt.getSeverity());
+            System.out.println("Symptoms : " + appt.getDisease());
+            patient = appt.getPatient();
         }
+        
+        System.out.print("Enter severity level: ");
+        int severity = scanner.nextInt();
+        scanner.nextLine();
+        
+        System.out.print("Enter diagnosis: ");
+        String diagnosis = scanner.nextLine();
 
-        if (consultManager.consultationRecord(patient)) {
+        System.out.print("Enter notes (if any): ");
+        String notes = scanner.nextLine();
+        
+        Consultation consultInfo = consultManager.consultationRecord(id, patient, severity, diagnosis, notes);
+
+        if (consultInfo != null) {
             System.out.println("Record saved.");
 
             while (true) {
@@ -188,11 +205,7 @@ public class ConsultationUI {
 
                 switch (action) {
                     case 1 -> {
-                        int sev = currentPatient instanceof Appointment appt ?
-                                  appt.getSeverity() :
-                                  ((Visit) currentPatient).getSeverityLevel().getSeverity();
-
-                        apptUI.bookAppointmentUI(patient, sev, currentDoc);
+                        apptUI.bookAppointmentUI(consultInfo);
                         Consultation.numOfFollowUp++;
 
                         if (isToPharmacy()) {
@@ -229,7 +242,7 @@ public class ConsultationUI {
             System.out.println("Enter treatment name to assign: ");
             String name = scanner.nextLine();
 
-            Treatment selected = trtManager.findTreatment(name);
+            Treatment selected = trtManager.findTreatmentName(name);
             if (selected == null) {
                 System.out.println("Treatment not found. Please try again.\n");
                 continue;
