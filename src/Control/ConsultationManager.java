@@ -105,7 +105,7 @@ public class ConsultationManager {
             return false;
         }     
         
-        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time, sev);
+        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
         treatmentQueue.enqueue(trtAppt);
         return true;
     }

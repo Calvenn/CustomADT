@@ -4,32 +4,21 @@ import java.time.LocalDateTime;
 public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
     
     private final String appointmentId; 
-    private Doctor doc; //need change to entity afterwards //done
-    private Consultation consult;  //need change to entity afterwards //done
+    private Doctor doctor; 
+    final private Consultation consult; 
     private final Treatment treatment; 
     private final String room;
     private LocalDateTime treatmentTime;  
-    private Severity severity; 
-    private String treatmentStatus; 
-    
-    private final static String[] status = {
-        "Scheduled", 
-        "Completed", 
-        "Cancelled", 
-        "Rescheduled"
-    }; 
     
     private static int idNo = 0; 
     
-    public TreatmentAppointment(Doctor doc, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, Severity severity) {
+    public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime) {
         appointmentId = "T" + String.format("%04d", generateId()); 
-        this.doc = doc; 
+        this.doctor = doctor; 
         this.consult = consult; 
         this.treatment = treatment; 
         this.room = room; 
-        this.treatmentTime = treatmentTime; 
-        this.severity = severity; 
-        treatmentStatus = ""; 
+        this.treatmentTime = treatmentTime;  
     }
     
     private static int generateId() {
@@ -37,16 +26,12 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
         return idNo; 
     }
     
-    public static String[] getAllStatus() {
-        return status; 
-    }
-    
     public String getAppointmentId() {
         return appointmentId; 
     }
      
     public Doctor getDoctor() {
-        return doc; 
+        return doctor; 
     }
      
     public Consultation getConsultation() {
@@ -64,53 +49,32 @@ public class TreatmentAppointment implements Comparable<TreatmentAppointment>{
     public LocalDateTime getTreatmentTime() {
         return treatmentTime; 
     }
-    
-    public Severity getSeverity() {
-        return severity; 
-    }
-     
-    public String getTreatmentStatus() {
-        return treatmentStatus;  
-    }
      
     public void setDoctor(Doctor doctor) {  
-        this.doc = doctor; 
-    }
-     
-    public void setTreatmentStatus(String treatmentStatus) {
-        this.treatmentStatus = treatmentStatus; 
+        this.doctor = doctor; 
     }
     
     public void setTreatmentTime(LocalDateTime treatmentTime) {
         this.treatmentTime = treatmentTime; 
     }
     
-    public void setSeverity(Severity severity) {
-        this.severity = severity; 
-    }
-    
     @Override 
     public int compareTo(TreatmentAppointment other) {
         //this earlier than other returns neg, this later than other returns pos, 0 if same time  
-        int comparism = this.treatmentTime.compareTo(other.treatmentTime);  
-        if(comparism == 0) {
-            comparism = this.severity.compareTo(other.severity); 
-        } 
-        return comparism; 
+        return this.treatmentTime.compareTo(other.treatmentTime);  
     }
     
     @Override
     public String toString() {
         return String.format("""
-                Appointment Id: %s
-                Doctor Id: %s
-                Consultation Id: %s
-                Treatment: %s
-                Room: %s
-                Treatment Time: %s
-                Treatment Status: %s
+            Appointment Id: %s
+            Doctor: %s
+            Consultation: %s
+            Treatment: %s
+            Room: %s
+            Treatment Time: %s
             """, 
-           this.appointmentId, this.doc, this.consult, this.treatment, this.room, this.treatmentTime, this.treatmentStatus
+           this.appointmentId, this.doctor, this.consult, this.treatment, this.room, this.treatmentTime
         ); 
     }
     
