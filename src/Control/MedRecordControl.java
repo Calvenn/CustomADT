@@ -13,6 +13,9 @@ public class MedRecordControl {
     public MedRecordControl(){
         this.recList = new List<>();
     }
+    public MedRecordControl(List<MedRecord> recList){
+        this.recList = recList;
+    }
     
     public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken) {
         MedRecord record = new MedRecord(
