@@ -39,17 +39,17 @@ public class MedRecordControl {
         }
     }
     
-    public void searchByPatient(String patientID) {
+    public void searchByPatient(String patientIC) {
         boolean found = false;
         for (int i = 0; i < recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getPatient().getPatientIC().equalsIgnoreCase(patientID)) {
+            if (record.getPatient().getPatientIC().equalsIgnoreCase(patientIC)) {
                 displayRecord(record);
                 found = true;
             }
         }
         if (!found) {
-            System.out.println("No records found for patient ID: " + patientID);
+            System.out.println("No records found for patient ID: " + patientIC);
         }
     }
     

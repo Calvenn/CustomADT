@@ -1,65 +1,65 @@
 package Control;
 import Entity.Medicine;
-import adt.Heap;
+import adt.LinkedHashMap;
 
 public class MedicineControl {
-    private Heap<Medicine> medHeap;
+    private LinkedHashMap<String,Medicine> medMap;
 
     public MedicineControl() {
-        medHeap = new Heap<>(false);
+        medMap = new LinkedHashMap<>();
+    }
+    public MedicineControl(LinkedHashMap<String,Medicine> medMap){
+        this.medMap = medMap;
     }
 
     public void addMedicine(Medicine med) {//
-        medHeap.insert(med);
+        medMap.put(med.getMedID(),med);
     }
     
     public boolean updateStock(String medID, int newStock) {//
-        for (int i = 0; i < medHeap.size(); i++) {
-            Medicine med = medHeap.get(i);
-            if (med.getMedID().equals(medID)) {
-                Medicine newMed = new Medicine(med);
-                newMed.setStock(newStock);
-                medHeap.update(med,newMed);
-                return true;
-            }
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setStock(newStock);
+            return true;
         }
         return false;
     }
 
     public boolean removeMedicine(String medID) {//
-        for (int i = 0; i < medHeap.size(); i++) {
-            Medicine med = medHeap.get(i);
-            if (med.getMedID().equals(medID)) {
-                return medHeap.remove(med);
-            }
+        return medMap.remove(medID) != null;
+    }
+    
+    public void displayAllMedicines() {
+        if (medMap.isEmpty()) {
+            System.out.println("\nNo medicines available in stock.");
+            return;
         }
-        return false;
-    }
-    
-    
-    public Medicine peekLowestStock() {//
-        return medHeap.peekRoot();
-    }
-    public void displayAllStock() {//
-        medHeap.display();
-    }
-    public Medicine extractLowestStock() {//
-        return medHeap.extractRoot();
-    }
-    
-    public Medicine findMedicine(String medToFind) {//search by name or id
-        for (int i = 0; i < medHeap.size(); i++) {
-            Medicine med = medHeap.get(i);
-            if (med.getMedID ().equals(medToFind) ||
-            med.getName().equalsIgnoreCase(medToFind)) {
-                return med;
-            }
+
+        System.out.println("\n=== Medicine List ===");
+        System.out.printf("%-10s %-20s %-30s %-10s%n", "MedID", "Name", "Description", "Stock");
+        System.out.println("--------------------------------------------------------------------------");
+
+        Object[] meds = medMap.getValues();
+        for (Object obj : meds) {
+            Medicine med = (Medicine) obj;
+            System.out.printf("%-10s %-20s %-30s %-10d%n",
+                    med.getMedID(),
+                    med.getName(),
+                    med.getDesc(),
+                    med.getStock());
         }
-      return null;
     }
 
+    
+    public Medicine findMedicine(String medID) {//
+        return medMap.get(medID);
+    }
+    
+    public boolean consists(String medID){
+        return medMap.containsKey(medID);
+    }
     public int getSize() {//
-        return medHeap.size();
+        return medMap.size();
     }
 }
 
