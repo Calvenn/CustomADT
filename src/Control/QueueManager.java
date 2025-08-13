@@ -130,7 +130,7 @@ public class QueueManager {
 
         Doctor doctor = docManager.getMinWorkDoctor();
         Visit visit = new Visit(visitId, patient, symptoms, severityLevel, doctor);
-        docManager.updateDoctor(doctor);
+        docManager.updateDoctorInc(doctor);
         visitQueue.insert(visit);
         refreshQueueComposition();
         updateNextPatient();
