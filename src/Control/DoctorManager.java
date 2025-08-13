@@ -37,6 +37,14 @@ public class DoctorManager {
     public Doctor peekRootDoctor(){
         return doctorHeap.peekRoot();
     }
+    
+    public String[] peekAllDoctorID() {
+        String[] allDocIDs = new String[doctorHeap.size()];
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            allDocIDs[i] = doctorHeap.get(i).getDoctorID();
+        }
+        return allDocIDs;
+    }
          
     // View all Doctor, return their id, name and work load
     public void viewAllDoctor(){

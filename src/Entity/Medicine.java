@@ -1,6 +1,6 @@
 package Entity;
 
-public class Medicine{
+public class Medicine {
     private String medID;
     private String name;
     private String desc;

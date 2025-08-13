@@ -275,7 +275,7 @@ public class ConsultationUI {
     private void toPharmacyUI(Doctor doc, Patient patient) {
         while (true) {
             System.out.println("\n--- Medicine Record ---");
-            medControl.displayAllStock();
+            //medControl.displayAllStock();
 
             System.out.println("Enter Medicine Name/ID: ");
             String medName = scanner.nextLine();

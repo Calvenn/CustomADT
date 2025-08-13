@@ -1,28 +1,44 @@
 package Entity;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  *
  * @author tanjixian
  */
 
-public class Doctor extends Staff implements Comparable<Doctor>{
+public class Doctor implements Comparable<Doctor>{
     // Variables
-    private String department;   // Treatment - Consultation
-    private int patientCount;    // Availability, How many work handled by this doctor
+    private String doctorID;
+    private String doctorName;
+    private int doctorAge;
+    private String doctorPhoneNo;
+    private String doctorGender;
+    private String position; // Treatment  & Consultation 
+    private LocalDate dateJoined;
+    private Integer patientCount;    // Availability, How many work handled by this doctor
     private static int doctorCount = 0;     // To count the total amount of doctors 
     
     // Constructor
     public Doctor(){ doctorCount++; }
-    public Doctor(String id, String name, int age, String phoneNo, String gender, String position, LocalDateTime dateJoined, String department){
-        super(id, name, age, phoneNo, gender, position, dateJoined);
+    public Doctor(String doctorID, String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, LocalDate dateJoined){
         doctorCount++;
+        this.doctorID = String.format("D%03d", doctorCount);
+        this.doctorName = doctorName;
+        this.doctorAge = doctorAge;
+        this.doctorPhoneNo = doctorPhoneNo;
+        this.doctorGender = doctorGender;
+        this.position = position;
+        this.dateJoined = dateJoined;
         this.patientCount = 0;
-        this.department = department;
     }
     
     // Setters
-    public void setPatientCount (int workload) { this.patientCount = workload; }n
+    public void setDoctorName (String doctorName){ this.doctorName = doctorName; }
+    public void setDoctorAge (int doctorAge){ this.doctorAge = doctorAge; }
+    public void setDoctorPhoneNo (String doctorPhoneNo){ this.doctorPhoneNo = doctorPhoneNo; }
+    public void setDoctorGender (String doctorGender){ this.doctorGender = doctorGender; }
+    public void setPosition (String position) { this.position = position; }
+    public void setPatientCount (int workload) { this.patientCount = workload; }
     
     // Getters
     public String getDoctorID () { return doctorID; }
@@ -36,8 +52,8 @@ public class Doctor extends Staff implements Comparable<Doctor>{
     
     //compareTo, Compare patientCount, used for Heap
     @Override
-    public int compareTo(Staff other){
-        return Integer.compare(this.patientCount, other.patientCount);
+    public int compareTo(Doctor other){
+        return this.patientCount.compareTo(other.patientCount);
     }
     
     //equals, Compare objects contents 
