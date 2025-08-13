@@ -8,7 +8,11 @@ public class MedicineControl {
     public MedicineControl() {
         medHeap = new Heap<>(false);
     }
-
+    
+    public MedicineControl(Heap<Medicine> medHeap) {
+        this.medHeap = medHeap;
+    }
+    
     public void addMedicine(Medicine med) {//
         medHeap.insert(med);
     }
