@@ -1,6 +1,6 @@
 package Entity;
 
-public class Medicine implements Comparable<Medicine>{
+public class Medicine{
     private String medID;
     private String name;
     private String desc;
@@ -18,13 +18,6 @@ public class Medicine implements Comparable<Medicine>{
         this.name = name;
         this.desc = desc;
         this.stock = stock;
-    }
-    
-    public Medicine(Medicine original){
-        this.medID = original.medID;
-        this.name = original.name;
-        this.desc = original.desc;
-        this.stock = original.stock;
     }
     
     public String getMedID(){
@@ -51,10 +44,5 @@ public class Medicine implements Comparable<Medicine>{
     }
     public void setStock(int stock){
         this.stock = stock;
-    }
-    
-    @Override
-    public int compareTo(Medicine other) {
-        return Integer.compare(this.stock, other.stock);  // lower stock = higher priority
     }
 }
