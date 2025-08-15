@@ -109,7 +109,7 @@ public class Main {
                     consultUI.consultMainMenu();
                 }
                 //case 4 -> consultUI.consultMainMenu();
-                case 5 -> consultUI.consultMainMenu();
+                case 5 -> pharUI.pharmacyMenu();
                 case 6 -> reportUI.reportMainMenu();
                 case 7 -> {
                     System.out.println("Thank you for using the Clinic System!");
