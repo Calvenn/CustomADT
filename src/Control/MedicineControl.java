@@ -36,13 +36,13 @@ public class MedicineControl {
         }
 
         System.out.println("\n=== Medicine List ===");
-        System.out.printf("%-10s %-20s %-30s %-10s%n", "MedID", "Name", "Description", "Stock");
+        System.out.printf("%-15s %-25s %-40s %-15s%n", "MedID", "Name", "Description", "Stock");
         System.out.println("--------------------------------------------------------------------------");
 
         Object[] meds = medMap.getValues();
         for (Object obj : meds) {
             Medicine med = (Medicine) obj;
-            System.out.printf("%-10s %-20s %-30s %-10d%n",
+            System.out.printf("%-15s %-25s %-40s %-15d%n",
                     med.getMedID(),
                     med.getName(),
                     med.getDesc(),
