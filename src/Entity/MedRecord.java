@@ -7,15 +7,15 @@ public class MedRecord {
     private String recordID;
     private Patient patient;
     private Doctor doc;
-    private Medicine medRec;       // Link to Medicine table
+    private Medicine med;       // Link to Medicine table
     private int quantityTaken;  
     private LocalDateTime timestamp;        // DateTime of when the medicine was issued
 
-    public MedRecord(Patient patient, Doctor doc, Medicine medRec, int quantityTaken, LocalDateTime timestamp) {
+    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp) {
         this.recordID = "MR" + String.format("%04d", generateId()); 
         this.patient = patient;
         this.doc = doc;
-        this.medRec = medRec;
+        this.med = med;
         this.quantityTaken = quantityTaken;
         this.timestamp = timestamp;
     }
@@ -43,7 +43,7 @@ public class MedRecord {
         return doc; 
     }
     public Medicine getMedID() { 
-        return medRec; 
+        return med; 
     }
     public int getQuantityTaken() { 
         return quantityTaken; 

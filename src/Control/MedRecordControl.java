@@ -33,7 +33,7 @@ public class MedRecordControl {
             System.out.println("No medicine records found.");
             return;
         }
-        for (int i = 0; i < recList.size(); i++) {
+        for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
             displayRecord(record);
         }
@@ -41,7 +41,7 @@ public class MedRecordControl {
     
     public void searchByPatient(String patientIC) {
         boolean found = false;
-        for (int i = 0; i < recList.size(); i++) {
+        for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
             if (record.getPatient().getPatientIC().equalsIgnoreCase(patientIC)) {
                 displayRecord(record);
@@ -55,7 +55,7 @@ public class MedRecordControl {
     
     public void searchByDoctor(String doctorID) {
         boolean found = false;
-        for (int i = 0; i < recList.size(); i++) {
+        for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
             if (record.getDoctor().getDoctorID().equalsIgnoreCase(doctorID)) {
                 displayRecord(record);
@@ -69,7 +69,7 @@ public class MedRecordControl {
     
     public void searchByMedicine(String medID) {
         boolean found = false;
-        for (int i = 0; i < recList.size(); i++) {
+        for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
             if (record.getMedID().getMedID().equalsIgnoreCase(medID)) {
                 displayRecord(record);
