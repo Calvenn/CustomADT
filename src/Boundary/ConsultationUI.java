@@ -276,12 +276,12 @@ public class ConsultationUI {
     private void toPharmacyUI(Doctor doc, Patient patient) {
         while (true) {
             System.out.println("\n--- Medicine Record ---");
-            //medControl.displayAllStock();
+            medControl.displayAllMedicines();
 
-            System.out.println("Enter Medicine Name/ID: ");
-            String medName = scanner.nextLine();
+            System.out.println("Enter Medicine ID: ");
+            String medID = scanner.nextLine();
 
-            Medicine selected = medControl.findMedicine(medName);
+            Medicine selected = medControl.findMedicine(medID);
             if (selected == null) {
                 System.out.println("Medicine not found. Please try again.\n");
                 continue;
