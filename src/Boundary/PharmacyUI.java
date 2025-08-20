@@ -1,6 +1,7 @@
 package Boundary;
 import Control.MedRecordControl;
 import Control.MedicineControl;
+import Control.PharmacyReport;
 import Entity.MedRecord;
 import Entity.Medicine;
 import adt.Queue;
@@ -10,14 +11,16 @@ import java.util.Scanner;
 public class PharmacyUI {
     private final MedRecordControl medRecControl;
     private final MedicineControl medControl;
+    private final PharmacyReport pharReport;
     private final Scanner scanner;
     private Queue<MedRecord> medCollectQueue = new Queue<>();
     
-    public PharmacyUI(MedRecordControl medRecControl, MedicineControl medControl,Queue<MedRecord> medCollectQueue){
+    public PharmacyUI(MedRecordControl medRecControl, MedicineControl medControl,Queue<MedRecord> medCollectQueue, PharmacyReport pharReport){
         this.medRecControl = medRecControl;
         this.medControl = medControl;
         this.scanner = new Scanner(System.in);
         this.medCollectQueue = medCollectQueue;
+        this.pharReport = pharReport;
     }
     
     public void pharmacyMenu(){
@@ -27,7 +30,8 @@ public class PharmacyUI {
             System.out.println("1. Dispense medicine");
             System.out.println("2. Medicine management");
             System.out.println("3. View medicine record");
-            System.out.println("4. Back");
+            System.out.println("4. Pharmacy Report");
+            System.out.println("0. Back");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -44,8 +48,10 @@ public class PharmacyUI {
                 case 2 -> medManagement();
 
                 case 3 -> viewRecord();
+                
+                case 4 -> viewRecord(); //pharmacy reportmenu 
 
-                case 4 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to main menu...");
 
                 default -> System.out.println("Invalid choice. Please try again.");
             }

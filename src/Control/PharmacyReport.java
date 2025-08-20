@@ -11,6 +11,10 @@ import adt.LinkedHashMap;
 import java.util.Scanner;
 
 public class PharmacyReport {
+    private final List<MedRecord> medRecList;
     
+    public PharmacyReport(List<MedRecord> medRecList){
+        this.medRecList = medRecList;
+    }
 }
 
