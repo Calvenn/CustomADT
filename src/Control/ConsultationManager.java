@@ -120,8 +120,8 @@ public class ConsultationManager {
             System.out.println("Quantity must be greater than 0.");
             return false;
         }
-        
-        MedRecord medCollect = new MedRecord(patient, doc, med, qty, time);
+        boolean toSaveRec = false;
+        MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec);
         medCollectQueue.enqueue(medCollect);
         return true;
     }

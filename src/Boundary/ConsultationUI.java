@@ -2,6 +2,7 @@ package Boundary;
 
 import Control.AppointmentManager;
 import Control.ConsultationManager;
+import Control.ConsultationReport;
 import Control.DoctorManager; //TEMP
 import Control.MedicineControl;
 import Control.TreatmentManager;
@@ -15,8 +16,9 @@ import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
 
+import exception.*;
+
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 /**
@@ -33,16 +35,17 @@ public class ConsultationUI {
     private final TreatmentManager trtManager;
     private final MedicineControl medControl;
     private static Doctor currentDoc = null;
+    private final ConsultationReport consultReport;
     private final Scanner scanner;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl) {
+    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport) {
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
         this.consultManager = consultManager;
         this.trtManager = trtManager;
         this.medControl = medControl;
+        this.consultReport = consultReport;
         this.scanner = new Scanner(System.in);
     }
     
@@ -91,21 +94,21 @@ public class ConsultationUI {
             System.out.println("\n--- Consultation Menu ---");
             System.out.println("1. Handle Consultation");
             System.out.println("2. Appointments");
-            System.out.println("3. Back");
-            System.out.println("4. Log Out");
+            System.out.println("3. Consultation Report");
+            System.out.println("4. Back");
+            System.out.println("0. Log Out");
 
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // clear newline
+            int choice = ValidationHelper.inputValidatedChoice(0,4);
 
             switch (choice) {
                 case 1 -> consultationMenu();
                 case 2 -> apptUI.apptMenu(currentDoc);
-                case 3 -> {
+                case 3 -> consultationReportMenu();
+                case 4 -> {
                     System.out.println("Returning to main menu...");
                     return;
                 }
-                case 4 -> {
+                case 0 -> {
                     System.out.println("Thank You " + currentDoc.getDoctorName());
                     currentDoc = null;
                     return;
@@ -120,10 +123,8 @@ public class ConsultationUI {
         System.out.println("1. Consultation Record");
         System.out.println("2. Consultation History");
         System.out.println("3. Back");
-        
-        System.out.print("Choose > ");
-        int choice = scanner.nextInt();
-        scanner.nextLine(); 
+
+        int choice = ValidationHelper.inputValidatedChoice(1,3);
         
         switch (choice) {
             case 1 -> consultRecord(); 
@@ -136,12 +137,29 @@ public class ConsultationUI {
         }
     }
     
+    private void consultationReportMenu(){
+       System.out.println("\n=== Consultation Report ===");
+        System.out.println("1. Consultation Outcome Trends");
+        //System.out.println("2. Doctor Report");
+        int choice = ValidationHelper.inputValidatedChoice(1,2);
+        
+        switch (choice) {
+            case 1 -> consultReport.consultationOutcomeTrends();
+            //case 2 -> 
+            case 3 -> {
+                System.out.println("Returning to main menu");
+                return;
+            }
+            default -> System.out.println("Invalid choice.\n");
+        }
+   }
+    
     private void consultRecord() {
         Object currentPatient = null;
-        System.out.print("Do you want to call next patient? (y/any key for no): ");
-        String choice = scanner.nextLine();
+        Severity severity = null;
+        Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to call next patient?)");
         
-        if(choice.equalsIgnoreCase("y")){          
+        if(choice == 'y' || choice == 'Y'){          
             currentPatient = consultManager.dispatchNextPatient();
         }
 
@@ -170,19 +188,21 @@ public class ConsultationUI {
             System.out.println("Severity : " + appt.getSeverity());
             System.out.println("Symptoms : " + appt.getDisease());
             patient = appt.getPatient();
-        }
+        }      
         
-        System.out.print("Enter severity level: ");
-        int severity = scanner.nextInt();
-        scanner.nextLine();
+        boolean isLifeThreatening = false;
         
         System.out.print("Enter diagnosis: ");
         String diagnosis = scanner.nextLine();
+        
+        Character lifeThreatening = ValidationHelper.inputValidateYesOrNo("Is this symptom potentially life-threatening? ");     
+        if(lifeThreatening == 'y' || lifeThreatening == 'Y') isLifeThreatening = true;
+        severity = Entity.Symptoms.assessSeverity(diagnosis, isLifeThreatening);
 
         System.out.print("Enter notes (if any): ");
         String notes = scanner.nextLine();
         
-        Consultation consultInfo = consultManager.consultationRecord(id, patient, severity, diagnosis, notes);
+        Consultation consultInfo = consultManager.consultationRecord(id, patient, severity.getSeverity(), diagnosis, notes);
 
         if (consultInfo != null) {
             System.out.println("Record saved.");
@@ -193,15 +213,7 @@ public class ConsultationUI {
                 System.out.println("2. Send to treatment");
                 System.out.println("3. Send to pharmacy");
                 System.out.println("4. Done");
-                System.out.print("Choose > ");
-
-                int action;
-                try {
-                    action = Integer.parseInt(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a number (1-4).");
-                    continue;
-                }
+                int action = ValidationHelper.inputValidatedChoice(1, 4);
 
                 switch (action) {
                     case 1 -> {
@@ -215,7 +227,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(currentDoc);
+                        toTreatmentUI(currentDoc, severity);
                         Consultation.numOfTreatment++;
                         return;
                     }
@@ -234,7 +246,7 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Doctor doc) {
+    private void toTreatmentUI(Doctor doc, Severity severity) {
         while (true) {
             System.out.println("\n--- Select Treatment ---");
             trtManager.displayAllTreatments();
@@ -251,17 +263,6 @@ public class ConsultationUI {
             System.out.println("Enter room: ");
             String room = scanner.nextLine();
 
-            System.out.println("Enter severity (1-3): ");
-            int sev;
-            try {
-                sev = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid number. Please enter 1-3.");
-                continue;
-            }
-
-            Severity severity = Severity.fromValue(sev);
-
             LocalDateTime time = LocalDateTime.now();
             if (consultManager.toTreatment(doc, selected, room, time, severity)) {
                 System.out.println("Treatment recorded.");
@@ -275,12 +276,12 @@ public class ConsultationUI {
     private void toPharmacyUI(Doctor doc, Patient patient) {
         while (true) {
             System.out.println("\n--- Medicine Record ---");
-            //medControl.displayAllStock();
+            medControl.displayAllMedicines();
 
-            System.out.println("Enter Medicine Name/ID: ");
-            String medName = scanner.nextLine();
+            System.out.println("Enter Medicine ID: ");
+            String medID = scanner.nextLine();
 
-            Medicine selected = medControl.findMedicine(medName);
+            Medicine selected = medControl.findMedicine(medID);
             if (selected == null) {
                 System.out.println("Medicine not found. Please try again.\n");
                 continue;
@@ -297,7 +298,7 @@ public class ConsultationUI {
 
             LocalDateTime time = LocalDateTime.now();
             if (consultManager.toPharmacy(doc, patient, selected, qty, time)) {
-                System.out.println("Medicine collection recorded.");
+                System.out.println("Medicine collection recorded. Please collect the medicine at counter.");
                 break;
             } else {
                 System.out.println("Failed to record. Please check and try again.");
@@ -307,11 +308,10 @@ public class ConsultationUI {
     
     private boolean isToPharmacy(){
         while(true){
-            System.out.println("Does patient need to collect medicine? (Y/N)");
-            String input = scanner.nextLine().trim().toUpperCase();
+            Character input = ValidationHelper.inputValidateYesOrNo("Does patient need to collect medicine?");
 
-            if (input.equals("Y")) return true;
-            else if (input.equals("N")) return false;
+            if (input == 'y' || input == 'Y') return true;
+            else if (input == 'n' || input == 'N') return false;
             else System.out.println("Please enter Y or N only.");
         }
     } 
@@ -320,21 +320,25 @@ public class ConsultationUI {
         if(!consultManager.displayAllRecordsByDoctor(currentDoc)){
             System.out.println("No record found.");
         } else {
-            System.out.print("Do you want to sort by patient IC? (y/any key to exit): ");
-            String choice = scanner.nextLine();
+            Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to sort by patient IC?");
 
-            if (choice.equalsIgnoreCase("y")) {
+            if (choice == 'y' || choice == 'Y') {
                 while (true) {
                     System.out.print("Please enter patient IC (press 'x' to exit): ");
-                    String searchedIC = scanner.nextLine();
+                    String rawInput = scanner.nextLine().trim();
 
-                    if (searchedIC.equalsIgnoreCase("x")) return;
+                    if (rawInput.equalsIgnoreCase("x")) {
+                        return; // exit search loop
+                    }
 
-                    if (!consultManager.displayRecordsByIC(searchedIC)) {
-                        System.out.println("Patient IC " + searchedIC + " not found");
+                    String searchedIc = ValidationHelper.inputValidatedIC(rawInput);
+                    if (searchedIc == null) continue; // invalid → try again
+
+                    if (!consultManager.displayRecordsByIC(searchedIc)) {
+                        System.out.println("Patient IC " + searchedIc + " not found");
                     }
                 }
             }
         }
-    }
+    }   
 }
