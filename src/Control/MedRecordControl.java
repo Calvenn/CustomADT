@@ -17,13 +17,14 @@ public class MedRecordControl {
         this.recList = recList;
     }
     
-    public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken) {
+    public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken, boolean toSave) {
         MedRecord record = new MedRecord(
                 patient,
                 doctor,
                 medicine,
                 quantityTaken,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                toSave
         );
         recList.add(record);
     }
@@ -71,7 +72,7 @@ public class MedRecordControl {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getMedID().getMedID().equalsIgnoreCase(medID)) {
+            if (record.getMed().getMedID().equalsIgnoreCase(medID)) {
                 displayRecord(record);
                 found = true;
             }
@@ -87,7 +88,7 @@ public class MedRecordControl {
         System.out.println("Record ID: " + record.getRecordID());
         System.out.println("Patient: " + record.getPatient().getPatientName() + " (" + record.getPatient().getPatientIC() + ")");
         System.out.println("Doctor: " + record.getDoctor().getDoctorName() + " (" + record.getDoctor().getDoctorID() + ")");
-        System.out.println("Medicine: " + record.getMedID().getName() + " (" + record.getMedID().getMedID() + ")");
+        System.out.println("Medicine: " + record.getMed().getName() + " (" + record.getMed().getMedID() + ")");
         System.out.println("Quantity Taken: " + record.getQuantityTaken());
         System.out.println("Issued On: " + record.getTimestamp());
     }

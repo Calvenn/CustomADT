@@ -10,9 +10,10 @@ public class MedRecord {
     private Medicine med;       // Link to Medicine table
     private int quantityTaken;  
     private LocalDateTime timestamp;        // DateTime of when the medicine was issued
+    private boolean toSave;
 
-    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp) {
-        this.recordID = "MR" + String.format("%04d", generateId()); 
+    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp, boolean toSave) {
+        this.recordID = "MR" + String.format("%04d", generateId(toSave)); 
         this.patient = patient;
         this.doc = doc;
         this.med = med;
@@ -28,7 +29,8 @@ public class MedRecord {
         this.timestamp = LocalDateTime.now();
     }
     
-    private static int generateId() {
+    private static int generateId(boolean toSave) {
+        if(toSave)
         idNo += 1; 
         return idNo; 
     }
@@ -42,7 +44,7 @@ public class MedRecord {
     public Doctor getDoctor() {
         return doc; 
     }
-    public Medicine getMedID() { 
+    public Medicine getMed() { 
         return med; 
     }
     public int getQuantityTaken() { 

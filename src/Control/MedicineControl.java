@@ -61,5 +61,28 @@ public class MedicineControl {
     public int getSize() {//
         return medMap.size();
     }
+    
+    public void displayLowStock(int threshold) {
+        System.out.println("\n=== Low Stock Alert (below " + threshold + ") ===");
+        boolean found = false;
+        for (Medicine med : getAllMedicines()) {
+            if (med.getStock() < threshold) {
+                System.out.println(med.getMedID() + " | " + med.getName() + " | Stock: " + med.getStock());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("All medicines have sufficient stock.");
+        }else System.out.println("Please reorder these medicines soon!");
+    }
+    
+    public Iterable<Medicine> getAllMedicines() {
+        Object[] meds = medMap.getValues();
+        java.util.List<Medicine> medList = new java.util.ArrayList<>();
+        for (Object obj : meds) {
+            medList.add((Medicine) obj);
+        }
+        return medList;
+    }
 }
 

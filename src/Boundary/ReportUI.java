@@ -4,6 +4,7 @@
  */
 package Boundary;
 import Control.ConsultationReport;
+import Control.PharmacyReport;
 import java.util.Scanner;
 /**
  *
@@ -11,10 +12,12 @@ import java.util.Scanner;
  */
 public class ReportUI {
    private final ConsultationReport consultReport;
+   private final PharmacyReport pharmacyReport;
    Scanner scanner;
-   public ReportUI(ConsultationReport consultReport){
+   public ReportUI(ConsultationReport consultReport, PharmacyReport pharmacyReport){
        scanner = new Scanner(System.in);
        this.consultReport = consultReport;
+       this.pharmacyReport = pharmacyReport;
    } 
    
    public void reportMainMenu(){
@@ -40,7 +43,7 @@ public class ReportUI {
                 //case 2 -> consultUI.consultMainMenu();
                 case 3 -> consultationReportMenu(); 
                 //case 4 -> consultUI.consultMainMenu();
-                //case 5 -> consultUI.consultMainMenu();
+                case 5 -> PharmacyReportModule();
                 case 6 -> System.out.println("Thank you for using the Clinic System!");
             }
         } while (choice != 6);
@@ -68,6 +71,27 @@ public class ReportUI {
         switch (choice) {
             case 1 -> consultReport.consultationOutcomeTrends();
             //case 2 -> 
+            case 3 -> {
+                System.out.println("Returning to main menu");
+                return;
+            }
+            default -> System.out.println("Invalid choice.\n");
+        }
+   }
+   
+   private void PharmacyReportModule(){
+       System.out.println("\n=== Pharmacy Report Menu ===");
+        System.out.println("1. Medicine Usage by Patient");
+        System.out.println("2. Medicine Dispense Summary");
+        System.out.println("3. Back to Main Menu");
+        
+        System.out.print("Choose > ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); 
+        
+        switch (choice) {
+            //case 1 -> pharmacyReport.generatePatientMedicineReport();
+            //case 2 -> pharmacyReport.generateMedicineSummaryReport();
             case 3 -> {
                 System.out.println("Returning to main menu");
                 return;
