@@ -8,7 +8,8 @@ import Entity.Appointment;
 import Entity.Doctor;
 import Control.AppointmentManager;
 import Entity.Consultation;
-import Entity.Patient;
+
+import exception.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,8 +22,8 @@ import java.util.Scanner;
  * @author calve
  */
 public class AppointmentUI {
-    private AppointmentManager apptManager;
-    private Scanner scanner;
+    private final AppointmentManager apptManager;
+    private final Scanner scanner;
     protected boolean missedFlag;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
@@ -79,47 +80,29 @@ public class AppointmentUI {
     }
     
     void bookAppointmentUI(Consultation consultAppt) {
-        LocalDateTime time = null;
-
         while (true) {
             suggestNextAvailableSlot();
-            System.out.print("Enter appointment date and time (yyyy-MM-dd HH:mm): ");
-            String input = scanner.nextLine();
+            LocalDateTime time = ValidationHelper.inputValidatedDateTime("Enter appointment date and time");
 
-            try {
-                time = LocalDateTime.parse(input, formatter);
-                
-                if (time.isBefore(LocalDateTime.now())) {
-                    System.out.println("Cannot book in the past.");
-                }
-
-                boolean success = apptManager.bookAppointment(consultAppt, time);
-                if (success) {
-                    System.out.println("Appointment booked successfully!");
-                    break;
-                } else {
-                    System.out.println("Failed to book appointment. Please try a different time.");
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid format! Please use yyyy-MM-dd HH:mm (e.g. 2024-12-20 08:00)");
+            if (apptManager.bookAppointment(consultAppt, time)) {
+                System.out.println("Appointment booked successfully!");
+                break;
+            } else {
+                System.out.println("Time slot already taken. Please try a different time.");
             }
         }
     }
 
     protected void updateAppointmentUI() {
-        System.out.print("Enter patient IC number: ");
-        String ic = scanner.nextLine();
-        
+        String ic = ValidationHelper.inputValidatedIC("Enter patient IC number");   // loop until valid IC
         Appointment oldData = apptManager.findPatienInfo(ic);
-        
-        if(oldData != null){
-            System.out.print("Enter new appointment time (yyyy-MM-dd HH:mm): ");
-            String newTimeStr = scanner.nextLine();
-            LocalDateTime newTime = LocalDateTime.parse(newTimeStr, formatter);
-            
-            if(getConfirmation("Are you sure want to change appointment to " + newTime.format(formatter) + " ?")){
+
+        if (oldData != null) {
+            LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("Enter new appointment time");
+
+            if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
                 boolean success = apptManager.updateAppointment(oldData, newTime);
-                System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");  
+                System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");
             }
         } else {
             System.out.println("IC Number " + ic + " not found. Please try again");
@@ -127,16 +110,14 @@ public class AppointmentUI {
     }
 
     private void cancelAppointmentUI() {
-        System.out.print("Enter patient IC number: ");
-        String ic = scanner.nextLine();
-
+        String ic = ValidationHelper.inputValidatedIC("Enter patient IC number");
         Appointment appt = apptManager.findPatienInfo(ic);
 
-        if(appt != null){
+        if (appt != null) {
             System.out.println("Patient Name: " + appt.getPatient().getPatientName());
             System.out.println("Current appointment: " + appt.getDateTime().format(formatter));
-            
-            if(getConfirmation("Are you sure want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime() + " ?")){
+
+            if (getConfirmation("Are you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime() + " ?")) {
                 boolean success = apptManager.cancelAppointment(appt);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }
@@ -144,33 +125,34 @@ public class AppointmentUI {
             System.out.println("IC Number " + ic + " not found. Please try again");
         }
     }
+
     
-    private void rescheduleMissedApptUI(Doctor doc){
+    private void rescheduleMissedApptUI(Doctor doc) {
         apptManager.displayAllMissedAppt(doc);
-        System.out.print("Enter patient IC to change appointment date: ");
-        String changedIC = scanner.nextLine();
-        
+        String changedIC = ValidationHelper.inputValidatedIC("Enter patient IC number");
+
         Appointment a = apptManager.getMissedAppt(doc, changedIC);
-        if(a == null) System.out.println("Patient IC " + changedIC + " not found");
+        if (a == null) {
+            System.out.println("Patient IC " + changedIC + " not found");
+            return;
+        }
+
         System.out.println(a);
-        
-        System.out.print("Please enter new date and time to reschedule (yyyy-MM-dd HH:mm): ");
-        String newTimeStr = scanner.nextLine();
-        LocalDateTime newTime = LocalDateTime.parse(newTimeStr, formatter);
-        
-        if(getConfirmation("Are you sure want to change appointment to " + newTime.format(formatter) + " ?")){
-           boolean success = apptManager.bookAppointment(a, newTime);
-           if(success){
-               System.out.println("Appointment Updated");
-               if(!apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())){
-                    System.out.println("Removed Unsucessful.Please try again");
+        LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("Please enter new date and time to reschedule");
+
+        if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
+            boolean success = apptManager.bookAppointment(a, newTime);
+            if (success) {
+                System.out.println("Appointment Updated");
+                if (!apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())) {
+                    System.out.println("Removed Unsuccessful. Please try again");
                 }
-           }else{
-               System.out.println("Not found or update failed. Please try again");
-           }
+            } else {
+                System.out.println("Not found or update failed. Please try again");
+            }
         }
     }
-    
+
     private void suggestNextAvailableSlot() {
         LocalDate today = LocalDate.now();
         LocalDateTime slot = apptManager.findNextAvailableSlot();
@@ -196,4 +178,6 @@ public class AppointmentUI {
             }
         }
     }
+    
+    //Enter patient IC number
 }

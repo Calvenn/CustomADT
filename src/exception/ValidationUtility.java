@@ -147,7 +147,8 @@ public class ValidationUtility {
 
     // Inside ValidationUtility
     public static void printErrorWithSolution(Exception e) {
-        System.out.println("Error: " + e.getMessage());
+        System.out.println("\n===================================================");
+        System.out.println("\nError: " + e.getMessage());
         showSolutionFromFile(e.getMessage());
         System.out.println("Please try again.\n");
     }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 public abstract class Staff {
     // Variable
-    private final String id;          // S0001
+    private String id;          // S0001
     private String name;        
     private int age;            
     private String phoneNo;     // 011-222 4568
