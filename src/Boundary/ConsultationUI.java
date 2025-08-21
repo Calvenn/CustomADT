@@ -138,10 +138,11 @@ public class ConsultationUI {
     }
     
     private void consultationReportMenu(){
-       System.out.println("\n=== Consultation Report ===");
+        System.out.println("\n=== Consultation Report ===");
         System.out.println("1. Consultation Outcome Trends");
         //System.out.println("2. Doctor Report");
-        int choice = ValidationHelper.inputValidatedChoice(1,2);
+        System.out.println("3. Back");
+        int choice = ValidationHelper.inputValidatedChoice(1,3);
         
         switch (choice) {
             case 1 -> consultReport.consultationOutcomeTrends();
