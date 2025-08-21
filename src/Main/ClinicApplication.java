@@ -91,7 +91,10 @@ public class ClinicApplication {
                 }
                 // case 4 -> consultUI.consultMainMenu();
                 case 5 -> pharUI.pharmacyMenu();
-                case 0 -> System.out.println("Thank you for using the Clinic System!");
+                case 0 -> {
+                    System.out.println("Thank you for using the Clinic System!");
+                    System.exit(0);    
+                }
             }
 
         } while (choice != 7);
