@@ -1,21 +1,22 @@
 package Boundary;
 import Control.PatientManager;
-import Control.ConsultationManager;
 import Control.QueueManager;
+
 import Entity.Visit;
-import Entity.Doctor;
 import Entity.Severity;
-import adt.Heap;
+
+import exception.InvalidInputException;
+import exception.TryCatchThrowFromFile;
+import exception.ValidationUtility;
+
 import java.util.Scanner;
 
 public class VisitRegistrationUI {
-    private Heap<Visit> visitQueue;
     private Scanner scanner;
     private QueueManager queueManager;
     private PatientManager patientManager;
 
-    public VisitRegistrationUI(Heap<Visit> visitQueue, QueueManager queueManager, PatientManager patientManager) {
-        this.visitQueue = visitQueue;
+    public VisitRegistrationUI(QueueManager queueManager, PatientManager patientManager) {
         this.queueManager = queueManager;
         this.patientManager = patientManager;
         this.scanner = new Scanner(System.in);
@@ -25,7 +26,18 @@ public class VisitRegistrationUI {
         int choice;
         do {
             displayVisitsMenu();
-            choice = getIntInput("Select an option: ");
+
+            while (true) {
+                try {
+                    System.out.print("Select an option: ");
+                    String input = scanner.nextLine().trim();
+                    TryCatchThrowFromFile.validateIntegerRange(input, 0, 9);
+                    choice = Integer.parseInt(input);
+                    break;
+                } catch (InvalidInputException e) {
+                    ValidationUtility.printErrorWithSolution(e);
+                }
+            }
 
             switch (choice) {
                 case 1:
@@ -47,15 +59,12 @@ public class VisitRegistrationUI {
                     // handleSeverityFilter();
                     break;
                 case 7:
-                    // handlePatientHistory();
-                    break;
-                case 8:
                     // handleSummaryReports();
                     break;
-                case 9:
+                case 8:
                     displayLiveQueueStatus();
                     break;
-                case 10:
+                case 9:
                     handleProcessNextPatient();
                     break;
                 case 0:
@@ -65,9 +74,7 @@ public class VisitRegistrationUI {
                     System.out.println("\nInvalid option. Please try again.");
             }
 
-            if (choice != 0) {
-                pauseForUser();
-            }
+            if (choice != 0) pauseForUser();
         } while (choice != 0);
     }
 
@@ -97,7 +104,18 @@ public class VisitRegistrationUI {
 
     public void handleVisitRegistration() {
         System.out.println("\n=== Visit Registration ===");
-        String ic = getStringInput("Enter patient IC number: ");
+        String ic;
+
+        while (true) {
+            try {
+                System.out.print("Enter patient IC number: ");
+                ic = scanner.nextLine().trim();
+                TryCatchThrowFromFile.validateIC(ic);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
 
         var patient = patientManager.findPatientByIC(ic);
         if (patient == null) {
@@ -107,10 +125,20 @@ public class VisitRegistrationUI {
         System.out.println("\nPatient found: \n" + patient);
 
         boolean isLifeThreatening = askLifeThreatening();
-        String symptoms = getStringInput("\nPlease describe the symptoms:");
+
+        String symptoms;
+        while (true) {
+            try {
+                System.out.print("\nPlease describe the symptoms: ");
+                symptoms = scanner.nextLine().trim();
+                TryCatchThrowFromFile.validateNotNull(symptoms);
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
 
         Visit visit = queueManager.createVisit(patient, symptoms, isLifeThreatening, false);
-
         System.out.println("\nVisit Registration Successful!");
         visitsTableHeader();
         System.out.println(visit);
@@ -120,12 +148,14 @@ public class VisitRegistrationUI {
 
     private boolean askLifeThreatening() {
         while (true) {
-            System.out.print("Is this symptom potentially life-threatening? (Y/N): ");
-            String input = scanner.nextLine().trim().toUpperCase();
-
-            if (input.equals("Y")) return true;
-            else if (input.equals("N")) return false;
-            else System.out.println("Please enter Y or N only.");
+            try {
+                System.out.print("Is this symptom potentially life-threatening? (Y/N): ");
+                char input = scanner.nextLine().trim().toUpperCase().charAt(0);
+                TryCatchThrowFromFile.validateYesOrNo(input);
+                return input == 'Y';
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
         }
     }
 
@@ -164,20 +194,19 @@ public class VisitRegistrationUI {
 
     private Visit promptForVisitById() {
         while (true) {
-            String numberPart = getStringInput("Enter Visit Number (e.g., 1000): ");
+            try {
+                System.out.print("Enter Visit Number (e.g., 1000): ");
+                String numberPart = scanner.nextLine().trim();
+                TryCatchThrowFromFile.validatePositiveInteger(numberPart);
 
-            if (!numberPart.matches("\\d+")) {
-                System.out.println("Invalid input. Please enter only numbers.\n");
-                continue;
-            }
+                String visitId = "V" + numberPart;
+                Visit result = queueManager.searchByVisitId(visitId);
 
-            String visitId = "V" + numberPart;
-            Visit result = queueManager.searchByVisitId(visitId);
+                if (result != null) return result;
+                else throw new InvalidInputException("No visit found with ID: " + visitId);
 
-            if (result != null) {
-                return result; // Found
-            } else {
-                System.out.println("No visit found with ID: " + visitId + "\n");
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
             }
         }
     }
@@ -197,14 +226,26 @@ public class VisitRegistrationUI {
         Visit visit = promptForVisitById();
         String visitId = visit.getVisitId();
 
-        String reasons = getStringInput("Enter reason for emergency override (additional symptoms): ");
-        boolean success = queueManager.emergencyOverride(visitId, reasons);
+        String reasons = null;
+        try {
+            System.out.print("Enter reason for emergency override (additional symptoms): ");
+            reasons = scanner.nextLine();
 
-        if (success) {
-            System.out.println("\nEmergency override successful for visit: " + visitId);
-            displayLiveQueueStatus();
-        } else {
-            System.out.println("\nEmergency override failed for visit: " + visitId);
+            if (reasons == null || reasons.trim().isEmpty()) {
+                throw new IllegalArgumentException("Reason cannot be empty or null.");
+            }
+
+            boolean success = queueManager.emergencyOverride(visitId, reasons);
+
+            if (success) {
+                System.out.println("\nEmergency override successful for visit: " + visitId);
+                displayLiveQueueStatus();
+            } else {
+                System.out.println("\nEmergency override failed for visit: " + visitId);
+            }
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
 
         pauseForUser();
@@ -236,16 +277,6 @@ public class VisitRegistrationUI {
         pauseForUser();
     }*/
 
-    /*private void handlePatientHistory() {
-        System.out.println("\n=== Patient Visit History ===");
-        System.out.print("Enter Patient IC: ");
-        String patientIC = scanner.nextLine().trim();
-        
-        queueManager.displayPatientVisits(patientIC);
-        
-        pauseForUser();
-    }*/
-
     private void displayLiveQueueStatus() {
         Visit processing = queueManager.getCurrentlyProcessing();
         Visit next = queueManager.getNextPatient();
@@ -268,7 +299,6 @@ public class VisitRegistrationUI {
         System.out.println("-".repeat(58));
     }
 
-    
     private void handleProcessNextPatient() {
         System.out.println("\n=== Process Next Patient ===");
 
@@ -279,41 +309,26 @@ public class VisitRegistrationUI {
         }
 
         System.out.println("Next patient in queue: " + nextVisit.getVisitId());
-        System.out.print("Process this patient? (Y/N): ");
-        String confirm = scanner.nextLine().trim().toUpperCase();
 
-        if (confirm.equals("Y")) {
-            Visit processedVisit = queueManager.processNextPatient(); // no doctor argument
-            if (processedVisit != null) {
-                System.out.println("Visit " + processedVisit.getVisitId() + " is now being processed.");
-            } else {
-                System.out.println("Unable to process patient.");
+        while (true) {
+            try {
+                System.out.print("Process this patient? (Y/N): ");
+                char confirm = scanner.nextLine().trim().toUpperCase().charAt(0);
+                TryCatchThrowFromFile.validateYesOrNo(confirm);
+
+                if (confirm == 'Y') {
+                    Visit processedVisit = queueManager.processNextPatient();
+                    System.out.println("Visit " + processedVisit.getVisitId() + " is now being processed.");
+                } else {
+                    System.out.println("Processing cancelled.");
+                }
+                break;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
             }
-        } else {
-            System.out.println("Processing cancelled.");
         }
 
         displayLiveQueueStatus();
-    }
-
-    // Helper methods for input handling
-    private String getStringInput(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine().trim();
-    }
-
-    private int getIntInput(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                int value = scanner.nextInt();
-                scanner.nextLine();
-                return value;
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-                scanner.nextLine();
-            }
-        }
     }
 
     private void pauseForUser() {
