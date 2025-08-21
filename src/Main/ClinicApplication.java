@@ -62,7 +62,7 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager);
-        pharReport = new PharmacyReport(medRecList);
+        pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }
     

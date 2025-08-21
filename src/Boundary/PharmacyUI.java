@@ -26,12 +26,15 @@ public class PharmacyUI {
     public void pharmacyMenu(){
         int choice;
         do {
-            System.out.println("\n--- Pharmacy Menu ---");
+            System.out.println("=========================");
+            System.out.println("      Pharmacy Menu      ");
+            System.out.println("=========================");
             System.out.println("1. Dispense medicine");
             System.out.println("2. Medicine management");
             System.out.println("3. View medicine record");
             System.out.println("4. Pharmacy Report");
             System.out.println("0. Back");
+            System.out.println("=========================");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -49,18 +52,56 @@ public class PharmacyUI {
 
                 case 3 -> viewRecord();
                 
-                case 4 -> viewRecord(); //pharmacy reportmenu 
+                case 4 -> pharReport();
 
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> {System.out.println("Returning to main menu...");return;}
 
                 default -> System.out.println("Invalid choice. Please try again.");
             }
 
-        } while (choice != 4);
+        } while (choice != 0);
+    }
+    
+    public void pharReport(){
+        int choice;
+        do {
+            System.out.println("=========================");
+            System.out.println("        Report Menu      ");
+            System.out.println("=========================");
+            System.out.println("1. Inactive Medicine Summary");
+            System.out.println("2. Medicine Dispense Summary");
+            System.out.println("3. Medicine Monthly Trend Summary");
+            System.out.println("0. Back");
+            System.out.println("=========================");
+            System.out.print("Enter choice: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next();
+                System.out.print("Enter choice: ");
+            }
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1 -> {pharReport.generateInactiveMedicinesReport() ;}
+                
+                case 2 -> {pharReport.generateMedicineDispenseSummary();}
+                
+                case 3 -> {pharReport.generateMonthlyTrendsReport();}
+
+                case 0 -> {System.out.println("Returning to main menu...");}
+
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+
+        } while (choice != 0);
     }
     
     public void dispenseMed() {
-        System.out.println("\n=== Dispense Medicine ===");
+        System.out.println("=========================");
+        System.out.println("    Dispense Medicine    ");
+        System.out.println("=========================");
 
         if (medCollectQueue.isEmpty()) {
             System.out.println("No patients are waiting to collect medicine.");
@@ -70,17 +111,21 @@ public class PharmacyUI {
         int choice;
         do {
             MedRecord nextRecord = medCollectQueue.peek(); // look at next patient
-            System.out.println("\n--- Next Patient in Queue ---");
+            System.out.println("=========================");
+            System.out.println("  Patient in Next Queue  ");
+            System.out.println("=========================");
             System.out.println("Patient: " + nextRecord.getPatient().getPatientName()+ " (IC: " + nextRecord.getPatient().getPatientIC() + ")");
             System.out.println("Doctor: " + nextRecord.getDoctor().getDoctorName()+ " (ID: " + nextRecord.getDoctor().getDoctorID() + ")");
             System.out.println("Medicine: " + nextRecord.getMed().getName() + " (ID: " + nextRecord.getMed().getMedID() + ")");
             System.out.println("Quantity: " + nextRecord.getQuantityTaken());
             System.out.println("Requested At: " + nextRecord.getTimestamp());
-
+            System.out.println("=========================\n");
+            System.out.println("=========================");
             System.out.println("\n1. Dispense this medicine");
             System.out.println("2. Skip patient");
-            System.out.println("3. Back to Pharmacy Menu");
+            System.out.println("0. Back to Pharmacy Menu");
             System.out.print("Enter choice: ");
+            System.out.println("=========================");
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -123,10 +168,10 @@ public class PharmacyUI {
                     medCollectQueue.enqueue(medCollectQueue.dequeue());
                     System.out.println("️ Patient moved to the back of the queue.");
                 }
-                case 3 -> System.out.println("Returning to Pharmacy Menu...");
+                case 0 -> System.out.println("Returning to Pharmacy Menu...");
                 default -> System.out.println("Invalid choice. Please try again.");
             }
-        } while (choice != 3 && !medCollectQueue.isEmpty());
+        } while (choice != 0 && !medCollectQueue.isEmpty());
     }
 
     
@@ -134,13 +179,16 @@ public class PharmacyUI {
         int choice;
 
         do {
-            System.out.println("\n--- Medicine Management ---");
+            System.out.println("=========================");
+            System.out.println("   Medicine Management   ");
+            System.out.println("=========================");
             medControl.displayLowStock(20);
             System.out.println("1. Add medicine");
             System.out.println("2. Update stock");
             System.out.println("3. Remove medicine");
             System.out.println("4. View all medicines");
-            System.out.println("5. Back");
+            System.out.println("0. Back");
+            System.out.println("=========================");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -160,12 +208,12 @@ public class PharmacyUI {
 
                 case 4 -> medControl.displayAllMedicines();
 
-                case 5 -> System.out.println("Returning to Pharmacy Menu...");
+                case 0 -> System.out.println("Returning to Pharmacy Menu...");
 
                 default -> System.out.println("Invalid choice. Please try again.");
             }
 
-        } while (choice != 5);
+        } while (choice != 0);
     }
 
     
@@ -173,12 +221,15 @@ public class PharmacyUI {
         int choice;
 
     do {
-        System.out.println("\n--- View Medicine Records ---");
+        System.out.println("=========================");
+        System.out.println("  View Medicine Records  ");
+        System.out.println("=========================");
         System.out.println("1. View all records");
-        System.out.println("2. Search by Patient ID");
-        System.out.println("3. Search by Doctor ID");
-        System.out.println("4. Search by Medicine ID");
-        System.out.println("5. Back");
+        System.out.println("2. Search by Patient IC/Name");
+        System.out.println("3. Search by Doctor ID/Name");
+        System.out.println("4. Search by Medicine ID/Name");
+        System.out.println("0. Back");
+        System.out.println("=========================");
         System.out.print("Enter choice: ");
 
         while (!scanner.hasNextInt()) {
@@ -193,36 +244,36 @@ public class PharmacyUI {
             case 1 : medRecControl.viewAllRecords();
             break;
             case 2 :
-                System.out.print("Enter Patient IC: ");
+                System.out.print("Enter Patient IC/Name: ");
                 String patientID = scanner.nextLine().trim();
                 if (patientID.isEmpty()) {
-                    System.out.println(" Patient ID cannot be empty!");
+                    System.out.println(" Patient cannot be empty!");
                 } else {
                     medRecControl.searchByPatient(patientID);
                 }
                 break;
             case 3 :
-                System.out.print("Enter Doctor ID: ");
+                System.out.print("Enter Doctor ID/Name: ");
                 String doctorID = scanner.nextLine().trim();
                 if (doctorID.isEmpty()) {
-                    System.out.println("Doctor ID cannot be empty!");
+                    System.out.println("Doctor cannot be empty!");
                 } else {
                     medRecControl.searchByDoctor(doctorID);
                 }
                 break;
             case 4 :
-                System.out.print("Enter Medicine ID: ");
+                System.out.print("Enter Medicine ID/Name: ");
                 String medID = scanner.nextLine().trim();
                 if (medID.isEmpty()) {
-                    System.out.println(" Medicine ID cannot be empty!");
+                    System.out.println(" Medicine cannot be empty!");
                 } else {
                     medRecControl.searchByMedicine(medID);
                 }
                 break;
-            case 5:System.out.println("Returning to Pharmacy Menu...");
+            case 0:System.out.println("Returning to Pharmacy Menu...");
             default: System.out.println(" Invalid choice. Please try again.");
         }
-    } while (choice != 5);
+    } while (choice != 0);
     }
     
     public void addMedUI(){
