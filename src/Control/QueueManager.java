@@ -3,15 +3,14 @@ import Entity.Visit;
 import Entity.Patient;
 import Entity.Severity;
 import Entity.Doctor;
-import Control.PatientManager;
 import Entity.Appointment;
 import Entity.Consultation;
+
 import adt.Heap;
 import adt.LinkedHashMap;
 import adt.List;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class QueueManager {
     private Heap<Visit> visitQueue;
@@ -19,58 +18,22 @@ public class QueueManager {
     
     private int queueNumber;
     private DoctorManager docManager;
-    private PatientManager patientManager; // Added PatientManager reference
     
     // Enhanced tracking features using custom ADTs
     private LinkedHashMap<Severity, Integer> severityCount;
-    private static final int MAX_PROCESSED_VISITS = 1000;
-    private CompletedVisit[] processedVisits;
-    private int processedCount;
-    private LinkedHashMap<String, CompletedVisit> completedVisits = new LinkedHashMap<>();
     private LinkedHashMap<String, List<Consultation>> consultLog;
 
     private Visit currentlyProcessing;
     private Visit nextPatient;
-    
-    // Inner class for completed visits
-    public static class CompletedVisit {
-        private Visit visit;
-        private LocalDateTime completionTime;
-        private long consultationDuration; // in minutes
-        private String doctorNotes;       
-        
-        public CompletedVisit(Visit visit, LocalDateTime completionTime, long duration, String notes) {
-            this.visit = visit;
-            this.completionTime = completionTime;
-            this.consultationDuration = duration;
-            this.doctorNotes = notes;
-        }
-        
-        public Visit getVisit() { return visit; }
-        public LocalDateTime getCompletionTime() { return completionTime; }
-        public long getConsultationDuration() { return consultationDuration; }
-        public String getDoctorNotes() { return doctorNotes; }
-        
-        @Override
-        public String toString() {
-            return String.format("Visit: %s | Patient: %s | Completed: %s | Duration: %d min | Doctor: %s",
-                visit.getVisitId(), visit.getPatient().getPatientName(), 
-                completionTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                consultationDuration, visit.getDoctor().getDoctorName());
-        }
-    }
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, PatientManager patientManager, LinkedHashMap<String, List<Consultation>> consultLog) {
+    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
-        this.patientManager = patientManager; // Initialize PatientManager
         this.queueNumber = 1000;
         
         // Initialize tracking structures
         this.severityCount = new LinkedHashMap<>();
-        this.processedVisits = new CompletedVisit[MAX_PROCESSED_VISITS];
-        this.processedCount = 0;
         this.consultLog = consultLog;
         this.apptQueue = new Heap<>(false);
         

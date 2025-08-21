@@ -51,7 +51,7 @@ public class ClinicApplication {
         // wire dependencies
         patientManager = new PatientManager();
         docManager = new DoctorManager(sharedDoc);
-        queueManager = new QueueManager(sharedVisitQueue, docManager, patientManager, consultLog);
+        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(),
         docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
@@ -61,7 +61,7 @@ public class ClinicApplication {
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
-        patientUI = new PatientManagementUI(sharedVisitQueue, queueManager, docManager);
+        patientUI = new PatientManagementUI(queueManager);
         pharReport = new PharmacyReport(medRecList);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }

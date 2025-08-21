@@ -1,26 +1,21 @@
 package Boundary;
+import java.util.Scanner;
+
 import Control.QueueManager;
 import Control.PatientManager;
-import Control.DoctorManager;
+
 import Entity.Patient;
-import Entity.Visit;
-import adt.Heap;
-import java.util.Scanner;
 
 import exception.InvalidInputException;
 import exception.TryCatchThrowFromFile;
 import exception.ValidationUtility;
 
 public class PatientManagementUI {
-    private Heap<Visit> visitQueue;
-    private DoctorManager docManager;
     private QueueManager queueManager;
     private PatientManager patientManager;
     private Scanner scanner;
 
-    public PatientManagementUI(Heap<Visit> sharedVisitQueue, QueueManager queueManager, DoctorManager docManager) {
-        this.visitQueue = sharedVisitQueue;
-        this.docManager = docManager;
+    public PatientManagementUI(QueueManager queueManager) {
         this.queueManager = queueManager;
         this.patientManager = new PatientManager();
         this.scanner = new Scanner(System.in);
@@ -194,7 +189,7 @@ public class PatientManagementUI {
         System.out.println("    VISIT REGISTRATION");
         System.out.println("=".repeat(35));
 
-        VisitRegistrationUI visitUI = new VisitRegistrationUI(visitQueue, queueManager, patientManager);
+        VisitRegistrationUI visitUI = new VisitRegistrationUI(queueManager, patientManager);
         visitUI.visitsMenu();
     }
 
@@ -216,8 +211,7 @@ public class PatientManagementUI {
                 // Find patient
                 patient = patientManager.findPatientByIC(ic);
                 if (patient != null) {
-                    System.out.println("\nPatient found!");
-                    patientManager.displayPatientDetails(patient);
+                    System.out.println("\nPatient found: \n" + patient);
                     return patient;
                 } else {
                     throw new InvalidInputException("Patient not found with IC " + ic);
@@ -439,6 +433,97 @@ public class PatientManagementUI {
             System.out.println("No patients in the system.");
             return;
         }
+
+        int choice;
+        do {
+            System.out.println("\nSelect Report Type:");
+            System.out.println("1. Age Distribution Report");
+            System.out.println("2. Gender Distribution Report");
+            System.out.println("0. Back");
+            System.out.print("Enter your choice: ");
+            
+            String input = scanner.nextLine().trim();
+            try {
+                TryCatchThrowFromFile.validateIntegerRange(input, 0, 2);
+                choice = Integer.parseInt(input);
+
+                switch (choice) {
+                    case 1:
+                        displayAgeDistribution();
+                        break;
+                    case 2:
+                        displayGenderDistribution();
+                        break;
+                    case 0:
+                        System.out.println("Returning to main menu...");
+                        break;
+                }
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+                choice = -1; // stay in loop
+            }
+        } while (choice != 0);
+    }
+
+    // Age Distribution
+    private void displayAgeDistribution() {
+        Patient[] patients = patientManager.getAllPatients();
+        int[] ageGroups = new int[5]; // 0–18, 19–35, 36–50, 51–65, 65+
+
+        for (Patient p : patients) {
+            int age = p.getPatientAge();
+            if (age <= 18) ageGroups[0]++;
+            else if (age <= 35) ageGroups[1]++;
+            else if (age <= 50) ageGroups[2]++;
+            else if (age <= 65) ageGroups[3]++;
+            else ageGroups[4]++;
+        }
+
+        int total = patients.length;
+
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println("        AGE DISTRIBUTION REPORT");
+        System.out.println("=".repeat(40));
+        System.out.printf("%-15s %-8s %-20s\n", "Range", "Count", "Chart");
+        System.out.println("-".repeat(40));
+
+        String[] ranges = {"0 to 18", "19 to 35", "36 to 50", "51 to 65", "65+"};
+        for (int i = 0; i < ageGroups.length; i++) {
+            System.out.printf("%-15s %-8d %-20s\n", 
+                ranges[i], ageGroups[i], "#".repeat(ageGroups[i]));
+        }
+
+        System.out.println("-".repeat(40));
+        System.out.println("Total Patients: " + total);
+    }
+
+    // Gender Distribution
+    private void displayGenderDistribution() {
+        Patient[] patients = patientManager.getAllPatients();
+        int maleCount = 0, femaleCount = 0;
+
+        for (Patient p : patients) {
+            if (Character.toUpperCase(p.getPatientGender()) == 'M') maleCount++;
+            else if (Character.toUpperCase(p.getPatientGender()) == 'F') femaleCount++;
+        }
+
+        int total = maleCount + femaleCount;
+        double malePercent = (total > 0) ? (maleCount * 100.0 / total) : 0;
+        double femalePercent = (total > 0) ? (femaleCount * 100.0 / total) : 0;
+
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println("      GENDER DISTRIBUTION REPORT");
+        System.out.println("=".repeat(40));
+        System.out.printf("%-8s %-8s %-12s %-20s\n", "Gender", "Count", "Percentage", "Chart");
+        System.out.println("-".repeat(40));
+
+        System.out.printf("%-8s %-8d %-12.2f %-20s\n", 
+            "Male", maleCount, malePercent, "#".repeat((int)(malePercent / 2))); // scale: 2% = 1 bar
+        System.out.printf("%-8s %-8d %-12.2f %-20s\n", 
+            "Female", femaleCount, femalePercent, "#".repeat((int)(femalePercent / 2)));
+
+        System.out.println("-".repeat(40));
+        System.out.println("Total Patients: " + total);
     }
 
     private void handleClearAllPatients() {
