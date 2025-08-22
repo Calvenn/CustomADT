@@ -56,8 +56,7 @@ public class ConsultationManager {
         Visit nextWalkIn = queue.peekRoot();  
         
         if (nextAppt instanceof Consultation) severity = ((Consultation) nextAppt).getSeverity();
-        if (severity == -1) return null;
-
+        
         while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
             nextAppt = appointmentHeap.peekRoot();
@@ -74,7 +73,10 @@ public class ConsultationManager {
 
         boolean isToday = nextAppt.getDateTime().toLocalDate().equals(LocalDate.now());
 
+        System.out.println(nextWalkIn);
+        
         if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > severity) {
+            System.out.println("Visit queue extracted");
             return queue.extractRoot();
         } else {
             System.out.println("Appt queue extracted");

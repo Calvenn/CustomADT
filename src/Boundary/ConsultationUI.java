@@ -105,7 +105,6 @@ public class ConsultationUI {
                 case 0 -> {
                     System.out.println("Thank You " + currentDoc.getDoctorName());
                     currentDoc = null;
-                    return;
                 }
                 default -> System.out.println("Invalid choice.\n");
             }
@@ -367,7 +366,7 @@ public class ConsultationUI {
             (total == 0 ? "No appointment found" : total));
 
         System.out.printf("| %-20s | %-34s |%n", "Incoming Appointment", 
-            (incoming == null ? "No incoming appointment found" : incoming));
+            (incoming == null ? "No incoming appointment found" : incoming.getPatient().getPatientName() + " " + incoming.getDateTime()));
 
         System.out.printf("| %-20s | %-34s |%n", "Missed Appointments", 
             (missed == 0 ? "No appointment missed" : missed));

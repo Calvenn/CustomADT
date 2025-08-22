@@ -138,7 +138,7 @@ public class AppointmentManager {
                 }
             }
             
-            int index = findOldApptIndex(newConsult);       
+            int index = findConsultRecIndex(newConsult);       
             System.out.println(index);
             String doctorId = newConsult.getDoctor().getDoctorID();
             List<Consultation> consultations = consultLog.get(doctorId);
@@ -164,15 +164,15 @@ public class AppointmentManager {
         return false;
     }
     
-    private List<Consultation> findOldAppt(Appointment oldAppt){
+    private List<Consultation> findConsultRec(Appointment oldAppt){
         String doctorId = oldAppt.getDoctor().getDoctorID();
         List<Consultation> consultations = consultLog.get(doctorId);
         return consultations;
     }
-    
-    private int findOldApptIndex(Appointment oldAppt){
+   
+    private int findConsultRecIndex(Appointment oldAppt){
         int index = -1;
-        List<Consultation> consultations = findOldAppt(oldAppt);
+        List<Consultation> consultations = findConsultRec(oldAppt);
     
         if(consultations == null) return -1;
         for (int i = 1; i <= consultations.size(); i++) {
@@ -182,7 +182,8 @@ public class AppointmentManager {
                 continue; // Skip nulls safely
             }
             if (consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC()) &&
-                consult.getDoctor().getDoctorID().equals(oldAppt.getDoctor().getDoctorID())) {
+                consult.getDoctor().getDoctorID().equals(oldAppt.getDoctor().getDoctorID()) && 
+                consult.getCreatedAt().toLocalDate().isEqual(LocalDate.now())) {
                 index = i;
                 break;
             }
@@ -194,7 +195,7 @@ public class AppointmentManager {
         int index = findOldApptIndex(oldAppt);
         List<Consultation> consultations = findOldAppt(oldAppt);
         String oldID = consultations.get(index).getID();
-            if(oldAppt instanceof Consultation oldConsult && index != -1){
+            if(oldAppt instanceof Consultation oldConsult && index != -1 && oldAppt.getDateTime() != null){
                 Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), oldConsult.getConsultTime(), newDateTime, oldConsult.getCreatedAt()); 
                 consultations.replace(index, newAppt);
                 apptQueue.remove(oldAppt);
@@ -216,6 +217,33 @@ public class AppointmentManager {
                 return true;
             }
         return false;
+    }
+    
+    private List<Consultation> findOldAppt(Appointment oldAppt){
+        String doctorId = oldAppt.getDoctor().getDoctorID();
+        List<Consultation> consultations = consultLog.get(doctorId);
+        return consultations;
+    }
+   
+    private int findOldApptIndex(Appointment oldAppt){
+        int index = -1;
+        List<Consultation> consultations = findConsultRec(oldAppt);
+    
+        if(consultations == null) return -1;
+        for (int i = 1; i <= consultations.size(); i++) {
+            Consultation consult = consultations.get(i);
+            if (consult == null) {
+                System.out.println("Consultation at index " + i + " is null!");
+                continue; // Skip nulls safely
+            }
+            if (consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC()) &&
+                consult.getDoctor().getDoctorID().equals(oldAppt.getDoctor().getDoctorID()) && 
+                consult.getDateTime() != null) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
     public void displayAllAppointments() {

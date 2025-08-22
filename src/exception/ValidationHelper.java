@@ -14,7 +14,6 @@ import java.util.Scanner;
  * @author calve
  */
 public class ValidationHelper {
-
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final Scanner scanner = new Scanner(System.in);
     
@@ -35,10 +34,12 @@ public class ValidationHelper {
         while (true) {
             System.out.print(prompt + " (yyyy-MM-dd HH:mm): ");
             String input = scanner.nextLine().trim();
-
+            
             try {
                 TryCatchThrowFromFile.validateDateTime(input);
                 LocalDateTime dt = LocalDateTime.parse(input, formatter);
+                
+                System.out.println("Parsed date/time: " + dt);
 
                 if (dt.isBefore(LocalDateTime.now())) {
                     System.out.println("Cannot enter a past date/time. Try again.\n");
