@@ -43,6 +43,15 @@ Choosing one of the two options.
 
 ================================================================================
 
+OBJECT NOT FOUND ERROR:
+The requested object could not be found in the system.
+- Check that you have entered the correct identifier (e.g., IC number, patient ID, or key value).
+- Ensure that the object exists in the system before searching.
+- If the object is supposed to exist, verify that it was properly added or loaded.
+- Try searching with a different key or check the data source for inconsistencies.
+
+================================================================================
+
 GENERAL ERROR:
 Please check your input.
 

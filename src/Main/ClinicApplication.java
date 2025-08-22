@@ -66,29 +66,28 @@ public class ClinicApplication {
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
-        patientUI = new PatientManagementUI(queueManager, patientManager);
+        patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         pharReport = new PharmacyReport(medRecList);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }
     
     
     public void run(){
-        //loadPatientsCSV("/CustomADT/src/data/patients.csv");
-        loadDummyPatients(patientManager);
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medMap);
         loadDummyMedRec(docManager, medControl,medRecList);
         //loadDummyAppt(apptManager, docManager);
         //loadDummyConsult(consultManager, docManager, consultLog);
-        CSVLoader.loadPatientFromCSV("src/data/patient.csv", patientManager);
+        CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultationData.csv", docManager, consultLog);
+        CSVLoader.loadVisitHistoryFromCSV("src/data/visits.csv", patientManager, docManager, historyManager);
 
         int choice;
         do {
             queueManager.loadVisit();
             displayMainMenu();
-            choice = ValidationHelper.inputValidatedChoice(0,5);
+            choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
@@ -122,11 +121,6 @@ public class ClinicApplication {
         System.out.println("=".repeat(35));
     }  
     
-    private static void loadDummyPatients(PatientManager patientManager) {
-        patientManager.registerNewPatient("050101-07-0101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
-        patientManager.registerNewPatient("050202-07-0202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
-        patientManager.registerNewPatient("050303-07-0303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
-    }
     
     private static void loadDummyDoctors(DoctorManager docManager) {
         docManager.addNewDoctor("D001", "John", 30, "012-1231234", "Man", "Head", LocalDate.now());
@@ -195,7 +189,7 @@ public class ClinicApplication {
         medRecList.add(mr4); 
         medRecList.add(mr5); 
     }
-    
+
     /*private static void loadDummyConsult(ConsultationManager consult, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
         Patient p1 = new Patient("050606070606", "Lina", "0124282783", 20, 'F', "Bayan Lepas");
         Patient p2 = new Patient("050707070707", "Bob", "0124282784", 22, 'M', "Gelugor");

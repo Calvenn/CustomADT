@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
+import java.util.Objects;
 
 public class ValidationUtility {
     
@@ -107,7 +108,9 @@ public class ValidationUtility {
         if (msg.contains("invalid ic number format")) {
             return "IC ERROR";
         }
-
+        if (msg.contains ("not found")) {
+            return "OBJECT NOT FOUND ERROR";
+        }
         return "GENERAL ERROR";
     }
 
@@ -153,4 +156,14 @@ public class ValidationUtility {
         System.out.println("Please try again.\n");
     }
 
+    public static <T, K> T findObjectByKey(T[] array, java.util.function.Function<T, K> keyExtractor, K key) {
+        if (array == null || keyExtractor == null || key == null) return null;
+
+        for (T obj : array) {
+            if (obj != null && Objects.equals(keyExtractor.apply(obj), key)) {
+                return obj;
+            }
+        }
+        return null; // not found
+    }
 }

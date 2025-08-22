@@ -1,7 +1,6 @@
 package Control;
 import Entity.Patient;
 import adt.LinkedHashMap;
-import exception.TryCatchThrowFromFile;
 
 /*  1. store patient in an array
     2. search for patient by ic number
