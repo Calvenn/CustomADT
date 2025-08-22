@@ -8,7 +8,10 @@ import Boundary.*;
 import Control.*;
 import Entity.*;
 import adt.*;
+import data.CSVLoader;
 import exception.*;
+
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +44,7 @@ public class ClinicApplication {
     private final MedicineControl medControl;
     private final MedRecordControl medRecControl;
     private final PharmacyReport pharReport;
+    private final VisitHistoryManager historyManager;
 
     // UI Layer
     private final ConsultationUI consultUI;
@@ -51,30 +55,37 @@ public class ClinicApplication {
         // wire dependencies
         patientManager = new PatientManager();
         docManager = new DoctorManager(sharedDoc);
-        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog);
+        historyManager = new VisitHistoryManager();
+        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(),
         docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
-        consultReport = new ConsultationReport(consultLog);
+        consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
         medControl = new MedicineControl(medMap);
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
+
         patientUI = new PatientManagementUI(queueManager);
         pharReport = new PharmacyReport(medRecList,medMap);
+      
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }
     
     
     public void run(){
+        //loadPatientsCSV("/CustomADT/src/data/patients.csv");
+        loadDummyPatients(patientManager);
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medMap);
         loadDummyMedRec(docManager, medControl,medRecList);
         //loadDummyAppt(apptManager, docManager);
-        loadDummyConsult(consultManager, docManager, consultLog);
-        
+        //loadDummyConsult(consultManager, docManager, consultLog);
+        CSVLoader.loadPatientFromCSV("src/data/patient.csv", patientManager);
+        CSVLoader.loadConsultRecFromCSV("src/data/consultationData.csv", docManager, consultLog);
+
         int choice;
         do {
             queueManager.loadVisit();
@@ -91,20 +102,32 @@ public class ClinicApplication {
                 }
                 // case 4 -> consultUI.consultMainMenu();
                 case 5 -> pharUI.pharmacyMenu();
-                case 0 -> System.out.println("Thank you for using the Clinic System!");
+                case 0 -> {
+                    System.out.println("Thank you for using the Clinic System!");
+                    System.exit(0);
+                }
             }
 
         } while (choice != 7);
     }
-
-    private static void displayMainMenu() {
-        System.out.println("\n=== Clinic Management System ===");
+    
+    private void displayMainMenu() {
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("     CLINIC MANAGEMENT SYSTEM");
+        System.out.println("=".repeat(35));
         System.out.println("1. Patient Registration System");
         System.out.println("2. Doctor Management System");
         System.out.println("3. Consultation System");
         System.out.println("4. Treatment System");
         System.out.println("5. Pharmacy Control System");
         System.out.println("0. Exit");
+        System.out.println("=".repeat(35));
+    }  
+    
+    private static void loadDummyPatients(PatientManager patientManager) {
+        patientManager.registerNewPatient("050101-07-0101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
+        patientManager.registerNewPatient("050202-07-0202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
+        patientManager.registerNewPatient("050303-07-0303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
     }
     
     private static void loadDummyDoctors(DoctorManager docManager) {
@@ -175,23 +198,69 @@ public class ClinicApplication {
         medRecList.add(mr5); 
     }
     
-    private static void loadDummyConsult(ConsultationManager consult, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
-        Patient p1 = new Patient("050606070606", "Lina", "0124282783", 20, 'M', "Bayan Lepas");
-        Patient p2 = new Patient("050707070707", "Bob", "0124282783", 20, 'M', "Bayan Lepas");
-        Patient p3 = new Patient("050808070808", "Nana", "0124282783", 20, 'M', "Bayan Lepas");
+    /*private static void loadDummyConsult(ConsultationManager consult, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
+        Patient p1 = new Patient("050606070606", "Lina", "0124282783", 20, 'F', "Bayan Lepas");
+        Patient p2 = new Patient("050707070707", "Bob", "0124282784", 22, 'M', "Gelugor");
+        Patient p3 = new Patient("050808070808", "Nana", "0124282785", 25, 'F', "Air Itam");
+        Patient p4 = new Patient("050909070909", "Ali", "0124282786", 28, 'M', "Balik Pulau");
+        Patient p5 = new Patient("051010071010", "Siti", "0124282787", 19, 'F', "George Town");
 
-        Doctor doc1 = docManager.findDoctor("D001"); // JOHN
-        Doctor doc2 = docManager.findDoctor("D002");
+        Doctor doc1 = docManager.findDoctor("D001"); // John
+        Doctor doc2 = docManager.findDoctor("D002"); // Another doctor
 
+        // ===== Doctor 1 Consultations =====
         List<Consultation> doc1Consults = new List<>();
-        doc1Consults.add(new Consultation(1, p1, "Flu", null, doc1, null));
+
+        Consultation c1 = new Consultation(
+            1, p1, "Flu", "Mild fever and cough", doc1,
+            LocalDateTime.of(2025, Month.AUGUST, 10, 9, 10),   // consultTime
+            null,                                              // apptDateTime (walk-in)
+            LocalDateTime.of(2025, Month.AUGUST, 10, 9, 0)     // createdAt (arrival / record created)
+        );
         Consultation.numOfFollowUp++;
+        doc1Consults.add(c1);
 
-        List<Consultation> doc2Consults = new List<>();
-        doc2Consults.add(new Consultation(3, p2, "Fever", null, doc2, LocalDateTime.of(2025, Month.AUGUST, 9, 15, 30)));
+        Consultation c2 = new Consultation(
+            2, p2, "Cough", "Dry cough", doc1,
+            LocalDateTime.of(2025, Month.AUGUST, 10, 10, 5),   // consultTime
+            LocalDateTime.of(2025, Month.AUGUST, 10, 10, 0),   // apptDateTime
+            LocalDateTime.of(2025, Month.AUGUST, 10, 9, 45)    // createdAt (log time)
+        );
+        Consultation.numOfPharmacy++;
+        doc1Consults.add(c2);
+
+        Consultation c3 = new Consultation(
+            3, p3, "Fever", "High temperature", doc1,
+            LocalDateTime.of(2025, Month.AUGUST, 10, 11, 45),  // consultTime
+            null,                                              // apptDateTime (walk-in)
+            LocalDateTime.of(2025, Month.AUGUST, 10, 11, 20)   // createdAt (arrival time)
+        );
         Consultation.numOfTreatment++;
+        doc1Consults.add(c3);
 
+        // ===== Doctor 2 Consultations =====
+        List<Consultation> doc2Consults = new List<>();
+
+        Consultation c4 = new Consultation(
+            4, p4, "Headache", "Recurring migraine", doc2,
+            LocalDateTime.of(2025, Month.AUGUST, 9, 15, 40),   // consultTime
+            LocalDateTime.of(2025, Month.AUGUST, 9, 15, 30),   // apptDateTime
+            LocalDateTime.of(2025, Month.AUGUST, 9, 15, 20)    // createdAt (logged before consult)
+        );
+        Consultation.numOfTreatment++;
+        doc2Consults.add(c4);
+
+        Consultation c5 = new Consultation(
+            5, p5, "Stomach Pain", "Food poisoning", doc2,
+            LocalDateTime.of(2025, Month.AUGUST, 9, 14, 50),   // consultTime
+            null,                                              // apptDateTime (walk-in)
+            LocalDateTime.of(2025, Month.AUGUST, 9, 14, 30)    // createdAt (arrival time)
+        );
+        Consultation.numOfPharmacy++;
+        doc2Consults.add(c5);
+
+        // ===== Add to consult log =====
         consultLog.put(doc1.getDoctorID(), doc1Consults);
         consultLog.put(doc2.getDoctorID(), doc2Consults);
-    }
+    }*/
 }

@@ -152,7 +152,9 @@ public class AppointmentManager {
                 newConsult.getDisease(),
                 newConsult.getNotes(),
                 newConsult.getDoctor(),
-                dateTime
+                newConsult.getConsultTime(),
+                dateTime,
+                newConsult.getCreatedAt()
             );                 
 
             if(index != -1) consultations.replace(index, consult);
@@ -193,7 +195,7 @@ public class AppointmentManager {
         List<Consultation> consultations = findOldAppt(oldAppt);
         String oldID = consultations.get(index).getID();
             if(oldAppt instanceof Consultation oldConsult && index != -1){
-                Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), newDateTime); 
+                Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), oldConsult.getConsultTime(), newDateTime, oldConsult.getCreatedAt()); 
                 consultations.replace(index, newAppt);
                 apptQueue.remove(oldAppt);
                 refreshHeapFromConsultations();
@@ -207,7 +209,7 @@ public class AppointmentManager {
         List<Consultation> consultations = findOldAppt(appt);
         String oldID = consultations.get(index).getID();
             if(appt instanceof Consultation oldConsult && index != -1){
-                Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), null); 
+                Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), oldConsult.getConsultTime(), null, oldConsult.getCreatedAt()); 
                 consultations.replace(index, newAppt);
                 apptQueue.remove(appt);
                 refreshHeapFromConsultations();

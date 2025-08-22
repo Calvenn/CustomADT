@@ -1,7 +1,6 @@
 package Control;
 import Entity.Patient;
 import adt.LinkedHashMap;
-import exception.InvalidInputException;
 import exception.TryCatchThrowFromFile;
 
 /*  1. store patient in an array
@@ -18,15 +17,6 @@ public class PatientManager {
 
     public PatientManager() {
         patientMap = new LinkedHashMap<>();
-        
-        // Pre-load sample data
-        Patient alice = new Patient("050101-07-0101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
-        Patient bob = new Patient("050202-07-0202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
-        Patient charlie = new Patient("050303-07-0303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
-        
-        patientMap.put(alice.getPatientIC(), alice);
-        patientMap.put(bob.getPatientIC(), bob);
-        patientMap.put(charlie.getPatientIC(), charlie);
     }
 
     public boolean isPatientExist(String ic) {
@@ -36,31 +26,12 @@ public class PatientManager {
         return patientMap.containsKey(ic);
     }
 
-    public Patient registerNewPatient(String ic, String name, String phone, String ageStr, char gender, String address) throws InvalidInputException {
-        int age = Integer.parseInt(ageStr);
-
-        if (isPatientExist(ic)) {
-            throw new InvalidInputException("Patient with IC " + ic + " already exists!");
-        }
-
+    public Patient registerNewPatient(String ic, String name, String phone, int age, char gender, String address) {
         Patient patient = new Patient(ic, name, phone, age, gender, address);
-        if (!addNewPatient(patient)) {
-            throw new InvalidInputException("Failed to add patient. Please try again.");
-        }
-
-        return patient;
-    }
-
-    public boolean addNewPatient(Patient patient) throws InvalidInputException {
-        TryCatchThrowFromFile.validateNotNull(patient);
-        TryCatchThrowFromFile.validateIC(patient.getPatientIC());
-
-        if (isPatientExist(patient.getPatientIC())) {
-            throw new InvalidInputException("Patient with IC " + patient.getPatientIC() + " already exists!");
-        }
 
         patientMap.put(patient.getPatientIC(), patient);
-        return true;
+
+        return patient;
     }
 
     public Patient findPatientByIC(String patientIC) {

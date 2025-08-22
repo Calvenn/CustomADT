@@ -15,6 +15,7 @@ import Entity.Patient;
 import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
+import adt.LinkedHashMap;
 
 import exception.*;
 
@@ -74,29 +75,22 @@ public class ConsultationUI {
         }
         
         while (true) {
-            System.out.println(apptManager.totalAppointments(currentDoc.getDoctorID()) == 0?
-                    "No appointment found"
-                    : "\nTotal Appointment: " + apptManager.totalAppointments(currentDoc.getDoctorID()));
-            System.out.println(apptManager.getIncomingAppointment(currentDoc.getDoctorID()) == null?
-                   "No incoming appointment found"
-                    : "Incoming Appointment: " + apptManager.getIncomingAppointment(currentDoc.getDoctorID()));
-            apptManager.checkMissedAppt(currentDoc.getDoctorID());
-            System.out.println(
-                    apptManager.getNumMissedAppt(currentDoc.getDoctorID()) == 0? 
-                    "No appointment missed" 
-                    : "Miss Appointment: " + apptManager.getNumMissedAppt(currentDoc.getDoctorID()));
+            consultationApptSummary();
             if(apptManager.getNumMissedAppt(currentDoc.getDoctorID()) != 0){
                 apptUI.missedFlag = true;
             } else {
                 apptUI.missedFlag = false;
             }
             
-            System.out.println("\n--- Consultation Menu ---");
+            System.out.println("\n" + "=".repeat(35));
+            System.out.println("        CONSULTATION MENU");
+            System.out.println("=".repeat(35));
             System.out.println("1. Handle Consultation");
             System.out.println("2. Appointments");
             System.out.println("3. Consultation Report");
             System.out.println("4. Back");
             System.out.println("0. Log Out");
+            System.out.println("=".repeat(35));
 
             int choice = ValidationHelper.inputValidatedChoice(0,4);
 
@@ -119,17 +113,20 @@ public class ConsultationUI {
     }
     
     private void consultationMenu() {
-        System.out.println("\n--- Appointment Menu ---");
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("        CONSULTATION");
+        System.out.println("=".repeat(35));
         System.out.println("1. Consultation Record");
         System.out.println("2. Consultation History");
-        System.out.println("3. Back");
+        System.out.println("0. Back");
+        System.out.println("=".repeat(35));
 
-        int choice = ValidationHelper.inputValidatedChoice(1,3);
+        int choice = ValidationHelper.inputValidatedChoice(0,2);
         
         switch (choice) {
             case 1 -> consultRecord(); 
             case 2 -> displayRecordUI();
-            case 3 -> {
+            case 0 -> {
                 System.out.println("Returning to main menu...");
                 return;
             }
@@ -138,16 +135,19 @@ public class ConsultationUI {
     }
     
     private void consultationReportMenu(){
-        System.out.println("\n=== Consultation Report ===");
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("        CONSULTATION REPORT");
+        System.out.println("=".repeat(35));
         System.out.println("1. Consultation Outcome Trends");
-        //System.out.println("2. Doctor Report");
-        System.out.println("3. Back");
-        int choice = ValidationHelper.inputValidatedChoice(1,3);
+        System.out.println("2. Wait Time Efficiency");
+        System.out.println("0. Back");
+        System.out.println("=".repeat(35));
+        int choice = ValidationHelper.inputValidatedChoice(0,2);
         
         switch (choice) {
-            case 1 -> consultReport.consultationOutcomeTrends();
-            //case 2 -> 
-            case 3 -> {
+            case 1 -> displayOutcomeReport();
+            case 2 -> displayTimeToConsultReport();
+            case 0 -> {
                 System.out.println("Returning to main menu");
                 return;
             }
@@ -158,6 +158,7 @@ public class ConsultationUI {
     private void consultRecord() {
         Object currentPatient = null;
         Severity severity = null;
+        LocalDateTime startTime = null, createdAt = null;
         Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to call next patient?)");
         
         if(choice == 'y' || choice == 'Y'){          
@@ -169,30 +170,35 @@ public class ConsultationUI {
             return;
         }
 
-        System.out.println("\n--- Now Consulting ---");
+        System.out.println("\n=== Now Consulting ===");
         String id = null;
         Patient patient = null;
         if(currentPatient instanceof Visit visit){
+            System.out.println("=".repeat(35));
             System.out.println("Type     : Walk-In");
             System.out.println("Visit ID : " + visit.getVisitId());
             System.out.println("Patient  : " + visit.getPatient().getPatientName());
             System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
             System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());
             System.out.println("Symptoms : " + visit.getSymptoms());
+            System.out.println("=".repeat(35));
             patient = visit.getPatient();
         } else if (currentPatient instanceof Consultation appt){
             id = appt.getID();
+            System.out.println("=".repeat(35));
             System.out.println("Type   : Appointment");
             System.out.println("ID       : " + id);
             System.out.println("Patient  : " + appt.getPatient().getPatientName());
             System.out.println("Doctor   : " + appt.getDoctor().getDoctorName());
             System.out.println("Severity : " + appt.getSeverity());
             System.out.println("Symptoms : " + appt.getDisease());
+            System.out.println("=".repeat(35));
             patient = appt.getPatient();
         }      
         
         boolean isLifeThreatening = false;
         
+        startTime = LocalDateTime.now();
         System.out.print("Enter diagnosis: ");
         String diagnosis = scanner.nextLine();
         
@@ -203,7 +209,8 @@ public class ConsultationUI {
         System.out.print("Enter notes (if any): ");
         String notes = scanner.nextLine();
         
-        Consultation consultInfo = consultManager.consultationRecord(id, patient, severity.getSeverity(), diagnosis, notes);
+        createdAt = LocalDateTime.now();
+        Consultation consultInfo = consultManager.consultationRecord(id, patient, severity.getSeverity(), diagnosis, notes, startTime, createdAt);
 
         if (consultInfo != null) {
             System.out.println("Record saved.");
@@ -341,5 +348,110 @@ public class ConsultationUI {
                 }
             }
         }
-    }   
+    }
+    
+    /**REPORT SECTION**/
+    public void consultationApptSummary(){
+        // Collect values first
+        int total = apptManager.totalAppointments(currentDoc.getDoctorID());
+        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getDoctorID());
+        int missed = apptManager.getNumMissedAppt(currentDoc.getDoctorID());
+
+        // Print table header
+        System.out.println("\n=================== Appointment Summary ====================");
+        System.out.printf("| %-20s | %-34s |%n", "Field", "Value");
+        System.out.println("------------------------------------------------------------");
+
+        // Print each row
+        System.out.printf("| %-20s | %-34s |%n", "Total Appointments", 
+            (total == 0 ? "No appointment found" : total));
+
+        System.out.printf("| %-20s | %-34s |%n", "Incoming Appointment", 
+            (incoming == null ? "No incoming appointment found" : incoming));
+
+        System.out.printf("| %-20s | %-34s |%n", "Missed Appointments", 
+            (missed == 0 ? "No appointment missed" : missed));
+
+        // Print footer
+        System.out.println("============================================================\n");       
+    }
+    
+    public void displayOutcomeReport() {
+        int[] outcomeData = consultReport.generateOutcomeCounts();
+        
+        if (outcomeData == null) {
+            System.out.println("\nNo consultation outcomes recorded yet.");
+            return;
+        }
+        
+        int followUp = outcomeData[0];
+        int pharmacy = outcomeData[1];
+        int treatment = outcomeData[2];
+        int total = outcomeData[3];
+
+        System.out.println("\n" + "=".repeat(46));
+        System.out.println("          Consultation Outcome Report");
+        System.out.println("=".repeat(46));
+        System.out.printf("| %-12s | %7s | %12s |\n", "Outcome", "Count", "Percentage");
+        System.out.println("|--------------|---------|--------------|");
+
+        System.out.printf("| %-12s | %7d | %10.2f %% |\n", "Follow-up", followUp, followUp * 100.0 / total);
+        System.out.printf("| %-12s | %7d | %10.2f %% |\n", "Pharmacy", pharmacy, pharmacy * 100.0 / total);
+        System.out.printf("| %-12s | %7d | %10.2f %% |\n", "Treatment", treatment, treatment * 100.0 / total);
+
+        System.out.println("|--------------|---------|--------------|");
+        System.out.printf("| %-12s | %7d | %10.2f %% |\n", "Total", total, 100.0);
+        System.out.println("=".repeat(46));
+        displayDiagnosisTrends();
+    }
+    
+    public void displayDiagnosisTrends() {
+        LinkedHashMap<String, Integer> trends = consultReport.generateDiagnosisTrends();
+        
+        if (trends == null) {
+            System.out.println("\nNo consultation records or diagnoses available.");
+            return;
+        }
+
+        System.out.println("\n" + "=".repeat(46));
+        System.out.println("           Diagnosis Frequency Report");
+        System.out.println("=".repeat(46));
+        System.out.printf("| %-22s | %-7s |\n", "Diagnosis", "Count");
+        System.out.println("|------------------------|---------|");
+
+        Object[] keys = trends.getKeys();
+        for (Object keyObj : keys) {
+            String key = (String) keyObj;
+            int count = trends.get(key);
+            System.out.printf("| %-22s | %7d |\n", key, count);
+        }
+
+        System.out.println("=".repeat(46));
+    }
+    
+    public void displayTimeToConsultReport() {
+        LinkedHashMap<String, Object[]> data = consultReport.generateTimeToConsultReport();
+
+        if (data.isEmpty()) {
+            System.out.println("\nNo consultation records available.");
+            return;
+        }
+
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("             Time-to-Consult Report (Wait Time Efficiency)");
+        System.out.println("=".repeat(70));
+        System.out.printf("| %-12s | %-10s | %-15s | %-15s |\n",
+                "Category", "Avg Wait", "Longest Wait", "Shortest Wait");
+        System.out.println("|--------------|------------|-----------------|-----------------|");
+
+        Object[] keys = data.getKeys();
+        for (Object k : keys) {
+            String category = (String) k;
+            Object[] stats = data.get(category);
+            System.out.printf("| %-12s | %-10s | %-15s | %-15s |\n",
+                    category, stats[0] + " mins", stats[1], stats[2]);
+        }
+
+        System.out.println("=".repeat(70));
+    }
 }

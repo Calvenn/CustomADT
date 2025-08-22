@@ -1,0 +1,6 @@
+id,patientIC,patientName,patientPhone,patientAge,patientGender,patientAddress,doctorId,severity,disease,notes,consultTime,apptDateTime,createdAt
+C0001,050606070606,Lina,0124282783,20,F,Bayan Lepas,D001,1,Flu,Mild fever and cough,2025-08-10T09:10,null,2025-08-10T09:00
+C0002,050707070707,Bob,0124282784,22,M,Gelugor,D001,2,Cough,Dry cough,2025-08-10T10:05,2025-08-10T10:00,2025-08-10T09:45
+C0003,050808070808,Nana,0124282785,25,F,Air Itam,D001,3,Fever,High temperature,2025-08-10T11:45,null,2025-08-10T11:20
+C0004,050909070909,Ali,0124282786,28,M,Balik Pulau,D002,4,Headache,Recurring migraine,2025-08-09T15:40,2025-08-09T15:30,2025-08-09T15:20
+C0005,051010071010,Siti,0124282787,19,F,George Town,D002,5,Stomach Pain,Food poisoning,2025-08-09T14:50,null,2025-08-09T14:30

@@ -21,8 +21,6 @@ import adt.List;
 import adt.Queue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
 /**
  *
@@ -52,12 +50,13 @@ public class ConsultationManager {
     }
 
     public Object dispatchNextPatient() {
+        int severity = -1;
         System.out.println(queue.size());
         Appointment nextAppt = appointmentHeap.peekRoot();
         Visit nextWalkIn = queue.peekRoot();  
         
-        System.out.println(nextAppt);
-        System.out.println(nextWalkIn);
+        if (nextAppt instanceof Consultation) severity = ((Consultation) nextAppt).getSeverity();
+        if (severity == -1) return null;
 
         while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
@@ -75,7 +74,7 @@ public class ConsultationManager {
 
         boolean isToday = nextAppt.getDateTime().toLocalDate().equals(LocalDate.now());
 
-        if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > nextAppt.getSeverity()) {
+        if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > severity) {
             return queue.extractRoot();
         } else {
             System.out.println("Appt queue extracted");
@@ -83,17 +82,17 @@ public class ConsultationManager {
         }
     }
         
-    public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes) {
+    public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes, LocalDateTime startTime, LocalDateTime createdAt) {
         // Get existing consultation list for doctor
         List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
         
         if(id == null){
-            newConsult = new Consultation(severity, patient, diagnosis, notes, currentDoc, null); 
+            newConsult = new Consultation(severity, patient, diagnosis, notes, currentDoc, startTime, null, createdAt); 
             consultations.add(newConsult);
             consultLog.put(currentDoc.getDoctorID(), consultations);
             return newConsult;
         } else {
-            newConsult = new Consultation(id, severity, patient, diagnosis, notes, currentDoc, null);
+            newConsult = new Consultation(id, severity, patient, diagnosis, notes, currentDoc, startTime, null, createdAt);
             apptManager.bookAppointment(newConsult, null);
             return newConsult;
         }

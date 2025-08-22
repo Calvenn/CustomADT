@@ -1,4 +1,5 @@
 package Entity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -10,13 +11,18 @@ public class Visit implements Comparable<Visit> {
     private Doctor doctor;
     private LocalDateTime registrationTime;
 
-    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel, Doctor doctor) {
+    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel, Doctor doctor, LocalDateTime registrationTime) {
         this.visitId = visitId;
         this.patient = patient;
         this.symptoms = symptoms;
         this.severityLevel = severityLevel;
         this.doctor = doctor;
-        this.registrationTime = LocalDateTime.now();
+        this.registrationTime = registrationTime; // use the passed value
+    }
+
+    // For new visits (auto-set to now)
+    public Visit(String visitId, Patient patient, String symptoms, Severity severityLevel, Doctor doctor) {
+        this(visitId, patient, symptoms, severityLevel, doctor, LocalDateTime.now());
     }
     
     public String getVisitId() {
@@ -67,7 +73,10 @@ public class Visit implements Comparable<Visit> {
         this.registrationTime = registrationTime;
     }
 
-    
+    public boolean isToday() {
+        return registrationTime.toLocalDate().equals(LocalDate.now());
+    }
+
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
