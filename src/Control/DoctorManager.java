@@ -1,30 +1,51 @@
 package Control;
 import Entity.Doctor;
 import adt.Heap;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import adt.LinkedHashMap;
+import adt.List;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
-// 2. Then use updateDoctor(Doctor minWorkDoctor), to update the doctor back into heap
-
+// 2. (A)IF THE DOCTOR IS APPOINTED NEW TASK then use updateDoctorInc(Doctor minWorkDoctor), to update the doctor back into heap
+//    (B)IF THE DOCTOR FINISH A TASK then use updateDoctorDec(Doctor minWorkDoctor), to update the doctor back into heap
 /**
  * 
  * 
  * @author tanjixian
  */
-public class DoctorManager {
+public class DoctorManager extends StaffManager {
     private Heap<Doctor> doctorHeap;
+    private List<Doctor> staffList;
+    private LinkedHashMap<String, Doctor> staffLookup;
     
-    public DoctorManager(Heap<Doctor> doctorHeap){
-        this.doctorHeap = doctorHeap;
+    // Constructor
+    public DoctorManager(){
+        super();    // initialise List and HashMap
+        doctorHeap = new Heap<>(false);
     }
     
   // Functions
-    // Create a new doctor and insert into heap, boolean to ensure success or fail
-    public boolean addNewDoctor(String doctorID, String doctorName, int doctorAge, String doctorPhoneNo, String doctorGender, String position, LocalDate dateJoined){
-        Doctor newDoctor = new Doctor(doctorID, doctorName, doctorAge, doctorPhoneNo, doctorGender, position, dateJoined);
+    public boolean addNewDoctor(Doctor newDoctor){
         doctorHeap.insert(newDoctor);
+        staffList.add(newDoctor);
+        staffLookup.put(newDoctor.getID(), newDoctor);
         return true;
+    }
+    
+    // View All Doctors
+    public void viewAllDoctor(){
+        for(int i = 0; i < staffList.size(); i++){
+            staffList.get(i).toString();
+        }
+    }
+    
+    // Get List of Doctors
+    public List<Doctor> getDoctorList(){
+        return this.staffList;
+    }
+    
+    // Find Doctors
+    public Doctor findDoctor(String id){
+        return staffLookup.get(id);
     }
     
     // Extract doctor from min-heap root (least workload), used in "bookAppointment"
@@ -36,26 +57,7 @@ public class DoctorManager {
     // Peek lowest patientCount doctor
     public Doctor peekRootDoctor(){
         return doctorHeap.peekRoot();
-    }
-    
-    public String[] peekAllDoctorID() {
-        String[] allDocIDs = new String[doctorHeap.size()];
-        for (int i = 0; i < doctorHeap.size(); i++) {
-            allDocIDs[i] = doctorHeap.get(i).getDoctorID();
-        }
-        return allDocIDs;
-    }
-         
-    // View all Doctor, return their id, name and work load
-    public void viewAllDoctor(){
-        try{
-            for(int i = 0; i < doctorHeap.size(); i++){
-                System.out.print("ID: " + doctorHeap.get(i).getDoctorID() + "\nName: " + doctorHeap.get(i).getDoctorName() + "\nWorkload: " + doctorHeap.get(i).getPatientCount() + "\n");
-            }
-        } catch (Exception e){
-            System.err.println("Error during findDoctor: " + e.getMessage());
-        }
-    }
+    } 
     
     // Update doctor workload/patientCount, used after !APPOINTED NEW TASK!
     public void updateDoctorInc(Doctor minWorkDoctor){
@@ -76,35 +78,14 @@ public class DoctorManager {
         return doctorHeap.size();
     }
     
-    // Find Doctor (from doctorHeap), receive doctor id then return the index(position) in the heap
-    public int findDoctor(Doctor toFind){
-        try{
-            if (toFind == null) return -1; // Null check 
-            for(int i = 0; i < sizeOfDoctHeap(); i++ ){
-                if(doctorHeap.get(i).equals(toFind)) return i;  // If same doctorID then return the index
-            } return -1; // No such doctor
-        } catch (Exception e){
-            System.err.println("Error during findDoctor: " + e.getMessage());
-            return -1;  // Error
-        }
+    // Remove Doctor (from doctorHeap, staffList, staffLookup)
+    public void removeDoctor(String id){
+        Doctor d = staffLookup.remove(id);
+        for(int i = 0; i < staffList.size(); i++){
+            if(staffList.get(i).equals(d)){
+                staffList.remove(i);
+            }
+        } 
+        doctorHeap.remove(d);
     }
-    
-    public Doctor findDoctor(String toFindID){
-        try{
-            if (toFindID == null) return null; // Null check 
-            for(int i = 0; i < sizeOfDoctHeap(); i++ ){
-                if(doctorHeap.get(i).getDoctorID().equals(toFindID)) {
-                    return doctorHeap.get(i);
-                }  // If same doctorID then return the index
-            } return null; // No such doctor
-        } catch (Exception e){
-            System.err.println("Error during findDoctor: " + e.getMessage());
-            return null;  // Error
-        }
-    }
-    
-    // Remove Doctor (from doctorHeap)
-    public void removeDoctor(Doctor toRemove){
-        doctorHeap.remove(toRemove);
-    } 
 }

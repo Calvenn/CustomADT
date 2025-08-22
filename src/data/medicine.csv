@@ -1,0 +1,11 @@
+MedID,Name,Description,Stock
+M001,Panadol,Pain reliever and fever reducer,100
+M002,Amoxicillin,Antibiotic for bacterial infections,80
+M003,Vitamin C,Immune system booster,150
+M004,Loratadine,Antihistamine for allergies,60
+M005,Omeprazole,Reduces stomach acid,9
+M006,Paracetamol,Common painkiller,200
+M007,Ibuprofen,Anti-inflammatory and pain relief,120
+M008,Salbutamol,Asthma inhaler medication,10
+M009,Aspirin,Blood thinner and pain relief,70
+M010,Metformin,Controls blood sugar in type 2 diabetes,50

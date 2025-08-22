@@ -40,56 +40,57 @@ public class MedRecordControl {
         }
     }
     
-    public void searchByPatient(String patientIC) {
+    public void searchByPatient(String patient) {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getPatient().getPatientIC().equalsIgnoreCase(patientIC)) {
+            if (record.getPatient().getPatientIC().equalsIgnoreCase(patient)||record.getPatient().getPatientName().equalsIgnoreCase(patient)) {
                 displayRecord(record);
                 found = true;
             }
         }
         if (!found) {
-            System.out.println("No records found for patient ID: " + patientIC);
+            System.out.println("No records found for patient: " + patient);
         }
     }
     
-    public void searchByDoctor(String doctorID) {
+    public void searchByDoctor(String doctor) {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getDoctor().getDoctorID().equalsIgnoreCase(doctorID)) {
+            if (record.getDoctor().getDoctorID().equalsIgnoreCase(doctor)||record.getDoctor().getDoctorName().equalsIgnoreCase(doctor)) {
                 displayRecord(record);
                 found = true;
             }
         }
         if (!found) {
-            System.out.println("No records found for doctor ID: " + doctorID);
+            System.out.println("No records found for doctor: " + doctor);
         }
     }
     
-    public void searchByMedicine(String medID) {
+    public void searchByMedicine(String med) {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getMed().getMedID().equalsIgnoreCase(medID)) {
+            if (record.getMed().getMedID().equalsIgnoreCase(med)||record.getMed().getName().equalsIgnoreCase(med)) {
                 displayRecord(record);
                 found = true;
             }
         }
         if (!found) {
-            System.out.println("No records found for medicine ID: " + medID);
+            System.out.println("No records found for medicine : " + med);
         }
     }
 
     //search by date?
     private void displayRecord(MedRecord record) {
-        System.out.println("--------------------------------");
+        System.out.println("=======================================");
         System.out.println("Record ID: " + record.getRecordID());
         System.out.println("Patient: " + record.getPatient().getPatientName() + " (" + record.getPatient().getPatientIC() + ")");
         System.out.println("Doctor: " + record.getDoctor().getDoctorName() + " (" + record.getDoctor().getDoctorID() + ")");
         System.out.println("Medicine: " + record.getMed().getName() + " (" + record.getMed().getMedID() + ")");
         System.out.println("Quantity Taken: " + record.getQuantityTaken());
         System.out.println("Issued On: " + record.getTimestamp());
+        System.out.println("=======================================");
     }
 }

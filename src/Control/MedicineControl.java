@@ -37,7 +37,7 @@ public class MedicineControl {
 
         System.out.println("\n=== Medicine List ===");
         System.out.printf("%-15s %-25s %-40s %-15s%n", "MedID", "Name", "Description", "Stock");
-        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("==================================================================================================================");
 
         Object[] meds = medMap.getValues();
         for (Object obj : meds) {
@@ -73,7 +73,7 @@ public class MedicineControl {
         }
         if (!found) {
             System.out.println("All medicines have sufficient stock.");
-        }else System.out.println("Please reorder these medicines soon!");
+        }else System.out.println("Please reorder these medicines soon!\n");
     }
     
     public Iterable<Medicine> getAllMedicines() {

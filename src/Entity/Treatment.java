@@ -32,6 +32,14 @@ public class Treatment implements Comparable<Treatment> {
         this.frequency = 0; 
     }
     
+    public Treatment(String name, String description, Duration duration, int frequency) {
+        this.treatmentId = String.format("T%04d", generateId());
+        this.name = name; 
+        this.description = description; 
+        this.duration = duration; 
+        this.frequency = frequency; 
+    }
+    
     private static int generateId() {
         return count += 1; 
     }
@@ -77,15 +85,16 @@ public class Treatment implements Comparable<Treatment> {
         return Integer.compare(this.frequency, other.frequency); 
     }
     
+    //id, name, description, duration, frequency 
     @Override
     public String toString() {
         return String.format("""
                              Treatment ID: %s
                              Treatment Name: %s
                              Description: %s 
-                             Duration: %s
+                             Duration: %s minutes
                              Frequency: %d
                              """, 
-                treatmentId, name, description, duration, frequency); 
+                treatmentId, name, description, duration.toMinutes(), frequency); 
     }
 }
