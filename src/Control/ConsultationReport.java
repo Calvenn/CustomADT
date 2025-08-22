@@ -7,6 +7,8 @@ package Control;
 import Entity.Consultation;
 import adt.LinkedHashMap;
 import adt.List;
+import adt.Heap;
+
 
 /**
  *
@@ -14,51 +16,32 @@ import adt.List;
  */
 public class ConsultationReport {
     private final LinkedHashMap<String, List<Consultation>> consultLog;
+    private final AppointmentManager apptManager;
     
-    public ConsultationReport(LinkedHashMap<String, List<Consultation>> consultLog){
+    public ConsultationReport(LinkedHashMap<String, List<Consultation>> consultLog, AppointmentManager apptManager){
         this.consultLog = consultLog;
-    }
-    
-    public void consultationOutcomeTrends(){
-        System.out.println("===========================================");
-        System.out.println("      Consultation Outcome Trends Report    ");
-        System.out.println("===========================================");
-
-        generateOutcomeCounts();
-        generateDiagnosisTrends();
-
-        System.out.println("===========================================\n");
+        this.apptManager = apptManager;
     }
 
-    private void generateOutcomeCounts() {
+    public int[] generateOutcomeCounts() {
         int followUp = Consultation.numOfFollowUp;
         int pharmacy = Consultation.numOfPharmacy;
         int treatment = Consultation.numOfTreatment;
         int totalOutcome = followUp + pharmacy + treatment;
 
         if (totalOutcome == 0) {
-            System.out.println("\nNo consultation outcomes recorded yet.");
-            return;
+            return null; 
         }
 
-        System.out.println("\n--- Consultation Outcome Distribution ---");
-        System.out.printf("| %-11s | %-5s | %-9s |\n", "Outcome", "Count", "Percentage");
-        System.out.println("|-------------|-------|------------|");
-        System.out.printf("| %-11s | %5d | %8.2f %% |\n", "Follow-up", followUp, followUp * 100.0 / totalOutcome);
-        System.out.printf("| %-11s | %5d | %8.2f %% |\n", "Pharmacy", pharmacy, pharmacy * 100.0 / totalOutcome);
-        System.out.printf("| %-11s | %5d | %8.2f %% |\n", "Treatment", treatment, treatment * 100.0 / totalOutcome);
-        System.out.println("|-------------|-------|------------|");
-        System.out.printf("| %-11s | %5d | %8.2f %% |\n", "Total", totalOutcome, 100.0);
+        return new int[]{ followUp, pharmacy, treatment, totalOutcome };
     }
 
-    
-    private void generateDiagnosisTrends() {
+    public LinkedHashMap<String, Integer> generateDiagnosisTrends() {
         LinkedHashMap<String, Integer> diagnosisCount = new LinkedHashMap<>();
         Consultation c = null;
 
         if (consultLog == null || consultLog.isEmpty()) {
-            System.out.println("No consultation records available.");
-            return;
+            return null; // Boundary handles "no records"
         }
 
         Object[] lists = consultLog.getValues(); // Each is a List<Consultation>
@@ -66,7 +49,8 @@ public class ConsultationReport {
         for (Object obj : lists) {
             List<Consultation> consultationList = (List<Consultation>) obj;
 
-            for (int i = 1; i <= consultationList.size(); i++) {
+            // use 0-based indexing (safer)
+            for (int i = 0; i < consultationList.size(); i++) {
                 c = consultationList.get(i);
                 if (c == null || c.getNotes() == null || c.getNotes().trim().isEmpty()) continue;
 
@@ -80,20 +64,78 @@ public class ConsultationReport {
             }
         }
 
-        if (diagnosisCount.isEmpty()) {
-            System.out.println("\nNo diagnoses found in consultation notes.");
-            return;
+        return diagnosisCount.isEmpty() ? null : diagnosisCount;
+    }
+    
+    public LinkedHashMap<String, Object[]> generateTimeToConsultReport() {
+        LinkedHashMap<String, Object[]> report = new LinkedHashMap<>();
+
+        if (consultLog == null || consultLog.isEmpty()) {
+            return report;
         }
 
-        System.out.println("\n--- Diagnosis Frequency ---");
-        System.out.printf("| %-18s | %-5s |\n", "Diagnosis", "Count");
-        System.out.println("|--------------------|-------|");
+        // Stats for appointment
+        long totalAppt = 0, apptCount = 0;
+        Heap<Long> apptMaxHeap = new Heap<>(true);  // max-heap
+        Heap<Long> apptMinHeap = new Heap<>(false); // min-heap
 
-        Object[] keys = diagnosisCount.getKeys();
-        for (Object keyObj : keys) {
-            String key = (String) keyObj;
-            int count = diagnosisCount.get(key);
-            System.out.printf("| %-18s | %5d |\n", key, count);
+        // Stats for walk-in
+        long totalWalk = 0, walkCount = 0;
+        Heap<Long> walkMaxHeap = new Heap<>(true);
+        Heap<Long> walkMinHeap = new Heap<>(false);
+
+        Object[] lists = consultLog.getValues();
+        for (Object obj : lists) {
+            List<Consultation> consultations = (List<Consultation>) obj;
+
+            for (int i = 1; i <= consultations.size(); i++) {
+                Consultation c = consultations.get(i);
+                if (c == null) continue;
+
+                long wait = java.time.Duration.between(
+                        c.getCreatedAt(), c.getConsultTime()
+                ).toMinutes();
+
+                if (c.getDateTime() != null) { // Appointment
+                    totalAppt += wait;
+                    apptCount++;
+                    apptMaxHeap.insert(wait);
+                    apptMinHeap.insert(wait);
+                } else { // Walk-in
+                    totalWalk += wait;
+                    walkCount++;
+                    walkMaxHeap.insert(wait);
+                    walkMinHeap.insert(wait);
+                }
+            }
         }
+
+        long avgAppt = (apptCount == 0 ? 0 : totalAppt / apptCount);
+        long avgWalk = (walkCount == 0 ? 0 : totalWalk / walkCount);
+        long avgOverall = ((apptCount + walkCount) == 0 ? 0 :
+                (totalAppt + totalWalk) / (apptCount + walkCount));
+
+        // Put into LinkedHashMap: category → {avg, max, min}
+        report.put("Appointments", new Object[]{
+                avgAppt,
+                (apptCount == 0 ? "-" : apptMaxHeap.peekRoot() + " mins"),
+                (apptCount == 0 ? "-" : apptMinHeap.peekRoot() + " mins")
+        });
+        report.put("Walk-ins", new Object[]{
+                avgWalk,
+                (walkCount == 0 ? "-" : walkMaxHeap.peekRoot() + " mins"),
+                (walkCount == 0 ? "-" : walkMinHeap.peekRoot() + " mins")
+        });
+        report.put("Overall", new Object[]{
+                avgOverall,
+                (apptCount + walkCount == 0 ? "-" :
+                        Math.max(apptMaxHeap.isEmpty() ? Long.MIN_VALUE : apptMaxHeap.peekRoot(),
+                                walkMaxHeap.isEmpty() ? Long.MIN_VALUE : walkMaxHeap.peekRoot()) + " mins"),
+                (apptCount + walkCount == 0 ? "-" :
+                        Math.min(apptMinHeap.isEmpty() ? Long.MAX_VALUE : apptMinHeap.peekRoot(),
+                                walkMinHeap.isEmpty() ? Long.MAX_VALUE : walkMinHeap.peekRoot()) + " mins")
+        });
+
+        return report;
     }
 }

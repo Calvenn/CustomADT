@@ -19,24 +19,30 @@ public class Consultation extends Appointment{
     //patient id as foreign key
     private static int idNo = 0; 
     private final String consultationID; //C0001
+    private int severity;
     private String disease;
     private String notes;
+    private LocalDateTime consultTime;
     private LocalDateTime createdAt;
     
-    public Consultation(int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime apptDateTime){
-        super(patient, doc, severity, apptDateTime);
+    public Consultation(int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime consultTime, LocalDateTime apptDateTime, LocalDateTime createdAt){
+        super(patient, doc, apptDateTime);
         this.consultationID = "C" + String.format("%04d", generateId()); 
+        this.severity = severity;
         this.disease = disease;
         this.notes = notes;
-        this.createdAt = createdAt.now();
+        this.consultTime = consultTime;
+        this.createdAt = createdAt;
     }
     
-    public Consultation(String consultationID, int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime apptDateTime) {
-        super(patient, doc, severity, apptDateTime);
+    public Consultation(String consultationID, int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime consultTime, LocalDateTime apptDateTime, LocalDateTime createdAt) {
+        super(patient, doc, apptDateTime);
         this.consultationID = consultationID;
+        this.severity = severity;
         this.disease = disease;
         this.notes = notes;
-        this.createdAt = LocalDateTime.now();
+        this.consultTime = consultTime;
+        this.createdAt = createdAt;
     }
     
     private static int generateId() {
@@ -48,12 +54,24 @@ public class Consultation extends Appointment{
         return consultationID;
     }
     
+    public int getSeverity(){
+        return severity;
+    }
+    
     public String getDisease(){
         return disease;
     }
     
     public String getNotes(){
         return notes;
+    }
+    
+    public LocalDateTime getConsultTime(){
+        return consultTime;
+    }
+    
+    public LocalDateTime getCreatedAt(){
+        return createdAt;
     }
     
     public void setNotes(){
@@ -67,15 +85,15 @@ public class Consultation extends Appointment{
 
     @Override
     public String toString() {
-        return "\n=== Consultation Record ===\n"
-             + "Consultation ID  : " + consultationID + "\n"
-             + "Patient Name     : " + getPatient().getPatientName() + "\n"
-             + "Patient IC       : " + getPatient().getPatientIC() + "\n"
-             + "Severity Level   : " + super.getSeverity() + "\n"
-             + "Diagnosis        : " + disease + "\n"
-             + "Notes            : " + notes + "\n"   
-             + "Doctor In Charge : " + super.getDoctor().getDoctorName() + "\n"
-             + "Appointment Time : " + super.getDateTime() + "\n"
-             + "===========================\n";
-    }
+        return "\n================ Consultation Record ================\n"
+             + String.format("%-20s: %s%n", "Consultation ID", consultationID)
+             + String.format("%-20s: %s%n", "Patient Name", getPatient().getPatientName())
+             + String.format("%-20s: %s%n", "Patient IC", getPatient().getPatientIC())
+             + String.format("%-20s: %d%n", "Severity Level", severity)
+             + String.format("%-20s: %s%n", "Diagnosis", disease)
+             + String.format("%-20s: %s%n", "Notes", notes)
+             + String.format("%-20s: %s%n", "Doctor In Charge", getDoctor().getDoctorName())
+             + String.format("%-20s: %s%n", "Appointment Time", getDateTime())
+             + "====================================================\n";
+    }   
 }
