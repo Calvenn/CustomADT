@@ -10,6 +10,8 @@ import Entity.*;
 import adt.*;
 import data.CSVLoader;
 import exception.*;
+
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +44,7 @@ public class ClinicApplication {
     private final MedicineControl medControl;
     private final MedRecordControl medRecControl;
     private final PharmacyReport pharReport;
+    private final VisitHistoryManager historyManager;
 
     // UI Layer
     private final ConsultationUI consultUI;
@@ -52,7 +55,8 @@ public class ClinicApplication {
         // wire dependencies
         patientManager = new PatientManager();
         docManager = new DoctorManager(sharedDoc);
-        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog);
+        historyManager = new VisitHistoryManager();
+        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(),
         docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
@@ -62,13 +66,15 @@ public class ClinicApplication {
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
-        patientUI = new PatientManagementUI(queueManager);
+        patientUI = new PatientManagementUI(queueManager, patientManager);
         pharReport = new PharmacyReport(medRecList);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }
     
     
     public void run(){
+        //loadPatientsCSV("/CustomADT/src/data/patients.csv");
+        loadDummyPatients(patientManager);
         loadDummyDoctors(docManager);
         loadDummyTreatment(trtManager);
         loadDummyMed(medMap);
@@ -115,6 +121,12 @@ public class ClinicApplication {
         System.out.println("0. Exit");
         System.out.println("=".repeat(35));
     }  
+    
+    private static void loadDummyPatients(PatientManager patientManager) {
+        patientManager.registerNewPatient("050101-07-0101", "Alice Lee", "0123456789", 25, 'F', "123, Jalan ABC");
+        patientManager.registerNewPatient("050202-07-0202", "Bob Tan", "0198765432", 30, 'M', "456, Jalan XYZ");
+        patientManager.registerNewPatient("050303-07-0303", "Charlie Lim", "0112345678", 22, 'M', "789, Jalan 123");
+    }
     
     private static void loadDummyDoctors(DoctorManager docManager) {
         docManager.addNewDoctor("D001", "John", 30, "012-1231234", "Man", "Head", LocalDate.now());

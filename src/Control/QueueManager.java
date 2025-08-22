@@ -18,6 +18,7 @@ public class QueueManager {
     
     private int queueNumber;
     private DoctorManager docManager;
+    private VisitHistoryManager historyManager;
     
     // Enhanced tracking features using custom ADTs
     private LinkedHashMap<Severity, Integer> severityCount;
@@ -27,7 +28,7 @@ public class QueueManager {
     private Visit nextPatient;
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
+    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         this.queueNumber = 1000;
@@ -36,6 +37,8 @@ public class QueueManager {
         this.severityCount = new LinkedHashMap<>();
         this.consultLog = consultLog;
         this.apptQueue = new Heap<>(false);
+
+        this.historyManager = historyManager;
         
         // Initialize severity counters
         for (Severity severity : Severity.values()) {
@@ -262,6 +265,9 @@ public class QueueManager {
 
     public void completeCurrentPatient() {
         if (currentlyProcessing != null) {
+            // move patient to history
+            historyManager.addHistoricalVisit(currentlyProcessing);
+
             // The visit has been extracted by ConsultationManager, so we just clear our tracking
             currentlyProcessing = null;
             

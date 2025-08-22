@@ -15,9 +15,9 @@ public class PatientManagementUI {
     private PatientManager patientManager;
     private Scanner scanner;
 
-    public PatientManagementUI(QueueManager queueManager) {
+    public PatientManagementUI(QueueManager queueManager, PatientManager patientManager) {
         this.queueManager = queueManager;
-        this.patientManager = new PatientManager();
+        this.patientManager = patientManager;
         this.scanner = new Scanner(System.in);
     }
 
@@ -138,12 +138,13 @@ public class PatientManagementUI {
             }
         }
 
-        String ageStr;
+        int age; // Changed from String to int
         while (true) {
             System.out.print("\nEnter age: ");
-            ageStr = scanner.nextLine();
+            String ageStr = scanner.nextLine();
             try {
                 TryCatchThrowFromFile.validatePositiveInteger(ageStr);
+                age = Integer.parseInt(ageStr); // Convert to int here
                 break;
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e);
@@ -174,13 +175,13 @@ public class PatientManagementUI {
             }
         }
 
-        Patient newPatient = null;
-        try {
-            newPatient = patientManager.registerNewPatient(ic, name, phone, ageStr, gender, address);
+        Patient newPatient = patientManager.registerNewPatient(ic, name, phone, age, gender, address);
+        if (newPatient != null) {
             System.out.println("\nPatient registered successfully!");
-            patientManager.displayPatientDetails(newPatient);
-        } catch (InvalidInputException e) {
-            ValidationUtility.printErrorWithSolution(e);
+            System.out.println("\nPatient Details:");
+            System.out.println(newPatient);
+        } else {
+            System.out.println("\nFailed to register patient.");
         }
     }
 
