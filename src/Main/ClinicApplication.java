@@ -22,7 +22,7 @@ public class ClinicApplication {
     // Shared ADTs
     private final Heap<Doctor> sharedDoc = new Heap<>(false);
     private final Heap<Visit> sharedVisitQueue = new Heap<>(true);
-    private final Heap<Treatment> providedTreatments = new Heap<>(true);
+    private final LinkedHashMap<String,Treatment> providedTreatments = new LinkedHashMap<>();
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
@@ -45,6 +45,7 @@ public class ClinicApplication {
     // UI Layer
     private final ConsultationUI consultUI;
     private final PatientManagementUI patientUI;
+    private final TreatmentUI treatmentUI; 
     private final PharmacyUI pharUI;
 
     public ClinicApplication() {
@@ -62,6 +63,7 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager);
+        treatmentUI = new TreatmentUI(trtManager);
         pharReport = new PharmacyReport(medRecList);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
     }
@@ -89,7 +91,7 @@ public class ClinicApplication {
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
                     consultUI.consultMainMenu();
                 }
-                // case 4 -> consultUI.consultMainMenu();
+                case 4 -> treatmentUI.treatmentMenu();
                 case 5 -> pharUI.pharmacyMenu();
                 case 0 -> System.out.println("Thank you for using the Clinic System!");
             }
