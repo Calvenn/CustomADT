@@ -14,7 +14,6 @@ import exception.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -33,43 +32,37 @@ public class AppointmentUI {
     }
     
     public void apptMenu(Doctor currentDoc) {
-        while (true) {
-            //System.out.println("Total Appointment: " + apptManager.totalAppointments());
-            //System.out.println("Incoming Appointment " + apptManager.getIncomingAppointment());
-            
-            System.out.println("\n--- Appointment Menu ---");
+        int choice;
+        while (true) {         
+            System.out.println("\n" + "=".repeat(35));
+            System.out.println("        APPOINTMENT MENU");
+            System.out.println("=".repeat(35));
             System.out.println("1. View Appointments");
             System.out.println("2. Update Appointment");
-            System.out.println("3. Delete Appointment");
+            System.out.println("3. Delete Appointment");        
             System.out.print(missedFlag == true? 
                     "4. Reschedule Miss Appointment"
                     :"");
-            System.out.println(missedFlag == false? 
-                    "4. Back"
-                    :"\n5. Back");
-
-            System.out.print("Choose > ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // clear newline
+            System.out.println("0. Back");
+            System.out.println("=".repeat(35));         
 
             if (!missedFlag) {
+                choice = ValidationHelper.inputValidatedChoice(0, 3);
                 switch (choice) {
                     case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
-                    case 4 -> {
-                        System.out.println("Returning to main menu");
-                        return;
-                    }
+                    case 0 -> {return;}
                     default -> System.out.println("Invalid choice.\n");
                 }
             } else {
+                choice = ValidationHelper.inputValidatedChoice(0, 4);
                 switch (choice) {
                     case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 4 -> rescheduleMissedApptUI(currentDoc);
-                    case 5 -> {
+                    case 0 -> {
                         System.out.println("Returning to main menu");
                         return;
                     }

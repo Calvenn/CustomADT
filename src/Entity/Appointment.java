@@ -12,13 +12,11 @@ import java.time.format.DateTimeFormatter;
 public abstract class Appointment implements Comparable<Appointment>{
     private Patient patient;
     private Doctor doctor;
-    private int severity;
     private LocalDateTime dateTime;
     
-    public Appointment(Patient patient, Doctor doctor, int severity, LocalDateTime time){
+    public Appointment(Patient patient, Doctor doctor, LocalDateTime time){
         this.patient = patient;
         this.doctor = doctor;
-        this.severity = severity;
         this.dateTime = time;
     }
     
@@ -30,16 +28,8 @@ public abstract class Appointment implements Comparable<Appointment>{
         return doctor;
     }
     
-    public int getSeverity(){
-        return severity;
-    }
-    
     public LocalDateTime getDateTime(){
         return dateTime;
-    }
-    
-    public void setSeverity(int severity){
-        this.severity = severity;
     }
     
     public void setTime(LocalDateTime time){
@@ -56,8 +46,7 @@ public abstract class Appointment implements Comparable<Appointment>{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return "Appointment Details:\n"
              + " Date & Time : " + dateTime.format(formatter) + "\n"
-             + " Doctor      : " + doctor.getDoctorName() + "\n"
-             + " Severity    : " + severity;
+             + " Doctor      : " + doctor.getDoctorName() + "\n";
     }
     
     @Override
