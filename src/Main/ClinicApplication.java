@@ -66,38 +66,43 @@ public class ClinicApplication {
         treatmentUI = new TreatmentUI(trtManager);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
+        loadDummyData();
     }
     
-    
-    public void run(){
+    private void loadDummyData(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
-
-        int choice;
+    }
+    
+    
+    public void run() {
         queueManager.loadVisit();
-        displayMainMenu();
-        choice = ValidationHelper.inputValidatedChoice(0,5);
+        while (true) { 
+            displayMainMenu();
+            int choice = ValidationHelper.inputValidatedChoice(0,5);
 
-        switch (choice) {
-            case 1 -> patientUI.patientMenu();
-            // case 2 -> consultUI.consultMainMenu();
-            case 3 -> {
-                System.out.println("Treatment queue: " + treatmentQueue.size());
-                System.out.println("Med Collection queue: " + medCollectQueue.size());
-                consultUI.consultMainMenu();
-            }
-            case 4 -> treatmentUI.treatmentMenu();
-            case 5 -> pharUI.pharmacyMenu();
-            case 0 -> {
-                System.out.println("Thank you for using the Clinic System!");
-                System.exit(0);
+            switch (choice) {
+                case 1 -> patientUI.patientMenu();
+                case 2 -> consultUI.consultMainMenu();
+                case 3 -> {
+                    System.out.println("Treatment queue: " + treatmentQueue.size());
+                    System.out.println("Med Collection queue: " + medCollectQueue.size());
+                    consultUI.consultMainMenu();
+                }
+                case 4 -> treatmentUI.treatmentMenu();
+                case 5 -> pharUI.pharmacyMenu();
+                case 0 -> {
+                    System.out.println("Thank you for using the Clinic System!");
+                    System.exit(0);
+                }
             }
         }
     }
+
     
     private void displayMainMenu() {
         System.out.println("\n" + "=".repeat(35));

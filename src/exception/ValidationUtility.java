@@ -40,7 +40,7 @@ public class ValidationUtility {
     public static boolean isValidDateTime(String dateTimeStr) {
         if (isNullOrEmpty(dateTimeStr)) return false;
 
-        String pattern = "dd-MM-yyyy HH:mm";
+        String pattern = "yyyy-MM-dd HH:mm";
 
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);

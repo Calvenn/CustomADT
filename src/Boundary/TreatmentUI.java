@@ -112,7 +112,7 @@ public class TreatmentUI {
     
     public void addTreatmentUI() {
         printTitle("Add Treatment");
-        
+            
         String name = inputName(); 
         String description = inputDescription(); 
         Duration duration = inputDuration(); 
