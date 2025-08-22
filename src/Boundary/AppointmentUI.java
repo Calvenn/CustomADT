@@ -47,7 +47,7 @@ public class AppointmentUI {
             System.out.println("=".repeat(35));         
 
             if (!missedFlag) {
-                choice = ValidationHelper.inputValidatedChoice(0, 3);
+                choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
                 switch (choice) {
                     case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
                     case 2 -> updateAppointmentUI();
@@ -56,7 +56,7 @@ public class AppointmentUI {
                     default -> System.out.println("Invalid choice.\n");
                 }
             } else {
-                choice = ValidationHelper.inputValidatedChoice(0, 4);
+                choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
                 switch (choice) {
                     case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
                     case 2 -> updateAppointmentUI();

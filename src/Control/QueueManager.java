@@ -279,6 +279,14 @@ public class QueueManager {
         }
     }
 
+    public Visit[] getAllVisits() {
+        Visit[] visits = new Visit[visitQueue.size()];
+        for (int i = 0; i < visitQueue.size(); i++) {
+            visits[i] = visitQueue.get(i);
+        }
+        return visits;
+    }
+
     // Add getter for the heap (so ConsultationManager can access it)
     public Heap<Visit> getVisitQueue() {
         return visitQueue;

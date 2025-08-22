@@ -62,9 +62,8 @@ public class ClinicApplication {
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
-        patientUI = new PatientManagementUI(queueManager, patientManager);
-        treatmentUI = new TreatmentUI(trtManager);
-        pharReport = new PharmacyReport(medRecList,medMap);
+        patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
+        pharReport = new PharmacyReport(medRecList, medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         loadDummyData();
     }
@@ -83,7 +82,7 @@ public class ClinicApplication {
         queueManager.loadVisit();
         while (true) { 
             displayMainMenu();
-            int choice = ValidationHelper.inputValidatedChoice(0,5);
+            int choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
@@ -103,7 +102,6 @@ public class ClinicApplication {
         }
     }
 
-    
     private void displayMainMenu() {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("     CLINIC MANAGEMENT SYSTEM");
@@ -116,4 +114,5 @@ public class ClinicApplication {
         System.out.println("0. Exit");
         System.out.println("=".repeat(35));
     }  
+
 }

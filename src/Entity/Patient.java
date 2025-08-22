@@ -67,17 +67,25 @@ public class Patient{
     
     @Override
     public String toString() {
+        int valueWidth = 40;       // space for values
+        int totalWidth = valueWidth + 14; // total box width
+        String line = "-".repeat(totalWidth);
+
         return String.format(
-            "\n%-10s: %s" +
-            "\n%-10s: %s" +
-            "\n%-10s: %d" +
-            "\n%-10s: %c" +
-            "\n%-10s: %s\n",
-            "Name", patientName,
-            "Phone No", patientPhoneNo,
-            "Age", patientAge,
-            "Gender", patientGender,
-            "Address", patientAddress
+            "%s%n" +
+            "| %-"+(totalWidth-4)+"s |%n" +
+            "%s%n" +
+            "| IC      | %-"+valueWidth+"s |%n" +
+            "| Name    | %-"+valueWidth+"s |%n" +
+            "| Phone   | %-"+valueWidth+"s |%n" +
+            "| Age     | %-"+valueWidth+"d |%n" +
+            "| Gender  | %-"+valueWidth+"c |%n" +
+            "| Address | %-"+valueWidth+"s |%n" +
+            "%s",
+            line,
+            "PATIENT INFO",
+            line,patientIC, patientName, patientPhoneNo, patientAge, patientGender, patientAddress, line
         );
     }
+
 }

@@ -92,7 +92,7 @@ public class ConsultationUI {
             System.out.println("0. Log Out");
             System.out.println("=".repeat(35));
 
-            int choice = ValidationHelper.inputValidatedChoice(0,4);
+            int choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
             switch (choice) {
                 case 1 -> consultationMenu();
@@ -120,7 +120,7 @@ public class ConsultationUI {
         System.out.println("0. Back");
         System.out.println("=".repeat(35));
 
-        int choice = ValidationHelper.inputValidatedChoice(0,2);
+        int choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
         
         switch (choice) {
             case 1 -> consultRecord(); 
@@ -141,7 +141,7 @@ public class ConsultationUI {
         System.out.println("2. Wait Time Efficiency");
         System.out.println("0. Back");
         System.out.println("=".repeat(35));
-        int choice = ValidationHelper.inputValidatedChoice(0,2);
+        int choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
         
         switch (choice) {
             case 1 -> displayOutcomeReport();
@@ -220,7 +220,7 @@ public class ConsultationUI {
                 System.out.println("2. Send to treatment");
                 System.out.println("3. Send to pharmacy");
                 System.out.println("4. Done");
-                int action = ValidationHelper.inputValidatedChoice(1, 4);
+                int action = ValidationHelper.inputValidatedChoice(1, 4, "your choice");
 
                 switch (action) {
                     case 1 -> {

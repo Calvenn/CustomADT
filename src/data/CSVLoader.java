@@ -7,12 +7,15 @@ package data;
 import Control.DoctorManager;
 import Control.MedicineControl;
 import Control.PatientManager;
+import Control.VisitHistoryManager;
 import Control.TreatmentManager;
 import Entity.Consultation;
 import Entity.Doctor;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.Severity;
+import Entity.Visit;
 import adt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -52,7 +55,7 @@ public class CSVLoader {
                 String phone = values[2].trim();
                 int age = Integer.parseInt(values[3].trim());
                 char gender = values[4].trim().charAt(0);
-                String address = values[5].trim();
+                String address = values[5].trim().replaceAll("^\"|\"$", "");
 
                 // Register into patient manager
                 patientManager.registerNewPatient(patientIc, name, phone, age, gender, address);
@@ -135,9 +138,68 @@ public class CSVLoader {
             e.printStackTrace();
         }
     }
-    
-    public static void loadMedicineFromCSV(String filePath, MedicineControl medControl) {
-        
+
+    public static void loadVisitHistoryFromCSV(String filePath, PatientManager patientManager, DoctorManager docManager, VisitHistoryManager historyManager) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) { // skip header
+                    isHeader = false;
+                    continue;
+                }
+
+                String[] values = line.split(",", 6); // 6 columns: VisitID, IC, Symptoms, Severity, DoctorID, RegistrationTime
+
+                if (values.length < 6) {
+
+                    System.err.println("Skipping invalid line: " + line);
+                    continue;
+                }
+
+                String visitId = values[0].trim();
+                String patientIc = values[1].trim();
+                String symptoms = values[2].trim();
+                String severityStr = values[3].trim();
+                String doctorId = values[4].trim();
+                LocalDateTime registrationTime = LocalDateTime.parse(values[5].trim(), formatter);
+
+                // Retrieve patient and doctor
+                Patient patient = patientManager.findPatientByIC(patientIc);
+                if (patient == null) {
+                    System.err.println("Patient not found: " + patientIc + " (Skipping visit " + visitId + ")");
+                    continue;
+                }
+
+                Doctor doctor = docManager.findDoctor(doctorId);
+                if (doctor == null) {
+                    System.err.println("Doctor not found: " + doctorId + " (Skipping visit " + visitId + ")");
+                    continue;
+                }
+
+                // Convert string to Severity enum
+                Severity severity;
+                try {
+                    severity = Severity.valueOf(severityStr.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Invalid severity: " + severityStr + " (defaulting to MILD)");
+                    severity = Severity.MILD;
+                }
+
+                Visit visit = new Visit(visitId, patient, symptoms, severity, doctor, registrationTime);
+                historyManager.addHistoricalVisit(visit);
+            }
+
+            System.out.println("Visit history loaded successfully from " + filePath);
+          } catch (IOException e) {
+            System.err.println("Error reading visit CSV file: " + e.getMessage());
+        }
+    }
+
+     public static void loadMedicineFromCSV(String filePath, MedicineControl medControl) {    
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean firstLine = true;
@@ -150,10 +212,7 @@ public class CSVLoader {
 
                 String[] values = line.split(",", -1);
                 if (values.length < 4) {
-                    System.err.println("Skipping invalid line: " + line);
-                    continue;
-                }
-
+  
                 String id = values[0].trim();
                 String name = values[1].trim();
                 String desc = values[2].trim();
@@ -250,5 +309,4 @@ public class CSVLoader {
             e.printStackTrace();
         }
     }
-
 }

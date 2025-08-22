@@ -70,4 +70,13 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Invalid input. Please enter 'Y' or 'N'.");
         }
     }
+
+    public static <T, K> T findObjectOrThrow(T[] array, java.util.function.Function<T, K> keyExtractor, K key, String objectType, String keyName) throws InvalidInputException {
+        T obj = ValidationUtility.findObjectByKey(array, keyExtractor, key);
+        if (obj == null) {
+            throw new InvalidInputException(objectType + " with " + keyName + " '" + key + "' not found.");
+        }
+        return obj;
+    }
+
 }

@@ -17,9 +17,9 @@ public class ValidationHelper {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final Scanner scanner = new Scanner(System.in);
     
-    public static int inputValidatedChoice(int min, int max) {
+    public static int inputValidatedChoice(int min, int max, String prompt) {
         while (true) {
-            System.out.print("Enter your choice: ");
+            System.out.print("Enter " + prompt + ": ");
             String input = scanner.nextLine().trim();
             try {
                 TryCatchThrowFromFile.validateIntegerRange(input, min, max);
@@ -97,5 +97,105 @@ public class ValidationHelper {
             }
         }
     }
+
+    public static String inputValidatedString(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                TryCatchThrowFromFile.validateNotNull(input);
+                return input;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static int inputValidatedPositiveInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                TryCatchThrowFromFile.validatePositiveInteger(input);
+                return Integer.parseInt(input);
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static char inputValidatedGender(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim().toUpperCase();
+            char gender = input.charAt(0);
+            try {
+                TryCatchThrowFromFile.validateGender(gender);
+                return gender;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    // Allows user to input a value but keeps current value if empty
+    public static String inputOptionalValidatedString(String prompt, String currentValue) {
+        while (true) {
+            System.out.print(prompt + " [" + currentValue + "]: ");
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) return currentValue;
+            try {
+                TryCatchThrowFromFile.validateNotNull(input);
+                return input;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static String inputOptionalValidatedPhone(String prompt, String currentValue) {
+        while (true) {
+            System.out.print(prompt + " [" + currentValue + "]: ");
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) return currentValue;
+            try {
+                TryCatchThrowFromFile.validatePhone(input);
+                return input;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static int inputOptionalValidatedPositiveInt(String prompt, int currentValue) {
+        while (true) {
+            System.out.print(prompt + " [" + currentValue + "]: ");
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) return currentValue;
+            try {
+                TryCatchThrowFromFile.validatePositiveInteger(input);
+                return Integer.parseInt(input);
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static char inputOptionalValidatedGender(String prompt, char currentValue) {
+        while (true) {
+            System.out.print(prompt + " [" + currentValue + "]: ");
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.isEmpty()) return currentValue;
+            char gender = input.charAt(0);
+            try {
+                TryCatchThrowFromFile.validateGender(gender);
+                return gender;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+
 }
 
