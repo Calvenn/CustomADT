@@ -1,44 +1,51 @@
 package Control;
-import adt.Heap; 
+import adt.LinkedHashMap;
 import Entity.Treatment; 
+import exception.InvalidInputException;
 import java.time.Duration; 
 
 //input data format validation should be in boundary, business logic validation in control 
 
 public class TreatmentManager {
-    private Heap<Treatment> providedTreatments;
+//    private Heap<Treatment> providedTreatments;
+    private LinkedHashMap<String, Treatment> providedTreatments; 
     
     public TreatmentManager() {
-        providedTreatments = new Heap<>(true); 
+//        providedTreatments = new Heap<>(true); 
+        providedTreatments = new LinkedHashMap<>();
     }
     
-    public TreatmentManager(Heap<Treatment> providedTreatments){
+    public TreatmentManager(LinkedHashMap<String, Treatment> providedTreatments){
         this.providedTreatments = providedTreatments;
     }
     
     //if treatment names same, return true. else, return false
-    public void treatmentExist(String treatmentName) {
-        for(int i = 0; i < providedTreatments.size(); i++) {
-            if(providedTreatments.get(i).getName().trim().equalsIgnoreCase(treatmentName)) {
-                throw new IllegalArgumentException("Treatment already exist."); 
-            }
-        }
+    public boolean treatmentExist(String treatmentName) {
+        return providedTreatments.containsKey(treatmentName.toLowerCase());
     }
     
-    public Treatment findTreatmentID(String treatmentId) {
-        for(int i = 0; i < providedTreatments.size(); i++ ){
-            if(providedTreatments.get(i).getTreatmentId().equalsIgnoreCase(treatmentId)) {
-                return providedTreatments.get(i);
-            }  
-        } return null;
+    public boolean changeDescription(Treatment treatment, String description) {
+        if(treatment.getDescription().equalsIgnoreCase(description)) {
+            return false; 
+        }
+        treatment.setDescription(description); 
+        return true; 
+    }
+    
+    public boolean changeDuration(Treatment treatment, Duration duration) {
+        if(treatment.getDuration().equals(duration)) {
+            return false; 
+        }
+        treatment.setDuration(duration); 
+        return true; 
+    }
+    
+    public boolean checkIDFormat(String id) {
+        return id.matches("^T\\d{4}$");
     }
     
     public Treatment findTreatmentName(String treatmentName) {
-        for(int i = 0; i < providedTreatments.size(); i++ ){
-            if(providedTreatments.get(i).getName().equalsIgnoreCase(treatmentName)) {
-                return providedTreatments.get(i);
-            }  
-        } return null;
+        return providedTreatments.get(treatmentName.toLowerCase());
     }
     
 //        if(isNull(treatmentName) || treatmentName.trim().isEmpty()) throw new IllegalArgumentException("Treatment Name cannot be empty.");
@@ -52,14 +59,14 @@ public class TreatmentManager {
     
     //trigger to add new treatment to heap list 
     public boolean newTreatment(String treatmentName, String description, Duration duration) {
+        treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
         Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration); 
-        providedTreatments.insert(newTreatment); 
+        providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
         return true; 
     }
     
-    //get the most frequently done treatment 
-    public Treatment getMostFrequentTreatment() {
-        return providedTreatments.peekRoot(); 
+    public String[] getTreatmentNames() {
+        return (String[]) providedTreatments.getKeys();
     }
     
     //show all available treatments 

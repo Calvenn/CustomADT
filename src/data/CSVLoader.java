@@ -7,6 +7,7 @@ package data;
 import Control.DoctorManager;
 import Control.MedicineControl;
 import Control.PatientManager;
+import Control.TreatmentManager;
 import Entity.Consultation;
 import Entity.Doctor;
 import Entity.MedRecord;
@@ -16,6 +17,7 @@ import adt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -218,4 +220,35 @@ public class CSVLoader {
             System.err.println("Error reading medical record CSV file: " + e.getMessage());
         }
     }
+     
+     public static void loadTreatmentFromCSV(String filePath, TreatmentManager trtManager) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) { // Skip header
+                    isHeader = false;
+                    continue;
+                }
+
+                // Split by comma, handle quoted description with commas
+                String[] values = line.split(",");
+
+                String treatmentName = values[0].trim();
+                String description = values[1].trim();
+                String durationStr = values[2].trim(); // e.g., PT30M
+                //int frequency = Integer.parseInt(values[3].trim());
+
+                // Convert ISO-8601 duration string to Duration
+                Duration duration = Duration.parse(durationStr);
+
+                trtManager.newTreatment(treatmentName, description, duration);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

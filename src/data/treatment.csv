@@ -1,0 +1,13 @@
+treatmentName,description,duration,frequency
+X-ray,Digital imaging to view internal structures of the body,PT30M,1
+Blood test,Laboratory analysis of blood samples to check for various health indicators,PT15M,4
+Urine test,Diagnostic test to analyze urine for diseases and conditions,PT10M,2
+Vaccination,Administration of vaccine to provide immunity against diseases,PT20M,12
+Physical therapy,Rehabilitation treatment to improve mobility and reduce pain,PT1H,24
+Ultrasound,Medical imaging technique using high-frequency sound waves,PT45M,1
+Allergy test,Diagnostic procedure to identify specific allergies,PT40M,6
+Wound care,Medical treatment for cleaning and dressing wounds,PT25M,48
+IV Fluid therapy,Intravenous administration of fluids for hydration or medication,PT50M,8
+Nebuliser,Device that delivers medication in mist form for respiratory conditions,PT35M,12
+Cryotherapy,Medical treatment using extreme cold to destroy abnormal tissue,PT1H30M,1
+Eye Examination,Comprehensive vision test and eye health assessment,PT40M,12
