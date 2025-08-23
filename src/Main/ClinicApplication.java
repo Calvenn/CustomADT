@@ -22,6 +22,8 @@ public class ClinicApplication {
     private final Heap<Visit> sharedVisitQueue = new Heap<>(true);
     private final LinkedHashMap<String,Treatment> providedTreatments = new LinkedHashMap<>();
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
+    private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
+    private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
@@ -45,6 +47,7 @@ public class ClinicApplication {
     // UI Layer
     private final ConsultationUI consultUI;
     private final PatientManagementUI patientUI;
+    private final StaffManagementUI staffUI;
     private final TreatmentUI treatmentUI;
     private final PharmacyUI pharUI;
 
@@ -65,6 +68,7 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager);
+        staffUI = new StaffManagementUI(docManager, staffManager);
         treatmentUI = new TreatmentUI(trtManager);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
@@ -82,7 +86,7 @@ public class ClinicApplication {
 
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new StaffLogin(docManager, staffManager).setVisible(true);
+//                new StaffManagementUI(docManager, staffManager).setVisible(true);
 //            }
         
         int choice;
@@ -92,7 +96,7 @@ public class ClinicApplication {
 
         switch (choice) {
             case 1 -> patientUI.patientMenu();
-            case 2 -> new StaffLogin(docManager, staffManager).setVisible(true);
+            case 2 -> staffUI.setVisible(true);
             case 3 -> {
                 System.out.println("Treatment queue: " + treatmentQueue.size());
                 System.out.println("Med Collection queue: " + medCollectQueue.size());
