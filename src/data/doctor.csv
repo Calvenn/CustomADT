@@ -1,6 +1,11 @@
-DoctorID,Name,Age,Phone,Gender,Position,DateJoined
-D001,Dr. Alice Tan,30,012-1231234,Female,Head,2025-08-22
-D002,Dr. Brian Lim,25,012-1231234,Man,Doctor,2025-08-22
-D003,Dr. Catherine Lee,26,012-1231234,Female,Assistant,2025-08-22
-D004,Dr. Daniel Ong,30,012-1231234,Man,Head,2025-08-22
-D005,Dr. Evelyn Chua,25,012-1231234,Female,Doctor,2025-08-22
+ID,Name,Age,Phone,Gender,Position,Department,DateJoined,Password
+D0001,Dr. Brian Lim,25,012-1231234,Man,DOCTOR,Treatment,2025-08-22,hahaha002
+D0002,Dr. Daniel Ong,30,012-1231234,Man,DOCTOR,Treatment,2025-08-22,danii33
+D0003,Dr. Evelyn Chua,25,012-1231234,Female,DOCTOR,Consult,2025-08-22,evelynchacha99
+D0004,Dr. Marcus Tan,32,012-8765432,Male,DOCTOR,Treatment,2023-05-14,marcus321
+D0005,Dr. Aisha Rahman,29,017-2233445,Female,DOCTOR,Consult,2024-11-02,aishaR29
+D0006,Dr. Kelvin Ong,40,016-9988776,Male,DOCTOR,Consult,2021-07-19,kelvinong40
+D0007,Dr. Lim Wei Ling,35,013-4455667,Female,DOCTOR,Treatment,2022-01-08,weiling88
+D0008,Dr. Samuel Lee,38,018-5566778,Male,DOCTOR,Consult,2020-09-23,samlee38
+D0009,Dr. Nurul Izzah,27,014-6677889,Female,DOCTOR,Consult,2025-02-11,nurulizzah27
+D0010,Dr. Daniel Wong,31,015-7788990,Male,DOCTOR,Consult,2023-03-30,danwong31

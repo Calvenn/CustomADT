@@ -5,11 +5,14 @@
 package data;
 
 import Control.DoctorManager;
+import Control.StaffManager;
 import Control.MedicineControl;
 import Control.PatientManager;
 import Control.TreatmentManager;
 import Entity.Consultation;
 import Entity.Doctor;
+import Entity.Staff;
+import Entity.Staff.Position;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
@@ -78,15 +81,51 @@ public class CSVLoader {
                 // Split by comma, handle quotes if needed
                 String[] values = line.split(",");
 
-                String doctorId = values[0].trim();
+                String Id = values[0].trim();
                 String name = values[1].trim();
                 int age = Integer.parseInt(values[2].trim());
                 String phone = values[3].trim();
                 String gender = values[4].trim();
-                String position = values[5].trim();
-                LocalDate hireDate = LocalDate.parse(values[6].trim(), formatter);
+                Position position = Position.valueOf(values[5].trim().toUpperCase());
+                String department = values[6].trim();
+                LocalDateTime hireDate = LocalDate.parse(values[7].trim(), formatter).atStartOfDay();
+                String password = values[8].trim();
 
-                docManager.addNewDoctor(doctorId, name, age, phone, gender, position, hireDate);
+                Doctor s = new Doctor(Id, name, age, phone, gender, position, department, hireDate, password);
+                docManager.addNewDoctor(s);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void loadStaffFromCSV(String filePath, StaffManager staffManager) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) { // Skip header line
+                    isHeader = false;
+                    continue;
+                }
+
+                // Split by comma, handle quotes if needed
+                String[] values = line.split(",");
+
+                String Id = values[0].trim();
+                String name = values[1].trim();
+                int age = Integer.parseInt(values[2].trim());
+                String phone = values[3].trim();
+                String gender = values[4].trim();
+                Position position = Position.valueOf(values[5].trim().toUpperCase());
+                LocalDateTime hireDate = LocalDate.parse(values[6].trim(), formatter).atStartOfDay();
+                String password = values[7].trim();
+
+                Staff s = new Staff(Id, name, age, phone, gender, position, hireDate, password);
+                staffManager.addNewStaff(s);
             }
 
         } catch (Exception e) {

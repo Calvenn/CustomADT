@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * @author tanjixian
  */
 
-public abstract class Staff {
+public class Staff {
     // Enums
     public enum Position{DOCTOR, NURSE, ADMIN}
     
@@ -20,11 +20,12 @@ public abstract class Staff {
     protected String gender;      // Male - Female
     protected Position position;    // Doctor - Nurse - Admin
     protected LocalDateTime dateJoined;   // 23 January 2023
+    protected String password;
     protected static int staffCount = 0;
     
     // Constructor
     public Staff(){}
-    public Staff(String id, String name, int age, String phoneNo, String gender, Position position, LocalDateTime dateJoined){
+    public Staff(String id, String name, int age, String phoneNo, String gender, Position position, LocalDateTime dateJoined, String password){
         this.id = id;
         this.name = name;
         this.age = age;
@@ -32,6 +33,7 @@ public abstract class Staff {
         this.gender = gender;
         this.position = position;
         this.dateJoined = dateJoined;
+        this.password = password;
         staffCount++;
     }
     
@@ -42,6 +44,7 @@ public abstract class Staff {
     public void setPhoneNo(String phoneNo){ this.phoneNo = phoneNo; }
     public void setGender(String gender) { this.gender = gender; }
     public void setPosition(Position position) { this.position = position; }
+    public void setPassword(String password) { this.password = password; }
     
     // Getters
     public String getID(){ return id; }
@@ -51,11 +54,12 @@ public abstract class Staff {
     public String getGender() { return gender; }
     public Position getPosition() { return position; }
     public LocalDateTime getDateJoined() { return dateJoined; }
+    public String getPassword() { return password; }
     
     // toString
     @Override
     public String toString(){
-        return "HI";
+        return "id: " + this.id;
     }
     
     // equals

@@ -2,7 +2,6 @@ package Control;
 import Entity.Doctor;
 import adt.Heap;
 import adt.LinkedHashMap;
-import adt.List;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. (A)IF THE DOCTOR IS APPOINTED NEW TASK then use updateDoctorInc(Doctor minWorkDoctor), to update the doctor back into heap
@@ -12,40 +11,35 @@ import adt.List;
  * 
  * @author tanjixian
  */
-public class DoctorManager extends StaffManager {
+public class DoctorManager{
+    private LinkedHashMap<String, Doctor> doctorLookup;
     private Heap<Doctor> doctorHeap;
-    private List<Doctor> staffList;
-    private LinkedHashMap<String, Doctor> staffLookup;
-    
+
     // Constructor
     public DoctorManager(){
-        super();    // initialise List and HashMap
+        doctorLookup = new LinkedHashMap();
         doctorHeap = new Heap<>(false);
     }
     
   // Functions
     public boolean addNewDoctor(Doctor newDoctor){
+        doctorLookup.put(newDoctor.getID(), newDoctor);
         doctorHeap.insert(newDoctor);
-        staffList.add(newDoctor);
-        staffLookup.put(newDoctor.getID(), newDoctor);
         return true;
     }
     
-    // View All Doctors
-    public void viewAllDoctor(){
-        for(int i = 0; i < staffList.size(); i++){
-            staffList.get(i).toString();
+    // Peek All Doctors
+    public String[] peekAllDoctorID() {
+        String[] allDocIDs = new String[doctorHeap.size()];
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            allDocIDs[i] = doctorHeap.get(i).getID();
         }
+        return allDocIDs;
     }
     
-    // Get List of Doctors
-    public List<Doctor> getDoctorList(){
-        return this.staffList;
-    }
-    
-    // Find Doctors
+    // Find Doctor 
     public Doctor findDoctor(String id){
-        return staffLookup.get(id);
+        return doctorLookup.get(id);
     }
     
     // Extract doctor from min-heap root (least workload), used in "bookAppointment"
@@ -80,12 +74,7 @@ public class DoctorManager extends StaffManager {
     
     // Remove Doctor (from doctorHeap, staffList, staffLookup)
     public void removeDoctor(String id){
-        Doctor d = staffLookup.remove(id);
-        for(int i = 0; i < staffList.size(); i++){
-            if(staffList.get(i).equals(d)){
-                staffList.remove(i);
-            }
-        } 
+        Doctor d = doctorLookup.remove(id);
         doctorHeap.remove(d);
     }
 }

@@ -140,7 +140,7 @@ public class AppointmentManager {
             
             int index = findOldApptIndex(newConsult);       
             System.out.println(index);
-            String doctorId = newConsult.getDoctor().getDoctorID();
+            String doctorId = newConsult.getDoctor().getID();
             List<Consultation> consultations = consultLog.get(doctorId);
             String oldID = consultations.get(index).getID();
             
@@ -165,7 +165,7 @@ public class AppointmentManager {
     }
     
     private List<Consultation> findOldAppt(Appointment oldAppt){
-        String doctorId = oldAppt.getDoctor().getDoctorID();
+        String doctorId = oldAppt.getDoctor().getID();
         List<Consultation> consultations = consultLog.get(doctorId);
         return consultations;
     }
@@ -182,7 +182,7 @@ public class AppointmentManager {
                 continue; // Skip nulls safely
             }
             if (consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC()) &&
-                consult.getDoctor().getDoctorID().equals(oldAppt.getDoctor().getDoctorID())) {
+                consult.getDoctor().getID().equals(oldAppt.getDoctor().getID())) {
                 index = i;
                 break;
             }
@@ -228,7 +228,7 @@ public class AppointmentManager {
         boolean found = false;
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
-            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)) {
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId)) {
                 System.out.println(appt); 
                 found = true;
             }
@@ -249,7 +249,7 @@ public class AppointmentManager {
 
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
-            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
                 if (earliest == null) {
                     earliest = appt;
                 }
@@ -264,7 +264,7 @@ public class AppointmentManager {
         int totalAppt = 0;
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
-            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
                 totalAppt++;
             }
         }
@@ -281,7 +281,7 @@ public class AppointmentManager {
         for (int i = apptQueue.size() - 1; i >= 0; i--) {
             Appointment appt = apptQueue.get(i);
 
-            if (appt.getDoctor().getDoctorID().equalsIgnoreCase(docId)
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId)
                     && (appt.getDateTime().isBefore(LocalDateTime.now()) 
                     || appt.getDateTime().equals(LocalDateTime.now()))) {
 
@@ -310,15 +310,15 @@ public class AppointmentManager {
     }
     
     public void displayAllMissedAppt(Doctor doc) {
-        if (missAppt.containsKey(doc.getDoctorID())) {
+        if (missAppt.containsKey(doc.getID())) {
             missAppt.display();
         }
     }
     
     public Appointment getMissedAppt(Doctor doc, String changedIC) {
         Appointment found = null;
-        if (missAppt.containsKey(doc.getDoctorID())) {
-            found = missAppt.get(doc.getDoctorID()).peek();
+        if (missAppt.containsKey(doc.getID())) {
+            found = missAppt.get(doc.getID()).peek();
             if(found.getPatient().getPatientIC().equals(changedIC)){
                 return found;
             }
@@ -327,9 +327,9 @@ public class AppointmentManager {
     }
     
     public boolean removeMissedAppt(Doctor doc, String patientIC) {
-        if (!missAppt.containsKey(doc.getDoctorID())) return false;
+        if (!missAppt.containsKey(doc.getID())) return false;
 
-        Queue<Appointment> originalQueue = missAppt.get(doc.getDoctorID());
+        Queue<Appointment> originalQueue = missAppt.get(doc.getID());
         Queue<Appointment> tempQueue = new Queue<>();
         boolean removed = false;
 
@@ -342,7 +342,7 @@ public class AppointmentManager {
             }
         }
 
-        missAppt.put(doc.getDoctorID(), tempQueue);
+        missAppt.put(doc.getID(), tempQueue);
         return removed;
     }
 }

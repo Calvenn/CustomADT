@@ -58,7 +58,7 @@ public class MedRecordControl {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getDoctor().getDoctorID().equalsIgnoreCase(doctor)||record.getDoctor().getDoctorName().equalsIgnoreCase(doctor)) {
+            if (record.getDoctor().getID().equalsIgnoreCase(doctor)||record.getDoctor().getName().equalsIgnoreCase(doctor)) {
                 displayRecord(record);
                 found = true;
             }
@@ -87,7 +87,7 @@ public class MedRecordControl {
         System.out.println("=======================================");
         System.out.println("Record ID: " + record.getRecordID());
         System.out.println("Patient: " + record.getPatient().getPatientName() + " (" + record.getPatient().getPatientIC() + ")");
-        System.out.println("Doctor: " + record.getDoctor().getDoctorName() + " (" + record.getDoctor().getDoctorID() + ")");
+        System.out.println("Doctor: " + record.getDoctor().getName() + " (" + record.getDoctor().getID() + ")");
         System.out.println("Medicine: " + record.getMed().getName() + " (" + record.getMed().getMedID() + ")");
         System.out.println("Quantity Taken: " + record.getQuantityTaken());
         System.out.println("Issued On: " + record.getTimestamp());

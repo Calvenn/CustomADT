@@ -49,7 +49,7 @@ public class AppointmentUI {
             if (!missedFlag) {
                 choice = ValidationHelper.inputValidatedChoice(0, 3);
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 0 -> {return;}
@@ -58,7 +58,7 @@ public class AppointmentUI {
             } else {
                 choice = ValidationHelper.inputValidatedChoice(0, 4);
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorID());
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 4 -> rescheduleMissedApptUI(currentDoc);

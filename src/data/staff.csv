@@ -1,0 +1,14 @@
+ID,Name,Age,Phone,Gender,Position,DateJoined,Password
+A001,Dr. Alice Tan,30,012-1231234,Female,ADMIN,2025-08-22,abc123
+A002,Mr. Benjamin Tan,35,017-2233445,Male,ADMIN,2024-07-15,benadmin35
+A003,Ms. Clara Lim,28,016-3344556,Female,ADMIN,2023-11-05,claral28
+A004,Mr. Daniel Ong,42,018-4455667,Male,ADMIN,2022-03-20,dannyO42
+A005,Ms. Evelyn Chua,31,013-5566778,Female,ADMIN,2025-01-12,eveAdmin31
+A006,Mr. Frank Lee,38,014-6677889,Male,ADMIN,2021-09-18,franklee38
+N001,Dr. Catherine Lee,26,012-1231234,Female,NURSE,2025-08-22,walaoeh12
+N002,Ms. Grace Wong,29,012-7788990,Female,NURSE,2023-04-22,grace29
+N003,Mr. Henry Lim,33,017-8899001,Male,NURSE,2022-12-10,henrylim33
+N004,Ms. Ivy Tan,27,016-9900112,Female,NURSE,2025-03-05,ivyTan27
+N005,Mr. Jason Lee,36,018-1011121,Male,NURSE,2021-08-30,jasonL36
+N006,Ms. Karen Ng,30,013-1213141,Female,NURSE,2024-06-18,karenN30
+

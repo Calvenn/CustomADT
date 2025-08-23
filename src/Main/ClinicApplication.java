@@ -12,7 +12,7 @@ import data.CSVLoader;
 import exception.*;
 import java.time.Duration;
 
-/**
+/**f
  *
  * @author calve
  */
@@ -24,13 +24,14 @@ public class ClinicApplication {
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
-    private final Queue<MedRecord> medCollectQueue = new Queue<>();
+    private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
     private final LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
 
     // Control Layer
     private final PatientManager patientManager;
     private final DoctorManager docManager;
+    private final StaffManager staffManager;
     private final QueueManager queueManager;
     private final AppointmentManager apptManager;
     private final ConsultationManager consultManager;
@@ -50,7 +51,8 @@ public class ClinicApplication {
     public ClinicApplication() {
         // wire dependencies
         patientManager = new PatientManager();
-        docManager = new DoctorManager(sharedDoc);
+        docManager = new DoctorManager();
+        staffManager = new StaffManager();
         historyManager = new VisitHistoryManager();
         queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
@@ -72,11 +74,17 @@ public class ClinicApplication {
     public void run(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager);
+        CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
 
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new StaffLogin(docManager, staffManager).setVisible(true);
+//            }
+        
         int choice;
         queueManager.loadVisit();
         displayMainMenu();
@@ -84,7 +92,7 @@ public class ClinicApplication {
 
         switch (choice) {
             case 1 -> patientUI.patientMenu();
-            // case 2 -> consultUI.consultMainMenu();
+            case 2 -> new StaffLogin(docManager, staffManager).setVisible(true);
             case 3 -> {
                 System.out.println("Treatment queue: " + treatmentQueue.size());
                 System.out.println("Med Collection queue: " + medCollectQueue.size());
@@ -104,7 +112,7 @@ public class ClinicApplication {
         System.out.println("     CLINIC MANAGEMENT SYSTEM");
         System.out.println("=".repeat(35));
         System.out.println("1. Patient Registration System");
-        System.out.println("2. Doctor Management System");
+        System.out.println("2. Staff Management System");
         System.out.println("3. Consultation System");
         System.out.println("4. Treatment System");
         System.out.println("5. Pharmacy Control System");

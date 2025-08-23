@@ -3,6 +3,7 @@ package Boundary;
 
 import Control.DoctorManager;
 import Control.StaffManager;
+import data.CSVLoader;
 import java.util.Scanner;
 import Entity.Staff.Position;
 import Entity.Staff;
@@ -15,8 +16,6 @@ public class StaffManagementUI {
     DoctorManager docManager;
     StaffManager staffManager;
     
-    //Testing Main
-
     // Variables
     int choice = 0;     // Used for menu navigation
     Scanner scanner  = new Scanner(System.in);

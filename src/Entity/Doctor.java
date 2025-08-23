@@ -9,19 +9,23 @@ import java.time.LocalDateTime;
 public class Doctor extends Staff implements Comparable<Doctor>{
     // Variables
     private Integer patientCount;    // Availability, How many work handled by this doctor 
+    private String department; // Treatment - Consult
     
     // Constructor
     public Doctor(){ super(); this.patientCount = 0; }
-    public Doctor(String id, String name, int age, String phoneNo, String gender, Position position, LocalDateTime dateJoined){
-        super(id, name, age, phoneNo, gender, position, dateJoined);
+    public Doctor(String id, String name, int age, String phoneNo, String gender, Position position, String department, LocalDateTime dateJoined, String password){
+        super(id, name, age, phoneNo, gender, position, dateJoined, password);
         this.patientCount = 0;
+        this.department = department;
     }
     
     // Setters
     public void setPatientCount (int workload) { this.patientCount = workload; }
+    public void setDepartment (String department) { this.department = department; }
     
     // Getters
     public int getPatientCount() { return patientCount; }
+    public String getDepartment() { return department; }
     
     //compareTo, Compare patientCount, used for Heap
     @Override
