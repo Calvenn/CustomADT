@@ -55,7 +55,7 @@ public abstract class Appointment implements Comparable<Appointment>{
         if (obj == null || getClass() != obj.getClass()) return false;
         Appointment other = (Appointment) obj;
         return this.getPatient().getPatientIC().equals(other.getPatient().getPatientIC())
-            && this.getDoctor().getDoctorID().equals(other.getDoctor().getDoctorID());
+            && this.getDoctor().getDoctorId().equals(other.getDoctor().getDoctorId());
     }
     
     public abstract String getAppointmentType();

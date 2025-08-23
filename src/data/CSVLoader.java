@@ -15,6 +15,7 @@ import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Severity;
+import Entity.Staff.Position;
 import Entity.Visit;
 import adt.*;
 import java.io.BufferedReader;
@@ -67,7 +68,7 @@ public class CSVLoader {
     }
     
     public static void loadDoctorsFromCSV(String filePath, DoctorManager docManager) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isHeader = true;
@@ -86,10 +87,12 @@ public class CSVLoader {
                 int age = Integer.parseInt(values[2].trim());
                 String phone = values[3].trim();
                 String gender = values[4].trim();
-                String position = values[5].trim();
-                LocalDate hireDate = LocalDate.parse(values[6].trim(), formatter);
+                Position pos = Position.valueOf(values[5].trim().toUpperCase());
+                LocalDateTime hireDate = LocalDateTime.parse(values[6].trim(), formatter);
+                
+                Doctor doc = new Doctor(doctorId, name, age, phone, gender, pos, hireDate);
 
-                docManager.addNewDoctor(doctorId, name, age, phone, gender, position, hireDate);
+                docManager.addNewDoctor(doc);
             }
 
         } catch (Exception e) {
@@ -110,23 +113,23 @@ public class CSVLoader {
                 }
 
                 String[] values = line.split(",");   
-                Patient patient = patientManager.findPatientByIC(values[1]);
+                Patient patient = patientManager.findPatientByIC(values[0].trim());
 
-                String doctorId = values[3];
+                String doctorId = values[1];
                 Doctor doc = docManager.findDoctor(doctorId);
 
                 // ===== Extract Consultation =====
-                int severity = Integer.parseInt(values[4]);
-                String disease = values[5];
-                String notes = values[6];
+                int severity = Integer.parseInt(values[2]);
+                String disease = values[3];
+                String notes = values[4];
 
-                LocalDateTime consultTime = LocalDateTime.parse(values[7], formatter);
-                LocalDateTime apptDateTime = values[8].equals("null") ? null : LocalDateTime.parse(values[8], formatter);
-                LocalDateTime createdAt = LocalDateTime.parse(values[9], formatter);
+                LocalDateTime consultTime = LocalDateTime.parse(values[5], formatter);
+                LocalDateTime apptDateTime = values[6].equals("null") ? null : LocalDateTime.parse(values[8], formatter);
+                LocalDateTime createdAt = LocalDateTime.parse(values[7], formatter);
 
                 Consultation c = new Consultation(severity, patient, disease, notes, doc,
                                                   consultTime, apptDateTime, createdAt);
-
+                
                 List<Consultation> doctorConsults = consultLog.get(doctorId);
                 if (doctorConsults == null) {
                     doctorConsults = new List<>(); 
@@ -199,7 +202,8 @@ public class CSVLoader {
         }
     }
 
-     public static void loadMedicineFromCSV(String filePath, MedicineControl medControl) {    
+     public static void loadMedicineFromCSV(String filePath, MedicineControl medControl) {
+        
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean firstLine = true;
@@ -212,7 +216,10 @@ public class CSVLoader {
 
                 String[] values = line.split(",", -1);
                 if (values.length < 4) {
-  
+                    System.err.println("Skipping invalid line: " + line);
+                    continue;
+                }
+
                 String id = values[0].trim();
                 String name = values[1].trim();
                 String desc = values[2].trim();

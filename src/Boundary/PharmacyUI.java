@@ -38,7 +38,7 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0,4);
+            choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
             switch (choice) {
                 case 1 -> {dispenseMed();pressEnterToContinue();}
@@ -69,7 +69,7 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0,3);
+            choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
 
             switch (choice) {
                 case 1 -> {pharReport.generateInactiveMedicinesReport();pressEnterToContinue();}
@@ -101,7 +101,7 @@ public class PharmacyUI {
             System.out.println("  Patient in Next Queue  ");
             System.out.println("=========================");
             System.out.println("Patient: " + nextRecord.getPatient().getPatientName()+ " (IC: " + nextRecord.getPatient().getPatientIC() + ")");
-            System.out.println("Doctor: " + nextRecord.getDoctor().getDoctorName()+ " (ID: " + nextRecord.getDoctor().getDoctorID() + ")");
+            System.out.println("Doctor: " + nextRecord.getDoctor().getDoctorName()+ " (ID: " + nextRecord.getDoctor().getDoctorId() + ")");
             System.out.println("Medicine: " + nextRecord.getMed().getName() + " (ID: " + nextRecord.getMed().getMedID() + ")");
             System.out.println("Quantity: " + nextRecord.getQuantityTaken());
             System.out.println("Requested At: " + nextRecord.getTimestamp());
@@ -113,7 +113,7 @@ public class PharmacyUI {
             System.out.print("Enter choice: ");
             System.out.println("=========================");
 
-            choice = ValidationHelper.inputValidatedChoice(0,2);
+            choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
 
             switch (choice) {
                 case 1 -> {
@@ -171,7 +171,7 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0,4);
+            choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
             switch (choice) {
                 case 1 -> {addMedUI();pressEnterToContinue();}
@@ -205,7 +205,7 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0,4);
+            choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
             switch (choice) {
                 case 1 -> {medRecControl.viewAllRecords();pressEnterToContinue();}

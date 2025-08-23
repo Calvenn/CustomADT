@@ -76,7 +76,7 @@ public class ConsultationUI {
         
         while (true) {
             consultationApptSummary();
-            if(apptManager.getNumMissedAppt(currentDoc.getDoctorID()) != 0){
+            if(apptManager.getNumMissedAppt(currentDoc.getDoctorId()) != 0){
                 apptUI.missedFlag = true;
             } else {
                 apptUI.missedFlag = false;
@@ -105,6 +105,7 @@ public class ConsultationUI {
                 case 0 -> {
                     System.out.println("Thank You " + currentDoc.getDoctorName());
                     currentDoc = null;
+                    return;
                 }
                 default -> System.out.println("Invalid choice.\n");
             }
@@ -352,9 +353,9 @@ public class ConsultationUI {
     /**REPORT SECTION**/
     public void consultationApptSummary(){
         // Collect values first
-        int total = apptManager.totalAppointments(currentDoc.getDoctorID());
-        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getDoctorID());
-        int missed = apptManager.getNumMissedAppt(currentDoc.getDoctorID());
+        int total = apptManager.totalAppointments(currentDoc.getDoctorId());
+        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getDoctorId());
+        int missed = apptManager.getNumMissedAppt(currentDoc.getDoctorId());
 
         // Print table header
         System.out.println("\n=================== Appointment Summary ====================");
