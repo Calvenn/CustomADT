@@ -60,7 +60,7 @@ public class ConsultationUI {
 
         if (currentDoc != null) {
             consultManager.currentDoc = currentDoc;
-            System.out.println("Login successful. Welcome, " + currentDoc.getDoctorName() + "!");
+            System.out.println("Login successful. Welcome, " + currentDoc.getName() + "!");
             return true;
         } else {
             System.out.println("No doctor found. Please try again.");
@@ -76,7 +76,7 @@ public class ConsultationUI {
         
         while (true) {
             consultationApptSummary();
-            if(apptManager.getNumMissedAppt(currentDoc.getDoctorId()) != 0){
+            if(apptManager.getNumMissedAppt(currentDoc.getID()) != 0){
                 apptUI.missedFlag = true;
             } else {
                 apptUI.missedFlag = false;
@@ -103,7 +103,7 @@ public class ConsultationUI {
                     return;
                 }
                 case 0 -> {
-                    System.out.println("Thank You " + currentDoc.getDoctorName());
+                    System.out.println("Thank You " + currentDoc.getName());
                     currentDoc = null;
                     return;
                 }
@@ -178,7 +178,7 @@ public class ConsultationUI {
             System.out.println("Type     : Walk-In");
             System.out.println("Visit ID : " + visit.getVisitId());
             System.out.println("Patient  : " + visit.getPatient().getPatientName());
-            System.out.println("Doctor   : " + visit.getDoctor().getDoctorName());
+            System.out.println("Doctor   : " + visit.getDoctor().getName());
             System.out.println("Severity : " + visit.getSeverityLevel().getSeverity());
             System.out.println("Symptoms : " + visit.getSymptoms());
             System.out.println("=".repeat(35));
@@ -189,7 +189,7 @@ public class ConsultationUI {
             System.out.println("Type   : Appointment");
             System.out.println("ID       : " + id);
             System.out.println("Patient  : " + appt.getPatient().getPatientName());
-            System.out.println("Doctor   : " + appt.getDoctor().getDoctorName());
+            System.out.println("Doctor   : " + appt.getDoctor().getName());
             System.out.println("Severity : " + appt.getSeverity());
             System.out.println("Symptoms : " + appt.getDisease());
             System.out.println("=".repeat(35));
@@ -353,9 +353,9 @@ public class ConsultationUI {
     /**REPORT SECTION**/
     public void consultationApptSummary(){
         // Collect values first
-        int total = apptManager.totalAppointments(currentDoc.getDoctorId());
-        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getDoctorId());
-        int missed = apptManager.getNumMissedAppt(currentDoc.getDoctorId());
+        int total = apptManager.totalAppointments(currentDoc.getID());
+        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getID());
+        int missed = apptManager.getNumMissedAppt(currentDoc.getID());
 
         // Print table header
         System.out.println("\n=================== Appointment Summary ====================");

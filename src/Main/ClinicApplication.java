@@ -12,26 +12,28 @@ import data.CSVLoader;
 import exception.*;
 import java.time.Duration;
 
-/**
+/**f
  *
  * @author calve
  */
 public class ClinicApplication {
     // Shared ADTs
     private final Heap<Doctor> sharedDoc = new Heap<>(false);
-    private final LinkedHashMap<String, Patient> patientMap = new LinkedHashMap<>();
     private final Heap<Visit> sharedVisitQueue = new Heap<>(true);
     private final LinkedHashMap<String,Treatment> providedTreatments = new LinkedHashMap<>();
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
+    private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
+    private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
-    private final Queue<MedRecord> medCollectQueue = new Queue<>();
+    private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
     private final LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
 
     // Control Layer
     private final PatientManager patientManager;
     private final DoctorManager docManager;
+    private final StaffManager staffManager;
     private final QueueManager queueManager;
     private final AppointmentManager apptManager;
     private final ConsultationManager consultManager;
@@ -45,7 +47,7 @@ public class ClinicApplication {
     // UI Layer
     private final ConsultationUI consultUI;
     private final PatientManagementUI patientUI;
-    private final DoctorManagementUI docUI;
+    private final StaffManagementUI staffUI;
     private final TreatmentUI treatmentUI;
     private final PharmacyUI pharUI;
 
@@ -53,6 +55,7 @@ public class ClinicApplication {
         // wire dependencies
         patientManager = new PatientManager();
         docManager = new DoctorManager();
+        staffManager = new StaffManager();
         historyManager = new VisitHistoryManager();
         queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
@@ -65,32 +68,35 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
-        docUI = new DoctorManagementUI();
+        staffUI = new StaffManagementUI(docManager, staffManager);
         treatmentUI = new TreatmentUI(trtManager);
-        pharReport = new PharmacyReport(medRecList, medMap);
+        pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
-        loadDummyData();
     }
     
-    private void loadDummyData(){
+    
+    public void run(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager);
+        CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
-    }
-    
-    
-    public void run() {
+
+        java.awt.EventQueue.invokeLater(() -> {
+            new StaffManagementUI(docManager, staffManager).setVisible(true);
+        });
+        
+        int choice;
         queueManager.loadVisit();
-        while (true) { 
+        while(true){
             displayMainMenu();
-            int choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
-                case 2 -> docUI.doctorMenu();
+                case 2 -> staffUI.setVisible(true);
                 case 3 -> {
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
@@ -105,18 +111,17 @@ public class ClinicApplication {
             }
         }
     }
-
+    
     private void displayMainMenu() {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("     CLINIC MANAGEMENT SYSTEM");
         System.out.println("=".repeat(35));
         System.out.println("1. Patient Registration System");
-        System.out.println("2. Doctor Management System");
+        System.out.println("2. Staff Management System");
         System.out.println("3. Consultation System");
         System.out.println("4. Treatment System");
         System.out.println("5. Pharmacy Control System");
         System.out.println("0. Exit");
         System.out.println("=".repeat(35));
     }  
-
 }

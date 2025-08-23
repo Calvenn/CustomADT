@@ -101,7 +101,7 @@ public class PharmacyUI {
             System.out.println("  Patient in Next Queue  ");
             System.out.println("=========================");
             System.out.println("Patient: " + nextRecord.getPatient().getPatientName()+ " (IC: " + nextRecord.getPatient().getPatientIC() + ")");
-            System.out.println("Doctor: " + nextRecord.getDoctor().getDoctorName()+ " (ID: " + nextRecord.getDoctor().getDoctorId() + ")");
+            System.out.println("Doctor: " + nextRecord.getDoctor().getName()+ " (ID: " + nextRecord.getDoctor().getID() + ")");
             System.out.println("Medicine: " + nextRecord.getMed().getName() + " (ID: " + nextRecord.getMed().getMedID() + ")");
             System.out.println("Quantity: " + nextRecord.getQuantityTaken());
             System.out.println("Requested At: " + nextRecord.getTimestamp());

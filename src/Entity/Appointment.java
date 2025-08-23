@@ -46,7 +46,7 @@ public abstract class Appointment implements Comparable<Appointment>{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return "Appointment Details:\n"
              + " Date & Time : " + dateTime.format(formatter) + "\n"
-             + " Doctor      : " + doctor.getDoctorName() + "\n";
+             + " Doctor      : " + doctor.getName() + "\n";
     }
     
     @Override
@@ -55,7 +55,7 @@ public abstract class Appointment implements Comparable<Appointment>{
         if (obj == null || getClass() != obj.getClass()) return false;
         Appointment other = (Appointment) obj;
         return this.getPatient().getPatientIC().equals(other.getPatient().getPatientIC())
-            && this.getDoctor().getDoctorId().equals(other.getDoctor().getDoctorId());
+            && this.getDoctor().getID().equals(other.getDoctor().getID());
     }
     
     public abstract String getAppointmentType();
