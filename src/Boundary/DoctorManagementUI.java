@@ -16,8 +16,9 @@ public class DoctorManagementUI {
     //
     
     // Menu for "Doctor Management System"
-    public void doctorMenu(){
-        while (choice < 1 && choice > 5){ // Repeat the step if the user input invalid choice
+    public void doctorMenu() {
+        int choice = -1;
+        while (true) {
             System.out.println("=== Doctor Management System ===");
             System.out.println("1. Register a new Doctor");
             System.out.println("2. Edit Information");
@@ -25,23 +26,23 @@ public class DoctorManagementUI {
             System.out.println("4. View All Doctors");
             System.out.println("5. Exit");  
 
-            System.out.println("Enter your choice: ");
+            System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
             switch(choice){
-                case 1 -> choice = 1; //register
-                case 2 -> choice = 1; //edit
-                case 3 -> choice = 1; //remove
-                case 4 -> choice = 1; // view all
-                case 5 -> { // exit
+                //case 1 -> registerDoctor();
+                //case 2 -> editDoctor();
+                //case 3 -> removeDoctor();
+                //case 4 -> viewAllDoctors();
+                case 5 -> {
                     System.out.println("\nThank you for using Doctor Management System");
                     return;
                 }
-                default -> System.out.printf("\nInvalid choice entered. Please choose again.");
+                default -> System.out.println("\nInvalid choice entered. Please choose again.");
             }
-            
-        } // End of While Loop
+        }
     }
+
     
     // addDoctorUI
     // editDoctorUI

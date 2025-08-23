@@ -57,12 +57,12 @@ public class ConsultationManager {
         
         if (nextAppt instanceof Consultation) severity = ((Consultation) nextAppt).getSeverity();
         
-        while (nextAppt != null && !nextAppt.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
+        while (nextAppt != null && !nextAppt.getDoctor().getDoctorId().equals(currentDoc.getDoctorId())) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
             nextAppt = appointmentHeap.peekRoot();
         }
 
-        while (nextWalkIn != null && !nextWalkIn.getDoctor().getDoctorID().equals(currentDoc.getDoctorID())) {
+        while (nextWalkIn != null && !nextWalkIn.getDoctor().getDoctorId().equals(currentDoc.getDoctorId())) {
             queue.extractRoot(); // skip unrelated doctor
             nextWalkIn = queue.peekRoot();
         }
@@ -86,12 +86,12 @@ public class ConsultationManager {
         
     public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes, LocalDateTime startTime, LocalDateTime createdAt) {
         // Get existing consultation list for doctor
-        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorId());
         
         if(id == null){
             newConsult = new Consultation(severity, patient, diagnosis, notes, currentDoc, startTime, null, createdAt); 
             consultations.add(newConsult);
-            consultLog.put(currentDoc.getDoctorID(), consultations);
+            consultLog.put(currentDoc.getDoctorId(), consultations);
             return newConsult;
         } else {
             newConsult = new Consultation(id, severity, patient, diagnosis, notes, currentDoc, startTime, null, createdAt);
@@ -129,12 +129,13 @@ public class ConsultationManager {
     
     public boolean displayAllRecordsByDoctor(Doctor doc) {
         Consultation record = null;
-        System.out.println("GET Doctor ID: " + doc.getDoctorID());
-        List<Consultation> consultations = consultLog.get(doc.getDoctorID());
+        List<Consultation> consultations = consultLog.get(doc.getDoctorId());
         if (consultations == null || consultations.isEmpty()) {
-            System.out.println("No consultation records found for Doctor " + doc.getDoctorID());
+            System.out.println("No consultation records found for Doctor " + doc.getDoctorId());
             return false;
         }
+        
+        System.out.println(consultations.size());
 
         for (int i = 1; i <= consultations.size(); i++) {
             record = consultations.get(i);
@@ -144,7 +145,7 @@ public class ConsultationManager {
     }
 
     public boolean displayRecordsByIC(String searchedIC) {
-        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorID());
+        List<Consultation> consultations = consultLog.get(currentDoc.getDoctorId());
         if (consultations == null || consultations.isEmpty()) {
             System.out.println("No consultation records found.");
             return false;

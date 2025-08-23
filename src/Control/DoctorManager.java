@@ -21,6 +21,8 @@ public class DoctorManager extends StaffManager {
     public DoctorManager(){
         super();    // initialise List and HashMap
         doctorHeap = new Heap<>(false);
+        staffList = new List<>();
+        staffLookup = new LinkedHashMap<>();
     }
     
   // Functions
@@ -58,6 +60,14 @@ public class DoctorManager extends StaffManager {
     public Doctor peekRootDoctor(){
         return doctorHeap.peekRoot();
     } 
+    
+    public String[] peekAllDoctorID() {
+        String[] allDocIDs = new String[doctorHeap.size()];
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            allDocIDs[i] = doctorHeap.get(i).getDoctorId();
+        }
+        return allDocIDs;
+    }
     
     // Update doctor workload/patientCount, used after !APPOINTED NEW TASK!
     public void updateDoctorInc(Doctor minWorkDoctor){

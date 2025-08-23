@@ -1,6 +1,6 @@
 DoctorID,Name,Age,Phone,Gender,Position,DateJoined
-D001,Dr. Alice Tan,30,012-1231234,Female,Head,2025-08-22
-D002,Dr. Brian Lim,25,012-1231234,Man,Doctor,2025-08-22
-D003,Dr. Catherine Lee,26,012-1231234,Female,Assistant,2025-08-22
-D004,Dr. Daniel Ong,30,012-1231234,Man,Head,2025-08-22
-D005,Dr. Evelyn Chua,25,012-1231234,Female,Doctor,2025-08-22
+D001,Dr. Alice Tan,30,012-1231234,Female,Doctor,2025-08-22 08:01
+D002,Dr. Brian Lim,25,012-1231234,Man,Doctor,2025-08-22 08:00
+D003,Dr. Catherine Lee,26,012-1231234,Female,Nurse,2025-08-22 08:00
+D004,Dr. Daniel Ong,30,012-1231234,Man,Nurse,2025-08-22 08:00
+D005,Dr. Evelyn Chua,25,012-1231234,Female,Admin,2025-08-22 08:00

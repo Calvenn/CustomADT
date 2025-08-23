@@ -23,6 +23,14 @@ public class Doctor extends Staff implements Comparable<Doctor>{
     // Getters
     public int getPatientCount() { return patientCount; }
     
+    public String getDoctorId(){
+        return super.id;
+    }
+    
+    public String getDoctorName(){
+        return super.name;
+    }
+    
     //compareTo, Compare patientCount, used for Heap
     @Override
     public int compareTo(Doctor other){

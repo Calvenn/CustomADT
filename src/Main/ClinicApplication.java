@@ -19,6 +19,7 @@ import java.time.Duration;
 public class ClinicApplication {
     // Shared ADTs
     private final Heap<Doctor> sharedDoc = new Heap<>(false);
+    private final LinkedHashMap<String, Patient> patientMap = new LinkedHashMap<>();
     private final Heap<Visit> sharedVisitQueue = new Heap<>(true);
     private final LinkedHashMap<String,Treatment> providedTreatments = new LinkedHashMap<>();
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
@@ -44,13 +45,14 @@ public class ClinicApplication {
     // UI Layer
     private final ConsultationUI consultUI;
     private final PatientManagementUI patientUI;
+    private final DoctorManagementUI docUI;
     private final TreatmentUI treatmentUI;
     private final PharmacyUI pharUI;
 
     public ClinicApplication() {
         // wire dependencies
         patientManager = new PatientManager();
-        docManager = new DoctorManager(sharedDoc);
+        docManager = new DoctorManager();
         historyManager = new VisitHistoryManager();
         queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
@@ -63,6 +65,8 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
+        docUI = new DoctorManagementUI();
+        treatmentUI = new TreatmentUI(trtManager);
         pharReport = new PharmacyReport(medRecList, medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         loadDummyData();
@@ -86,7 +90,7 @@ public class ClinicApplication {
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
-                case 2 -> consultUI.consultMainMenu();
+                case 2 -> docUI.doctorMenu();
                 case 3 -> {
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
