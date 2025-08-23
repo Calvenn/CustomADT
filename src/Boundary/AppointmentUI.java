@@ -49,7 +49,7 @@ public class AppointmentUI {
             if (!missedFlag) {
                 choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorId());
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 0 -> {return;}
@@ -58,7 +58,7 @@ public class AppointmentUI {
             } else {
                 choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getDoctorId());
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 4 -> rescheduleMissedApptUI(currentDoc);
@@ -98,7 +98,7 @@ public class AppointmentUI {
                 System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");
             }
         } else {
-            System.out.println("IC Number " + ic + " not found or does not have existing appointment. Please try again.");
+            System.out.println("IC Number " + ic + " not found. Please try again");
         }
     }
 
