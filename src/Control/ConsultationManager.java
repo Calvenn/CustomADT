@@ -82,7 +82,7 @@ public class ConsultationManager {
             System.out.println("Appt queue extracted");
             return appointmentHeap.extractRoot();  // Extract appointment otherwise           
         }
-    }
+    }   
         
     public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes, LocalDateTime startTime, LocalDateTime createdAt) {
         // Get existing consultation list for doctor
@@ -140,6 +140,7 @@ public class ConsultationManager {
         for (int i = 1; i <= consultations.size(); i++) {
             record = consultations.get(i);
             System.out.println(record);
+            //dislay med rec & trt rec if have (TMRRRRRRRRRRRRRRRRRRRRRR)
         }
         return true;
     }
@@ -162,4 +163,67 @@ public class ConsultationManager {
 
         return found;
     }
+    
+    public List<String> suggestedTrt(String symptoms) {
+        List<String> trtType = new List<>();
+        String input = symptoms.toLowerCase();
+
+        if (input.contains("fever") || input.contains("fatigue")) {
+            trtType.add("Blood test");
+            trtType.add("Urine test");
+        } else if (input.contains("cough") || input.contains("shortness of breath")) {
+            trtType.add("X-ray");
+            trtType.add("Nebuliser");
+        } else if (input.contains("allergy") || input.contains("rash")) {
+            trtType.add("Allergy test");
+            trtType.add("Cryotherapy");
+        } else if (input.contains("injury") || input.contains("wound")) {
+            trtType.add("Wound care");
+            trtType.add("Physical therapy");
+        } else if (input.contains("vision problem") || input.contains("blurred vision")) {
+            trtType.add("Eye Examination");
+        } else if (input.contains("dehydration")) {
+            trtType.add("IV Fluid therapy");
+        } else if (input.contains("pregnancy")) {
+            trtType.add("Ultrasound");
+        } else if (input.contains("vaccination") || input.contains("flu prevention")) {
+            trtType.add("Vaccination");
+        } else {
+            trtType.add("General checkup");
+        }
+
+        return trtType;
+    }
+    
+    public List<String> suggestedMeds(String symptoms) {
+        String[][] medicines = {
+            {"Panadol", "fever", "headache", "pain"},
+            {"Amoxicillin", "infection", "bacteria", "throat infection"},
+            {"Vitamin C", "immunity", "cold", "flu"},
+            {"Loratadine", "allergy", "itchy", "runny nose", "sneeze"},
+            {"Omeprazole", "acid", "stomach", "reflux", "heartburn"},
+            {"Paracetamol", "pain", "fever"},
+            {"Ibuprofen", "inflammation", "swelling", "pain"},
+            {"Salbutamol", "asthma", "shortness of breath", "wheezing"},
+            {"Aspirin", "blood clot", "chest pain", "heart", "stroke"},
+            {"Metformin", "diabetes", "sugar", "glucose"}
+        };
+
+        List<String> suggested = new List<>();
+        String lowerSymptoms = symptoms.toLowerCase();
+
+        for (String[] med : medicines) {
+            String medName = med[0];
+            for (int i = 1; i < med.length; i++) {
+                if (lowerSymptoms.contains(med[i].toLowerCase())) {
+                    if (!suggested.contains(medName)) {
+                        suggested.add(medName);
+                    }
+                }
+            }
+        }
+
+        return suggested;
+    }
+
 }

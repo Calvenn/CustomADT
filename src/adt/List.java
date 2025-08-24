@@ -67,6 +67,16 @@ public class List<E> implements ListInterface<E>{
     }
     
     @Override
+    public boolean contains(E data) {
+        for (int i = 0; i < numOfEntries; i++) {
+            if (array[i].equals(data)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
     public int size(){
         return numOfEntries;
     }
