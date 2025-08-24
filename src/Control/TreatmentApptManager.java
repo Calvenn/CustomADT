@@ -1,12 +1,19 @@
 package Control;
 import Entity.Consultation;
 import Entity.Doctor;
+import Entity.Patient;
 import adt.Heap; 
 import adt.LinkedHashMap; 
 import Entity.TreatmentAppointment; 
 import Entity.Treatment; 
+import Entity.Appointment; 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
 
 //how to make new appointment to get treatment 
 //doctor go in system, open treatment appt page 
@@ -29,7 +36,7 @@ Treatment appointment new
 5. select room 
 */
 public class TreatmentApptManager {
-    private Heap<TreatmentAppointment> treatmentAppointment;
+    private Heap<Appointment> treatmentAppointment;
     private LinkedHashMap<String, TreatmentAppointment> history; 
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
@@ -62,17 +69,18 @@ public class TreatmentApptManager {
     }
        
     public TreatmentAppointment nextAppointment() {
-        return treatmentAppointment.peekRoot();
+        return (TreatmentAppointment) treatmentAppointment.peekRoot();
     }
     
-    public Heap<TreatmentAppointment> upcomingAppointments() {
+    public Heap<Appointment> upcomingAppointments() {
         return treatmentAppointment; 
     }
     
     public boolean completeTreatment(TreatmentAppointment appointment) {
-        if(treatmentAppointment.peekRoot().equals(appointment)) {
+        if(nextAppointment().equals(appointment)) {
             //something to set appointment status 
-            history.put(appointment.getAppointmentId(), treatmentAppointment.extractRoot());
+            TreatmentAppointment treatAppt = (TreatmentAppointment) treatmentAppointment.extractRoot();
+            history.put(treatAppt.getAppointmentId(), treatAppt);
             return true; 
         }
         return false; 

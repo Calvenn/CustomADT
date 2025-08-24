@@ -235,7 +235,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(currentDoc, severity);
+                        toTreatmentUI(patient, currentDoc, severity);
                         Consultation.numOfTreatment++;
                         return;
                     }
@@ -254,7 +254,7 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Doctor doc, Severity severity) {
+    private void toTreatmentUI(Patient patient, Doctor doc, Severity severity) {
         while (true) {
             System.out.println("\n--- Select Treatment ---");
             trtManager.displayAllTreatments();
