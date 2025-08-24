@@ -132,7 +132,7 @@ public class StaffLoginTest {
             printTitle("DOCTOR", staffManager.findStaff(userID).getName());
             System.out.println("1. Consultation System"); //read only
             System.out.println("2. Treatment System"); //read only??
-            System.out.println("3. Pharmacy System (Read-Only)");
+            System.out.println("3. Pharmacy System");
             System.out.println("4. Patient Registration System");
             System.out.println("5. Staff Management System");
             System.out.println("0. Log Out");   
@@ -163,18 +163,16 @@ public class StaffLoginTest {
             System.out.println("1. Consultation System");
             System.out.println("2. Treatment System");
             System.out.println("3. Pharmacy System (Read-Only)");
-            System.out.println("4. Staff Management System");
             System.out.println("0. Log Out");   
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
 
             switch(choice){
                 case 1 -> {                 
                     consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
-                case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
-                case 4 -> staffUI.staffMenu(); // Staff Management System
+                case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY) !! PLEASE CHANGE AFTER INTEGRATION !!
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
@@ -191,18 +189,16 @@ public class StaffLoginTest {
             //System.out.println("1. Consultation System");
             System.out.println("1. Pharmacy Control System");
             System.out.println("2. Patient Registration System");
-            System.out.println("3. Staff Management System");
             System.out.println("0. Exit");   
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
 
             switch(choice){
                /* case 1 -> {                 
                     consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System*/
                 case 1 -> pharUI.pharmacyMenu(); // Pharmacy System 
                 case 2 -> patientUI.patientMenu();
-                case 3 -> staffUI.staffMenu(); // Staff Management System
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
