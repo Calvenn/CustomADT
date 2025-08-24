@@ -298,7 +298,7 @@ public class PharmacyUI {
             return;
         }
 
-        Medicine newMed = new Medicine(medID, name, desc, stock);
+        Medicine newMed = new Medicine(medID, name.toLowerCase(), desc, stock);
         medControl.addMedicine(newMed);
 
         System.out.println("Medicine added successfully!");
@@ -319,7 +319,7 @@ public class PharmacyUI {
             return;
         }
 
-        Medicine med = medControl.findMedicine(medID);
+        Medicine med = medControl.findMedicineById(medID);
         if (med == null) {
             System.out.println("Medicine ID not found!");
             return;
@@ -360,7 +360,7 @@ public class PharmacyUI {
             return;
         }
 
-        Medicine med = medControl.findMedicine(medID);
+        Medicine med = medControl.findMedicineById(medID);
         if (med == null) {
             System.out.println("Medicine ID not found!");
             return;

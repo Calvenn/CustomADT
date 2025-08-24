@@ -98,7 +98,7 @@ public class AppointmentUI {
                 System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");
             }
         } else {
-            System.out.println("IC Number " + ic + " not found. Please try again");
+            System.out.println("IC Number " + ic + " not found or does not have appointment. Please try again");
         }
     }
 

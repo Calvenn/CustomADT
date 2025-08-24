@@ -11,6 +11,8 @@ public interface ListInterface<E> {
     
     boolean replace(int position, E data);
     
+    boolean contains(E data);
+    
     int size();
     
     boolean isEmpty();

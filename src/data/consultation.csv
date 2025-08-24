@@ -1,51 +1,51 @@
 patientIC,doctorId,severity,disease,notes,consultTime,apptDateTime,createdAt
 050322-07-0101,D0001,2,Flu,Mild fever prescribed rest,2025-08-20 09:15,null,2025-08-19 18:00
-110627-07-0102,D0002,3,Asthma,Difficulty breathing inhaler prescribed,2025-08-20 09:30,null,2025-08-19 18:10
-071106-07-0103,D0001,1,Cold,Runny nose advised hydration,2025-08-20 09:45,null,2025-08-19 18:15
+110627-07-0102,D0009,3,Asthma,Difficulty breathing inhaler prescribed,2025-08-20 09:30,null,2025-08-19 18:10
+071106-07-0103,D0010,1,Cold,Runny nose advised hydration,2025-08-20 09:45,null,2025-08-19 18:15
 151215-07-0104,D0003,4,Fracture,X-ray required referred to ortho,2025-08-20 10:00,null,2025-08-19 18:20
-110821-07-0105,D0004,2,Stomachache,Prescribed mild pain relief,2025-08-20 10:15,null,2025-08-19 18:25
-140825-07-0106,D0002,5,Dengue,Admitted for observation,2025-08-20 10:30,null,2025-08-19 18:30
+110821-07-0105,D0009,2,Stomachache,Prescribed mild pain relief,2025-08-20 10:15,null,2025-08-19 18:25
+140825-07-0106,D0006,5,Dengue,Admitted for observation,2025-08-20 10:30,null,2025-08-19 18:30
 220519-07-0107,D0005,3,Chickenpox,Rashes observed medication given,2025-08-20 10:45,null,2025-08-19 18:40
-150119-07-0108,D0001,1,Allergy,Skin rash antihistamine prescribed,2025-08-20 11:00,null,2025-08-19 18:50
+150119-07-0108,D0010,1,Allergy,Skin rash antihistamine prescribed,2025-08-20 11:00,null,2025-08-19 18:50
 240219-07-0109,D0003,2,Flu,Mild cough monitored closely,2025-08-20 11:15,null,2025-08-19 19:00
-090819-07-0110,D0002,4,Migraine,Severe headache prescribed meds,2025-08-20 11:30,null,2025-08-19 19:10
-220408-07-0111,D0004,2,Cold,Runny nose prescribed rest,2025-08-20 11:45,null,2025-08-19 19:15
-240118-07-0112,D0001,5,Asthma,Shortness of breath inhaler,2025-08-20 12:00,null,2025-08-19 19:20
+090819-07-0110,D0009,4,Migraine,Severe headache prescribed meds,2025-08-20 11:30,null,2025-08-19 19:10
+220408-07-0111,D0009,2,Cold,Runny nose prescribed rest,2025-08-20 11:45,null,2025-08-19 19:15
+240118-07-0112,D0010,5,Asthma,Shortness of breath inhaler,2025-08-20 12:00,null,2025-08-19 19:20
 990315-07-0113,D0005,3,Stomachache,Prescribed antacid,2025-08-20 12:15,null,2025-08-19 19:25
-960808-07-0114,D0003,2,Flu,Mild fever advised rest,2025-08-20 12:30,null,2025-08-19 19:30
-980613-07-0115,D0001,4,Allergy,Skin irritation antihistamine,2025-08-20 12:45,null,2025-08-19 19:35
-050629-07-0707,D0004,3,Cold,Runny nose advised rest,2025-08-20 13:00,null,2025-08-19 19:40
-001028-07-0117,D0002,2,Flu,Fever prescribed paracetamol,2025-08-20 13:15,null,2025-08-19 19:45
+960808-07-0114,D0006,2,Flu,Mild fever advised rest,2025-08-20 12:30,null,2025-08-19 19:30
+980613-07-0115,D0010,4,Allergy,Skin irritation antihistamine,2025-08-20 12:45,null,2025-08-19 19:35
+050629-07-0707,D0009,3,Cold,Runny nose advised rest,2025-08-20 13:00,null,2025-08-19 19:40
+001028-07-0117,D0009,2,Flu,Fever prescribed paracetamol,2025-08-20 13:15,null,2025-08-19 19:45
 020722-07-0118,D0005,1,Migraine,Mild headache hydration advised,2025-08-20 13:30,null,2025-08-19 19:50
 950203-07-0119,D0003,4,Fracture,X-ray required referred to ortho,2025-08-20 13:45,null,2025-08-19 19:55
-920619-07-0120,D0001,3,Cold,Sneezing advised rest,2025-08-20 14:00,null,2025-08-19 20:00
-900624-07-0121,D0002,2,Asthma,Inhaler given breathing monitored,2025-08-20 14:15,null,2025-08-19 20:05
-050205-07-0228,D0004,5,Flu,High fever prescribed medication,2025-08-20 14:30,null,2025-08-19 20:10
+920619-07-0120,D0010,3,Cold,Sneezing advised rest,2025-08-20 14:00,null,2025-08-19 20:00
+900624-07-0121,D0009,2,Asthma,Inhaler given breathing monitored,2025-08-20 14:15,null,2025-08-19 20:05
+050205-07-0228,D0009,5,Flu,High fever prescribed medication,2025-08-20 14:30,null,2025-08-19 20:10
 910110-07-0123,D0005,3,Stomachache,Mild discomfort antacid given,2025-08-20 14:45,null,2025-08-19 20:15
-920511-07-0124,D0001,4,Allergy,Rash antihistamine prescribed,2025-08-20 15:00,null,2025-08-19 20:20
+920511-07-0124,D0010,4,Allergy,Rash antihistamine prescribed,2025-08-20 15:00,null,2025-08-19 20:20
 910805-07-0125,D0003,2,Cold,Runny nose advised rest,2025-08-20 15:15,null,2025-08-19 20:25
-880124-07-0126,D0002,5,Dengue,Hospitalization needed,2025-08-20 15:30,null,2025-08-19 20:30
-860328-07-0127,D0004,3,Asthma,Inhaler prescribed,2025-08-20 15:45,null,2025-08-19 20:35
+880124-07-0126,D0009,5,Dengue,Hospitalization needed,2025-08-20 15:30,null,2025-08-19 20:30
+860328-07-0127,D0009,3,Asthma,Inhaler prescribed,2025-08-20 15:45,null,2025-08-19 20:35
 830602-07-0128,D0005,2,Flu,Fever and cough rest advised,2025-08-20 16:00,null,2025-08-19 20:40
-760919-07-0129,D0001,4,Migraine,Severe headache prescribed meds,2025-08-20 16:15,null,2025-08-19 20:45
-880321-07-0130,D0002,3,Stomachache,Mild discomfort antacid,2025-08-20 16:30,null,2025-08-19 20:50
-760403-07-0131,D0004,1,Cold,Runny nose advised rest,2025-08-20 16:45,null,2025-08-19 20:55
+760919-07-0129,D0010,4,Migraine,Severe headache prescribed meds,2025-08-20 16:15,null,2025-08-19 20:45
+880321-07-0130,D0009,3,Stomachache,Mild discomfort antacid,2025-08-20 16:30,null,2025-08-19 20:50
+760403-07-0131,D0009,1,Cold,Runny nose advised rest,2025-08-20 16:45,null,2025-08-19 20:55
 790906-07-0132,D0003,2,Allergy,Skin irritation antihistamine,2025-08-20 17:00,null,2025-08-19 21:00
 860308-07-0133,D0005,5,Fracture,X-ray required referred ortho,2025-08-20 17:15,null,2025-08-19 21:05
-781125-07-0134,D0001,3,Cold,Sneezing rest advised,2025-08-20 17:30,null,2025-08-19 21:10
-840223-07-0135,D0002,2,Allergy,Rash antihistamine,2025-08-20 17:45,null,2025-08-19 21:15
-890520-07-0136,D0004,4,Migraine,Severe headache prescribed meds,2025-08-20 18:00,null,2025-08-19 21:20
+781125-07-0134,D0010,3,Cold,Sneezing rest advised,2025-08-20 17:30,null,2025-08-19 21:10
+840223-07-0135,D0009,2,Allergy,Rash antihistamine,2025-08-20 17:45,null,2025-08-19 21:15
+890520-07-0136,D0009,4,Migraine,Severe headache prescribed meds,2025-08-20 18:00,null,2025-08-19 21:20
 841222-07-0137,D0005,1,Cold,Runny nose advised rest,2025-08-20 18:15,null,2025-08-19 21:25
-631218-07-0138,D0001,3,Flu,Fever rest advised,2025-08-20 18:30,null,2025-08-19 21:30
-690924-07-0139,D0002,2,Allergy,Skin rash antihistamine,2025-08-20 18:45,null,2025-08-19 21:35
+631218-07-0138,D0010,3,Flu,Fever rest advised,2025-08-20 18:30,null,2025-08-19 21:30
+690924-07-0139,D0009,2,Allergy,Skin rash antihistamine,2025-08-20 18:45,null,2025-08-19 21:35
 641126-07-0140,D0003,5,Dengue,Hospitalized observation,2025-08-20 19:00,null,2025-08-19 21:40
-681201-07-0141,D0004,3,Fracture,X-ray required referred ortho,2025-08-20 19:15,null,2025-08-19 21:45
+681201-07-0141,D0009,3,Fracture,X-ray required referred ortho,2025-08-20 19:15,null,2025-08-19 21:45
 740113-07-0142,D0005,2,Cold,Runny nose advised rest,2025-08-20 19:30,null,2025-08-19 21:50
-720420-07-0143,D0001,4,Migraine,Severe headache prescribed meds,2025-08-20 19:45,null,2025-08-19 21:55
-641221-07-0144,D0002,1,Cold,Sneezing rest advised,2025-08-20 20:00,null,2025-08-19 22:00
+720420-07-0143,D0006,4,Migraine,Severe headache prescribed meds,2025-08-20 19:45,null,2025-08-19 21:55
+641221-07-0144,D0009,1,Cold,Sneezing rest advised,2025-08-20 20:00,null,2025-08-19 22:00
 701226-07-0145,D0003,3,Allergy,Skin rash antihistamine,2025-08-20 20:15,null,2025-08-19 22:05
-740801-07-0146,D0004,2,Flu,Mild fever rest advised,2025-08-20 20:30,null,2025-08-19 22:10
-711127-07-0147,D0005,5,Dengue,Hospitalized for observation,2025-08-20 20:45,null,2025-08-19 22:15
-660916-07-0148,D0001,3,Cold,Runny nose advised rest,2025-08-20 21:00,null,2025-08-19 22:20
-631025-07-0149,D0002,2,Allergy,Skin rash antihistamine,2025-08-20 21:15,null,2025-08-19 22:25
+740801-07-0146,D0009,2,Flu,Mild fever rest advised,2025-08-20 20:30,null,2025-08-19 22:10
+711127-07-0147,D0006,5,Dengue,Hospitalized for observation,2025-08-20 20:45,null,2025-08-19 22:15
+660916-07-0148,D0010,3,Cold,Runny nose advised rest,2025-08-20 21:00,null,2025-08-19 22:20
+631025-07-0149,D0009,2,Allergy,Skin rash antihistamine,2025-08-20 21:15,null,2025-08-19 22:25
 680102-07-0150,D0003,4,Flu,Fever prescribed rest,2025-08-20 21:30,null,2025-08-19 22:30

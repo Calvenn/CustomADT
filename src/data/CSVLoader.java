@@ -198,7 +198,7 @@ public class CSVLoader {
                 String desc = values[2].trim();
                 int stock = Integer.parseInt(values[3].trim());
 
-                medControl.addMedicine(new Medicine(id, name, desc, stock));
+                medControl.addMedicine(new Medicine(id, name.toLowerCase(), desc, stock));
             }
 
         } catch (IOException e) {
@@ -231,7 +231,7 @@ public class CSVLoader {
                     }
 
                     // Medicine
-                    Medicine medicine = medControl.findMedicine(values[2].trim());
+                    Medicine medicine = medControl.findMedicineById(values[2].trim());
                     if (medicine == null) {
                         System.err.println("Medicine not found: " + values[2]);
                         continue;

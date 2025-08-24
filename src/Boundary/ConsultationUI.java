@@ -16,6 +16,7 @@ import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
 import adt.LinkedHashMap;
+import adt.List;
 
 import exception.*;
 
@@ -213,10 +214,10 @@ public class ConsultationUI {
         Consultation consultInfo = consultManager.consultationRecord(id, patient, severity.getSeverity(), diagnosis, notes, startTime, createdAt);
 
         if (consultInfo != null) {
-            System.out.println("Record saved.");
+            System.out.println("Record saved");
 
             while (true) {
-                System.out.println("Next action:");
+                System.out.println("\nNext action:");
                 System.out.println("1. Schedule follow-up appointment");
                 System.out.println("2. Send to treatment");
                 System.out.println("3. Send to pharmacy");
@@ -229,18 +230,18 @@ public class ConsultationUI {
                         Consultation.numOfFollowUp++;
 
                         if (isToPharmacy()) {
-                            toPharmacyUI(currentDoc, patient);
+                            toPharmacyUI(currentDoc, patient, diagnosis);
                             Consultation.numOfPharmacy++;
                         }
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(currentDoc, severity);
+                        toTreatmentUI(currentDoc, severity, diagnosis);
                         Consultation.numOfTreatment++;
                         return;
                     }
                     case 3 -> {
-                        toPharmacyUI(currentDoc, patient);
+                        toPharmacyUI(currentDoc, patient, diagnosis);
                         Consultation.numOfPharmacy++;
                         return;
                     }
@@ -254,19 +255,34 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Doctor doc, Severity severity) {
+    private void toTreatmentUI(Doctor doc, Severity severity, String diagnosis) {
+        String trtGiven = "";
+        List<String> trtType;  
+
         while (true) {
-            System.out.println("\n--- Select Treatment ---");
-            trtManager.displayAllTreatments();
+            System.out.println("\n--- Suggested Treatment ---");      
+            trtType = consultManager.suggestedTrt(diagnosis);
 
-            System.out.println("Enter treatment name to assign: ");
-            String name = scanner.nextLine();
+            if (trtType.size() == 1) {
+                // only 1 suggestion
+                System.out.println("Suggested Treatment: " + trtType.get(0));
+                trtGiven = trtType.get(0);
+            } else {
+                // multiple suggestions
+                for (int i = 1; i <= trtType.size(); i++) {
+                    System.out.println("[" + (i) + "] " + trtType.get(i));
+                }
+                int choice = ValidationHelper.inputValidatedChoice(1, trtType.size(), "treatment type");
+                trtGiven = trtType.get(choice);
+            }         
 
-            Treatment selected = trtManager.findTreatmentName(name);
+            Treatment selected = trtManager.findTreatmentName(trtGiven);
             if (selected == null) {
                 System.out.println("Treatment not found. Please try again.\n");
                 continue;
             }
+            
+            System.out.print("\nTreatment: " + trtGiven);
 
             System.out.println("Enter room: ");
             String room = scanner.nextLine();
@@ -280,22 +296,37 @@ public class ConsultationUI {
             }
         }
     }
-    
-    private void toPharmacyUI(Doctor doc, Patient patient) {
+
+    private void toPharmacyUI(Doctor doc, Patient patient, String diagnosis) {
+        String medGiven = "";
+        List<String> med;   
+        
         while (true) {
-            System.out.println("\n--- Medicine Record ---");
-            medControl.displayAllMedicines();
+            System.out.println("\n--- Suggested Medicine ---");
+            med = consultManager.suggestedMeds(diagnosis);
+            
+            if (med.size() == 1) {
+                // only 1 suggestion
+                System.out.println("Suggested Medicine: " + med.get(0));
+                medGiven = med.get(0);
+            } else {
+                // multiple suggestions
+                for (int i = 1; i <= med.size(); i++) {
+                    System.out.println("[" + (i) + "] " + med.get(i));
+                }
+                int choice = ValidationHelper.inputValidatedChoice(1, med.size(), "medicine");
+                medGiven = med.get(choice);
+            }           
 
-            System.out.println("Enter Medicine ID: ");
-            String medID = scanner.nextLine();
-
-            Medicine selected = medControl.findMedicine(medID);
+            Medicine selected = medControl.findMedicineByName(medGiven.toLowerCase());
             if (selected == null) {
                 System.out.println("Medicine not found. Please try again.\n");
                 continue;
             }
+            
+            System.out.println("\nMedicine Given: " + medGiven);
 
-            System.out.println("Quantity taken: ");
+            System.out.print("Quantity taken: ");
             int qty;
             try {
                 qty = Integer.parseInt(scanner.nextLine());

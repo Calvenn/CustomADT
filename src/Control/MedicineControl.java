@@ -51,8 +51,19 @@ public class MedicineControl {
     }
 
     
-    public Medicine findMedicine(String medID) {//
+    public Medicine findMedicineById(String medID) {//
         return medMap.get(medID);
+    }
+    
+    public Medicine findMedicineByName(String medName) {
+        Object[] values = medMap.getValues(); 
+        for (Object obj : values) {
+            Medicine med = (Medicine) obj; 
+            if (med.getName().equalsIgnoreCase(medName)) {
+                return med;
+            }
+        }
+        return null; 
     }
     
     public boolean consists(String medID){
