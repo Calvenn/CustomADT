@@ -56,13 +56,44 @@ public class PharmacyUI {
         }while(choice!=0);
     }
     
+    public void pharmacyMenuReadOnly(){
+        int choice;
+        do{
+            System.out.println("=========================");
+            System.out.println("      Pharmacy Menu      ");
+            System.out.println("=========================");
+            System.out.println("1. View medicine record");
+            System.out.println("1. View all medicine");
+            System.out.println("2. Pharmacy Report");
+            System.out.println("0. Back");
+            System.out.println("=========================");
+            System.out.print("Enter choice: ");
+
+            choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
+
+            switch (choice) {
+                case 1 -> viewRecord();
+                
+                case 2 -> {medControl.displayAllMedicines();pressEnterToContinue();}
+                
+                case 3 -> pharReport();
+
+                case 0 -> {System.out.println("Returning to main menu...");return;}
+
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }while(choice!=0);
+    }
+    
+    
+    
     public void pharReport(){
         int choice;
         do{
             System.out.println("=========================");
             System.out.println("        Report Menu      ");
             System.out.println("=========================");
-            System.out.println("1. Inactive Medicine Summary");
+            System.out.println("1. Low Usage Medicine Summary");
             System.out.println("2. Medicine Dispense Summary");
             System.out.println("3. Medicine Monthly Trend Summary");
             System.out.println("0. Back");
@@ -72,7 +103,11 @@ public class PharmacyUI {
             choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
 
             switch (choice) {
-                case 1 -> {pharReport.generateInactiveMedicinesReport();pressEnterToContinue();}
+                case 1 -> {
+                    int threshold = ValidationHelper.inputValidatedPositiveInt("Enter usage to check: ");
+                    int days = ValidationHelper.inputValidatedPositiveInt("Enter number of days to check: ");
+                    pharReport.generateLowUsageMedicinesReport(threshold, days);
+                    pressEnterToContinue();}
                 
                 case 2 -> {pharReport.generateMedicineDispenseSummary();pressEnterToContinue();}
                 
@@ -118,34 +153,46 @@ public class PharmacyUI {
             switch (choice) {
                 case 1 -> {
                     char confirm = ValidationHelper.inputValidateYesOrNo("Dispense medicine to this patient?");
-                    if(confirm == 'Y'){
+                    if (confirm == 'Y') {
                         MedRecord collectMed = medCollectQueue.dequeue();
 
-                        // Step 2: Update medicine stock
                         Medicine med = collectMed.getMed();
-                        int newStock = med.getStock() - collectMed.getQuantityTaken();
-                        if (newStock < 0) newStock = 0; // avoid negative stock
-                        medControl.updateStock(med.getMedID(), newStock);
+                        int availableStock = med.getStock();
+                        int requestedQty = collectMed.getQuantityTaken();
+                        int dispensedQty;
 
-                        boolean toSave = true;
-                        // Step 3: Add this transaction into MedRecordControl
-                        medRecControl.addRecord(
-                                collectMed.getPatient(),
-                                collectMed.getDoctor(),
-                                med,
-                                collectMed.getQuantityTaken(),
-                                toSave
-                        );
+                        if (availableStock <= 0) {
+                            System.out.println("Medicine is out of stock! Cannot dispense.");
+                            dispensedQty = 0;
+                        } else if (availableStock < requestedQty) {
+                            System.out.println("Requested " + requestedQty + " units, but only " + availableStock + " available.");
+                            System.out.println("Proceeding with dispensing " + availableStock + " units.");
+                            dispensedQty = availableStock;
+                            medControl.updateStock(med.getMedID(), 0); // stock goes to 0
+                        } else {
+                            dispensedQty = requestedQty;
+                            medControl.updateStock(med.getMedID(), availableStock - requestedQty);
+                        }
 
-                        System.out.println("Medicine dispensed and record saved!");
+                        if (dispensedQty > 0) {
+                            boolean toSave = true;
+                            medRecControl.addRecord(
+                                    collectMed.getPatient(),
+                                    collectMed.getDoctor(),
+                                    med,
+                                    dispensedQty, // record actual dispensed qty
+                                    toSave
+                            );
+                            System.out.println("Medicine dispensed (" + dispensedQty + " units) and record saved!");
+                        }
                     }
+
                     if (medCollectQueue.isEmpty()) {
                         System.out.println("All patients have collected their medicine.");
                         return;
                     }
                 }
                 case 2 -> {
-                    // move this patient to the back of the queue
                     medCollectQueue.enqueue(medCollectQueue.dequeue());
                     System.out.println("️ Patient moved to the back of the queue.");
                 }
@@ -164,23 +211,26 @@ public class PharmacyUI {
             System.out.println("=========================");
             medControl.displayLowStock(20);
             System.out.println("1. Add medicine");
-            System.out.println("2. Update stock");
-            System.out.println("3. Remove medicine");
-            System.out.println("4. View all medicines");
+            System.out.println("2. Add stock");
+            System.out.println("3. Update medicine");
+            System.out.println("4. Remove medicine");
+            System.out.println("5. View all medicines");
             System.out.println("0. Back");
             System.out.println("=========================");
             System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
 
             switch (choice) {
                 case 1 -> {addMedUI();pressEnterToContinue();}
 
                 case 2 -> {updateStockUI();pressEnterToContinue();}
 
-                case 3 -> {removeMedUI();pressEnterToContinue();}
+                case 3 ->{updateMedicineUI(); pressEnterToContinue();}
+                
+                case 4 -> {removeMedUI();pressEnterToContinue();}
 
-                case 4 -> {medControl.displayAllMedicines();pressEnterToContinue();}
+                case 5 -> {medControl.displayAllMedicines();pressEnterToContinue();}
 
                 case 0 -> {System.out.println("Returning to Pharmacy menu...");return;}
 
@@ -304,10 +354,76 @@ public class PharmacyUI {
         System.out.println("Medicine added successfully!");
     }
 
-    
+    public void updateMedicineUI() {
+        System.out.println("=== Update Medicine ===");
+
+        // Validate Medicine ID
+        System.out.print("Enter Medicine ID: ");
+        String medID = scanner.nextLine().trim();
+        try {
+            TryCatchThrowFromFile.validateNotNull(medID);
+        } catch (InvalidInputException e) {
+            ValidationUtility.printErrorWithSolution(e);
+            return;
+        }
+
+        Medicine med = medControl.findMedicineById(medID);
+        if (med == null) {
+            System.out.println("Medicine ID not found!");
+            return;
+        }
+
+        System.out.println("Selected Medicine: " + med.getName() + " (ID: " + med.getMedID() + ")");
+        System.out.println("Current Description: " + med.getDesc());
+
+        int choice;
+        do {
+            System.out.println("=========================");
+            System.out.println("   Update Options        ");
+            System.out.println("=========================");
+            System.out.println("1. Update Name");
+            System.out.println("2. Update Description");
+            System.out.println("0. Cancel");
+            System.out.println("=========================");
+            System.out.print("Enter choice: ");
+
+            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
+
+            switch (choice) {
+                case 1 -> {
+                    System.out.print("Enter new Medicine Name: ");
+                    String newName = scanner.nextLine().trim();
+                    try {
+                        TryCatchThrowFromFile.validateNotNull(newName);
+                        medControl.updateMedicineName(medID, newName);
+                        System.out.println("Medicine name updated successfully!");
+                    } catch (InvalidInputException e) {
+                        ValidationUtility.printErrorWithSolution(e);
+                    }
+                }
+                case 2 -> {
+                    System.out.print("Enter new Description: ");
+                    String newDesc = scanner.nextLine().trim();
+                    try {
+                        TryCatchThrowFromFile.validateNotNull(newDesc);
+                        medControl.updateMedicineDesc(medID, newDesc);
+                        System.out.println("Medicine description updated successfully!");
+                    } catch (InvalidInputException e) {
+                        ValidationUtility.printErrorWithSolution(e);
+                    }
+                }
+                case 0 -> {
+                    System.out.println("Update cancelled.");
+                    return;
+                }
+                default -> System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 0);
+    }
+
     
     public void updateStockUI() {
-        System.out.println("=== Update Medicine Stock ===");
+        System.out.println("=== Add Medicine Stock ===");
 
         // Validate Medicine ID
         System.out.print("Enter Medicine ID: ");
@@ -328,17 +444,18 @@ public class PharmacyUI {
         System.out.println("Current stock for " + med.getName() + ": " + med.getStock());
 
         // Validate new stock
-        System.out.print("Enter new stock quantity: ");
+        System.out.print("Enter add stock quantity: ");
         String newStockInput = scanner.nextLine().trim();
-        int newStock = 0;
+        int addStock = 0;
         try {
             TryCatchThrowFromFile.validatePositiveInteger(newStockInput);
-            newStock = Integer.parseInt(newStockInput);
+            addStock = Integer.parseInt(newStockInput);
         } catch (InvalidInputException e) {
             ValidationUtility.printErrorWithSolution(e);
             return;
         }
-
+        int newStock = addStock + med.getStock();
+        
         if (medControl.updateStock(medID, newStock)) {
             System.out.println("Stock updated successfully!");
         } else {
