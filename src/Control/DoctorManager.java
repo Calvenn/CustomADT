@@ -1,5 +1,6 @@
 package Control;
 import Entity.Doctor;
+import Control.StaffManager;
 import adt.Heap;
 import adt.LinkedHashMap;
 
@@ -11,10 +12,10 @@ import adt.LinkedHashMap;
  * 
  * @author tanjixian
  */
-public class DoctorManager{
+public class DoctorManager {
     private LinkedHashMap<String, Doctor> doctorLookup;
     private Heap<Doctor> doctorHeap;
-
+    
     // Constructor
     public DoctorManager(){
         doctorLookup = new LinkedHashMap();
@@ -23,6 +24,7 @@ public class DoctorManager{
     
   // Functions
     public boolean addNewDoctor(Doctor newDoctor){
+        //super.addNewStaff(newDoctor);
         doctorLookup.put(newDoctor.getID(), newDoctor);
         doctorHeap.insert(newDoctor);
         return true;
@@ -37,6 +39,14 @@ public class DoctorManager{
         return allDocIDs;
     }
     
+    public Doctor[] viewAllDoctor() {
+        Object[] obj = doctorLookup.getValues();
+        Doctor[] doctor = new Doctor[obj.length];
+        for (int i = 0; i < obj.length; i++) {
+            doctor[i] = (Doctor) obj[i];  // safe if all are Staff
+        }
+        return doctor;
+    }
     // Find Doctor 
     public Doctor findDoctor(String id){
         return doctorLookup.get(id);

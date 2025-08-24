@@ -60,6 +60,7 @@ public class Staff {
     @Override
     public String toString(){
         return "id: " + this.id;
+        
     }
     
     // equals

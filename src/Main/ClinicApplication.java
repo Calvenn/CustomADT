@@ -48,6 +48,7 @@ public class ClinicApplication {
     private final ConsultationUI consultUI;
     private final PatientManagementUI patientUI;
     private final StaffManagementUI staffUI;
+    private final StaffLogin staffLogin;
     private final TreatmentUI treatmentUI;
     private final PharmacyUI pharUI;
 
@@ -68,16 +69,17 @@ public class ClinicApplication {
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
-        staffUI = new StaffManagementUI(docManager, staffManager);
         treatmentUI = new TreatmentUI(trtManager);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
+        staffUI = new StaffManagementUI(staffManager, docManager);
+        staffLogin = new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI, treatmentUI, pharUI, patientUI, staffUI);
     }
     
     
     public void run(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
-        CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager);
+        CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager, staffManager);
         CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
@@ -85,7 +87,7 @@ public class ClinicApplication {
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
 
         java.awt.EventQueue.invokeLater(() -> {
-            new StaffManagementUI(docManager, staffManager).setVisible(true);
+            new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI,treatmentUI, pharUI, patientUI, staffUI).setVisible(true);
         });
         
         int choice;
@@ -96,7 +98,7 @@ public class ClinicApplication {
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
-                case 2 -> staffUI.setVisible(true);
+                case 2 -> staffLogin.setVisible(true);
                 case 3 -> {
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
