@@ -279,12 +279,12 @@ public class CSVLoader {
                 String treatmentName = values[0].trim();
                 String description = values[1].trim();
                 String durationStr = values[2].trim(); // e.g., PT30M
-                //int frequency = Integer.parseInt(values[3].trim());
+                int frequency = Integer.parseInt(values[3].trim());
 
                 // Convert ISO-8601 duration string to Duration
                 Duration duration = Duration.parse(durationStr);
 
-                trtManager.newTreatment(treatmentName, description, duration);
+                trtManager.newTreatment(treatmentName, description, duration, frequency);
             }
 
         } catch (Exception e) {

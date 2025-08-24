@@ -17,7 +17,7 @@ public class Treatment implements Comparable<Treatment> {
 //        "Vaccination",
 //        "Physical therapy", 
 //        "Ultrasound", 
-//        "Allertic test", 
+//        "Allergic test", 
 //        "Wound care", 
 //        "IV Fluid therapy", 
 //        "Nebuliser", 
@@ -78,6 +78,10 @@ public class Treatment implements Comparable<Treatment> {
     
     public void doneTreatment() {
         this.frequency++; 
+    }
+    
+    public Duration getTimeAllocation() {
+        return duration.multipliedBy(frequency);
     }
     
     @Override

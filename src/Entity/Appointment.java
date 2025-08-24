@@ -36,7 +36,7 @@ public abstract class Appointment implements Comparable<Appointment>{
         this.dateTime = time;
     }
     
-    //@Override
+    @Override
     public int compareTo(Appointment other){
         return this.dateTime.compareTo(other.dateTime);
     }

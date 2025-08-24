@@ -1,17 +1,16 @@
 package Control;
 import adt.LinkedHashMap;
+import adt.Heap; 
+import adt.List; 
 import Entity.Treatment; 
-import exception.InvalidInputException;
 import java.time.Duration; 
 
 //input data format validation should be in boundary, business logic validation in control 
 
 public class TreatmentManager {
-//    private Heap<Treatment> providedTreatments;
     private LinkedHashMap<String, Treatment> providedTreatments; 
     
     public TreatmentManager() {
-//        providedTreatments = new Heap<>(true); 
         providedTreatments = new LinkedHashMap<>();
     }
     
@@ -48,19 +47,17 @@ public class TreatmentManager {
         return providedTreatments.get(treatmentName.toLowerCase());
     }
     
-//        if(isNull(treatmentName) || treatmentName.trim().isEmpty()) throw new IllegalArgumentException("Treatment Name cannot be empty.");
-//        if(isNull(description)) throw new IllegalArgumentException("Description cannot be null.");
-//        if(isNull(duration)) throw new IllegalArgumentException("Duration cannot be null.");
-//        if(duration.isNegative() || duration.isZero()) throw new IllegalArgumentException("Duration cannot be negative or zero."); 
-
-//    public boolean isNull(Object obj) {
-//        return obj == null; 
-//    }
-    
-    //trigger to add new treatment to heap list 
+    //trigger to add new treatment 
     public boolean newTreatment(String treatmentName, String description, Duration duration) {
         treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
         Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration); 
+        providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
+        return true; 
+    }
+    
+    public boolean newTreatment(String treatmentName, String description, Duration duration, int frequency) {
+        treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
+        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, frequency); 
         providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
         return true; 
     }
@@ -74,9 +71,72 @@ public class TreatmentManager {
         providedTreatments.display(); 
     }
     
+    public boolean deleteTreatment(Treatment treatment) {
+        String treatmentName = treatment.getName();
+        if(treatmentExist(treatmentName)) {
+            providedTreatments.remove(treatmentName.toLowerCase());
+            return true; 
+        }
+        return false; 
+    }
+    
     //return total amount of treatments provided 
     public int totalTreatments() {
         return providedTreatments.size(); 
+    }
+    
+    public boolean emptyTreatment() {
+        return providedTreatments.isEmpty(); 
+    }
+    
+    //functions for reports 
+    public Heap<Treatment> getFrequencyReport() {
+        Heap<Treatment> treatmentHeap = new Heap(true); 
+        
+        if(emptyTreatment()) {
+            return null;
+        }
+        
+        for(Object obj : providedTreatments.getValues()) {
+            if(obj instanceof Treatment treatment) { 
+                treatmentHeap.insert(treatment);
+            }
+        }
+        
+        return treatmentHeap; 
+    
+    }
+    
+    public List<Treatment> getTimeAllocationReport() {
+        List<Treatment> treatmentList = new List(); 
+        
+        if(emptyTreatment()) {
+            return null;
+        }
+        
+        for(Object obj : providedTreatments.getValues()) {
+            if(obj instanceof Treatment treatment) {
+                treatmentList.add(treatment); 
+            }
+        }
+        
+        int listLength = treatmentList.size(); 
+
+        //bubble sort
+        for(int i = 1; i < listLength; i++) {
+            for(int j = 1; j < listLength - i + 1; j++) {
+                Treatment current = treatmentList.get(j); 
+                Treatment next = treatmentList.get(j+1);
+
+                //swap
+                if(current.getTimeAllocation().compareTo(next.getTimeAllocation()) < 0) {
+                    treatmentList.replace(j, next); 
+                    treatmentList.replace(j+1, current); 
+                }
+            }
+        }
+        return treatmentList; 
+        
     }
     
 }
