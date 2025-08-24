@@ -236,7 +236,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(currentDoc, severity, diagnosis);
+                        toTreatmentUI(patient,currentDoc, severity, diagnosis);
                         Consultation.numOfTreatment++;
                         return;
                     }
@@ -255,7 +255,7 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Doctor doc, Severity severity, String diagnosis) {
+    private void toTreatmentUI(Patient patient, Doctor doc, Severity severity, String diagnosis) {
         String trtGiven = "";
         List<String> trtType;  
 
@@ -282,9 +282,9 @@ public class ConsultationUI {
                 continue;
             }
             
-            System.out.print("\nTreatment: " + trtGiven);
+            System.out.println("\nTreatment: " + trtGiven);
 
-            System.out.println("Enter room: ");
+            System.out.print("Enter room: ");
             String room = scanner.nextLine();
 
             LocalDateTime time = LocalDateTime.now();

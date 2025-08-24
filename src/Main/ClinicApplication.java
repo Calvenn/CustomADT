@@ -10,7 +10,6 @@ import Entity.*;
 import adt.*;
 import data.CSVLoader;
 import exception.*;
-import java.time.Duration;
 
 /**f
  *
@@ -25,6 +24,7 @@ public class ClinicApplication {
     private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
     private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
+    private final Heap<Appointment> treatmentAppointment = new Heap<>(true);
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
@@ -39,6 +39,7 @@ public class ClinicApplication {
     private final ConsultationManager consultManager;
     private final ConsultationReport consultReport;
     private final TreatmentManager trtManager;
+    private final TreatmentApptManager treatmentApptManager;
     private final MedicineControl medControl;
     private final MedRecordControl medRecControl;
     private final PharmacyReport pharReport;
@@ -50,6 +51,7 @@ public class ClinicApplication {
     private final StaffManagementUI staffUI;
     private final StaffLogin staffLogin;
     private final TreatmentUI treatmentUI;
+    private final TreatmentApptUI treatmentApptUI;
     private final PharmacyUI pharUI;
 
     public ClinicApplication() {
@@ -64,12 +66,14 @@ public class ClinicApplication {
         docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
+        treatmentApptManager = new TreatmentApptManager();
         medControl = new MedicineControl(medMap);
         medRecControl = new MedRecordControl(medRecList);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         treatmentUI = new TreatmentUI(trtManager);
+        treatmentApptUI = new TreatmentApptUI(treatmentApptManager);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
