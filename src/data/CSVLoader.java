@@ -66,7 +66,7 @@ public class CSVLoader {
         }
     }
     
-    public static void loadDoctorsFromCSV(String filePath, DoctorManager docManager) {
+    public static void loadDoctorsFromCSV(String filePath, DoctorManager docManager, StaffManager staffManager) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -93,6 +93,8 @@ public class CSVLoader {
 
                 Doctor s = new Doctor(Id, name, age, phone, gender, position, department, hireDate, password);
                 docManager.addNewDoctor(s);
+                staffManager.addNewStaff(s);
+                
             }
 
         } catch (Exception e) {

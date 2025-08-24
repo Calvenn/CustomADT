@@ -22,8 +22,13 @@ public class StaffManager {
     }    
          
     // Get all Staff (LinkedHashMap)
-    public Staff[] viewAllStaff(){
-        return (Staff[])staffLookup.getValues();
+    public Staff[] viewAllStaff() {
+        Object[] obj = staffLookup.getValues();
+        Staff[] staff = new Staff[obj.length];
+        for (int i = 0; i < obj.length; i++) {
+            staff[i] = (Staff) obj[i];  // safe if all are Staff
+        }
+        return staff;
     }
     
     // Find Staff 
