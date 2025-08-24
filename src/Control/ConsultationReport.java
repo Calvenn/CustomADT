@@ -42,19 +42,20 @@ public class ConsultationReport {
 
         if (consultLog == null || consultLog.isEmpty()) {
             return null; // Boundary handles "no records"
+            
         }
 
         Object[] lists = consultLog.getValues(); // Each is a List<Consultation>
 
         for (Object obj : lists) {
+            System.out.println("No record...............");
             List<Consultation> consultationList = (List<Consultation>) obj;
 
-            // use 0-based indexing (safer)
-            for (int i = 0; i < consultationList.size(); i++) {
+            for (int i = 1; i <= consultationList.size(); i++) {
                 c = consultationList.get(i);
-                if (c == null || c.getNotes() == null || c.getNotes().trim().isEmpty()) continue;
+                if (c == null || c.getDisease() == null || c.getDisease().trim().isEmpty()) continue;
 
-                String diagnosis = c.getNotes().trim().toLowerCase();
+                String diagnosis = c.getDisease().trim().toLowerCase();
 
                 if (diagnosisCount.containsKey(diagnosis)) {
                     diagnosisCount.put(diagnosis, diagnosisCount.get(diagnosis) + 1);

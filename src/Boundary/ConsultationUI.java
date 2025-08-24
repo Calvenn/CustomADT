@@ -5,6 +5,7 @@ import Control.ConsultationManager;
 import Control.ConsultationReport;
 import Control.DoctorManager; //TEMP
 import Control.MedicineControl;
+import Control.StaffManager;
 import Control.TreatmentManager;
 
 import Entity.Doctor;
@@ -13,6 +14,7 @@ import Entity.Consultation;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Severity;
+import Entity.Staff;
 import Entity.Visit;
 import Entity.Treatment;
 import adt.LinkedHashMap;
@@ -51,27 +53,11 @@ public class ConsultationUI {
         this.scanner = new Scanner(System.in);
     }
     
-    //handle in doctor ui
-    private boolean doctorLogin() {
-        System.out.println("\n--- Doctor Login ---");
-        System.out.print("Enter your ID (e.g. D001): ");
-        String docId = scanner.nextLine().trim();
-        
-        currentDoc = docManager.findDoctor(docId);
-
-        if (currentDoc != null) {
-            consultManager.currentDoc = currentDoc;
-            System.out.println("Login successful. Welcome, " + currentDoc.getName() + "!");
-            return true;
-        } else {
-            System.out.println("No doctor found. Please try again.");
-            return false;
-        }
-    }
-    
-    public void consultMainMenu() {     
-        if (currentDoc == null && !doctorLogin()) {
-            System.out.println("Login failed.");
+    public void consultMainMenu(Staff staff) {     
+        currentDoc = docManager.findDoctor(staff.getID());
+        consultManager.currentDoc = currentDoc;
+        if (currentDoc == null || currentDoc.getDepartment().toUpperCase().equals("TREATMENT")) {
+            System.out.println("Staff " + staff.getID() + " unable to access");
             return;
         }
         
@@ -89,22 +75,17 @@ public class ConsultationUI {
             System.out.println("1. Handle Consultation");
             System.out.println("2. Appointments");
             System.out.println("3. Consultation Report");
-            System.out.println("4. Back");
-            System.out.println("0. Log Out");
+            System.out.println("0. Back");
             System.out.println("=".repeat(35));
 
-            int choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
+            int choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
 
             switch (choice) {
                 case 1 -> consultationMenu();
                 case 2 -> apptUI.apptMenu(currentDoc);
                 case 3 -> consultationReportMenu();
-                case 4 -> {
-                    System.out.println("Returning to main menu...");
-                    return;
-                }
                 case 0 -> {
-                    System.out.println("Thank You " + currentDoc.getName());
+                    System.out.println("Returning to main menu...");
                     currentDoc = null;
                     return;
                 }
@@ -146,7 +127,7 @@ public class ConsultationUI {
         int choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
         
         switch (choice) {
-            case 1 -> displayOutcomeReport();
+            case 1 -> displayDiagnosisTrends();
             case 2 -> displayTimeToConsultReport();
             case 0 -> {
                 System.out.println("Returning to main menu");
@@ -261,7 +242,7 @@ public class ConsultationUI {
 
         while (true) {
             System.out.println("\n--- Suggested Treatment ---");      
-            trtType = consultManager.suggestedTrt(diagnosis);
+            trtType = trtManager.suggestedTrt(diagnosis);
 
             if (trtType.size() == 1) {
                 // only 1 suggestion
@@ -292,7 +273,7 @@ public class ConsultationUI {
                 System.out.println("Treatment recorded.");
                 break;
             } else {
-                System.out.println("Failed to assign treatment. Please try again.");
+                System.out.println("Missing required information for treatment appointment.");
             }
         }
     }
@@ -303,7 +284,7 @@ public class ConsultationUI {
         
         while (true) {
             System.out.println("\n--- Suggested Medicine ---");
-            med = consultManager.suggestedMeds(diagnosis);
+            med = medControl.suggestedMeds(diagnosis);
             
             if (med.size() == 1) {
                 // only 1 suggestion
@@ -326,21 +307,14 @@ public class ConsultationUI {
             
             System.out.println("\nMedicine Given: " + medGiven);
 
-            System.out.print("Quantity taken: ");
-            int qty;
-            try {
-                qty = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid quantity. Please enter a number.");
-                continue;
-            }
+            int qty = ValidationHelper.inputValidatedPositiveInt("Quantity taken: ");
 
             LocalDateTime time = LocalDateTime.now();
             if (consultManager.toPharmacy(doc, patient, selected, qty, time)) {
                 System.out.println("Medicine collection recorded. Please collect the medicine at counter.");
                 break;
             } else {
-                System.out.println("Failed to record. Please check and try again.");
+                System.out.println("Missing data for medicine dispensing.");
             }
         }
     }
@@ -357,7 +331,7 @@ public class ConsultationUI {
     
     private void displayRecordUI(){
         if(!consultManager.displayAllRecordsByDoctor(currentDoc)){
-            System.out.println("No record found.");
+            System.out.println("No consultation records found for Doctor " + currentDoc.getID());
         } else {
             Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to sort by patient IC?");
 
@@ -370,7 +344,7 @@ public class ConsultationUI {
                         return; // exit search loop
                     }
 
-                    String searchedIc = ValidationHelper.inputValidatedIC(rawInput);
+                    String searchedIc = ValidationHelper.validateICOnce(rawInput);
                     if (searchedIc == null) continue; // invalid → try again
 
                     if (!consultManager.displayRecordsByIC(searchedIc)) {

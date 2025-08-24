@@ -3,6 +3,7 @@ import Entity.Doctor;
 import Control.StaffManager;
 import adt.Heap;
 import adt.LinkedHashMap;
+import adt.List;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. (A)IF THE DOCTOR IS APPOINTED NEW TASK then use updateDoctorInc(Doctor minWorkDoctor), to update the doctor back into heap
@@ -47,16 +48,36 @@ public class DoctorManager {
         }
         return doctor;
     }
+    
     // Find Doctor 
     public Doctor findDoctor(String id){
         return doctorLookup.get(id);
     }
     
-    // Extract doctor from min-heap root (least workload), used in "bookAppointment"
-    public Doctor getMinWorkDoctor(){
-        Doctor minWorkDoctor = doctorHeap.extractRoot();
-        return minWorkDoctor;
+    // Extract doctor from min-heap root (least workload), used in "visit queue"
+    public Doctor getMinWorkDoctor() {
+        List<Doctor> temp = new List<>();
+        Doctor chosen = null;
+
+        while (!doctorHeap.isEmpty()) {
+            Doctor doc = doctorHeap.extractRoot();
+            if (doc.getDepartment().equalsIgnoreCase("CONSULT")) {
+                chosen = doc;
+                break;
+            } else {
+                temp.add(doc);
+            }
+        }
+
+        // Put back the other doctors
+        for (int i = 1; i <= temp.size(); i++) {
+            Doctor d = doctorHeap.get(i-1);
+            doctorHeap.insert(d);
+        }
+
+        return chosen; 
     }
+
     
     // Peek lowest patientCount doctor
     public Doctor peekRootDoctor(){

@@ -4,6 +4,7 @@
  */
 package Main;
 
+import Boundary.StaffLogin;
 import Boundary.*;
 import Control.*;
 import Entity.*;
@@ -50,6 +51,7 @@ public class ClinicApplication {
     private final PatientManagementUI patientUI;
     private final StaffManagementUI staffUI;
     private final StaffLogin staffLogin;
+    private final StaffLoginTest staffLoginTest; // test console version
     private final TreatmentUI treatmentUI;
     private final TreatmentApptUI treatmentApptUI;
     private final PharmacyUI pharUI;
@@ -78,10 +80,23 @@ public class ClinicApplication {
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
         staffLogin = new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI, treatmentUI, pharUI, patientUI, staffUI);
+        staffLoginTest = new StaffLoginTest(queueManager, staffManager, consultUI, treatmentUI, pharUI, patientUI, staffUI); 
+    }
+    
+    public void runTest(){
+        CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
+        CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager, staffManager);
+        CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
+        CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
+        CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
+        CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
+        CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
+          
+        staffLoginTest.login();
     }
     
     
-    public void run(){
+    /*public void run(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager, staffManager);
         CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
@@ -90,9 +105,9 @@ public class ClinicApplication {
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList);
 
-        java.awt.EventQueue.invokeLater(() -> {
-            new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI,treatmentUI, pharUI, patientUI, staffUI).setVisible(true);
-        });
+        //java.awt.EventQueue.invokeLater(() -> {
+          //  new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI,treatmentUI, pharUI, patientUI, staffUI).setVisible(true);
+        //});
         
         int choice;
         queueManager.loadVisit();
@@ -102,7 +117,7 @@ public class ClinicApplication {
 
             switch (choice) {
                 case 1 -> patientUI.patientMenu();
-                case 2 -> staffLogin.setVisible(true);
+                case 2 -> staffLoginTest.login(); //staffLogin.setVisible(true); 
                 case 3 -> {
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
@@ -116,7 +131,7 @@ public class ClinicApplication {
                 }
             }
         }
-    }
+    }*/
     
     private void displayMainMenu() {
         System.out.println("\n" + "=".repeat(35));
