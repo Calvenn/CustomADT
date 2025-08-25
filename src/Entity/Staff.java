@@ -84,7 +84,10 @@ public class Staff {
     public Position getPosition() { return position; }
     public LocalDateTime getDateJoined() { return dateJoined; }
     public String getPassword() { return password; }
-    
+    public static int getAdminCount() { return adminCount; }
+    public static int getDoctorCount() { return doctorCount; }
+    public static int getNurseCount() { return nurseCount; }
+    public static int getTotalStaffCount() { return adminCount + doctorCount + nurseCount; }
     // toString
     @Override
     public String toString(){

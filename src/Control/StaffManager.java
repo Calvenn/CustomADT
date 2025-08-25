@@ -39,6 +39,7 @@ public class StaffManager {
         return staff;
     }
     
+    
     public void printStaff(Staff s){
         System.out.println(s.toString());
     }
@@ -63,4 +64,19 @@ public class StaffManager {
     public boolean existStaff(String id){
         return staffLookup.containsKey(id);
     }
+    
+    // Get all dateJoiend
+    public LocalDateTime[] getAllDateJoin(){
+        LocalDateTime[] dateList = new LocalDateTime[staffLookup.size()];
+        Staff[] staff = viewAllStaff();
+        int i = 0;
+        
+        for(Staff s: staff){
+            dateList[i] = s.getDateJoined();
+            i++;
+        }
+        
+        return dateList;
+    }
+    
 }

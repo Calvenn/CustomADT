@@ -1,12 +1,8 @@
 package Boundary;
 
 import java.util.Scanner;
-import Control.DoctorManager;
 import Control.QueueManager;
 import Control.StaffManager;
-import Entity.MedRecord;
-import Entity.TreatmentAppointment;
-import adt.Queue;
 import exception.*;
 
 
@@ -78,11 +74,38 @@ public class StaffLoginTest {
         String id;
         String password;
         
-        System.out.print("User ID: ");
-        id = scanner.nextLine();
+        System.out.println("\n===================================");
+        System.out.printf("               Login");
+        System.out.println("\n===================================");
         
-        System.out.print("Password: ");
-        password = scanner.nextLine();
+
+        // USER ID
+        while(true){
+            System.out.print("User ID: ");
+            id = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validateNotNull(id);
+                if(!idFormat(id)) throw new InvalidInputException("ID format is incorrect!");
+                if(staffManager.findStaff(id) == null) throw new InvalidInputException("ID not found!");
+                break;
+            } catch (InvalidInputException e){
+                ValidationUtility.printErrorWithSolution(e);
+            }
+            
+        }
+        
+        // PASSWORD
+        while (true){
+            System.out.print("Password: ");
+            password = scanner.nextLine();
+            try{
+                TryCatchThrowFromFile.validateNotNull(password);
+                if (!password.equalsIgnoreCase(staffManager.findStaff(id).getPassword())) throw new InvalidInputException("Invalid Password!");
+                break;
+            } catch (InvalidInputException e){
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
         
         if(!checkLogin(id, password)) return;
         System.out.print(login);
@@ -102,6 +125,7 @@ public class StaffLoginTest {
     // Check Correct ID format using REGEX
     private boolean idFormat(String id){
         return id.matches("^[ADN]\\d{4}$");
+        
     }
     
     // Get the position of a id
@@ -172,7 +196,7 @@ public class StaffLoginTest {
                 case 1 -> {                 
                     consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
-                case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY) !! PLEASE CHANGE AFTER INTEGRATION !!
+                case 3 -> pharUI.pharmacyMenuRead();// Pharmacy System (READ_ONLY) 
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
