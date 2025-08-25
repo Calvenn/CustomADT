@@ -93,7 +93,9 @@ public class Consultation extends Appointment{
              + String.format("%-20s: %s%n", "Diagnosis", disease)
              + String.format("%-20s: %s%n", "Notes", notes)
              + String.format("%-20s: %s%n", "Doctor In Charge", getDoctor().getName())
-             + String.format("%-20s: %s%n", "Appointment Time", getDateTime())
+             + String.format("%-20s: %s%n", "Consult Time", getConsultTime())
+             + String.format("%-20s: %s%n", "Appointment Time", getDateTime() == null ? "" : getDateTime())
+             + String.format("%-20s: %s%n", "Created At", getCreatedAt())
              + "====================================================\n";
     }   
 }
