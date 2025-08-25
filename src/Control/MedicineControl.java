@@ -43,6 +43,15 @@ public class MedicineControl {
         }
         return false;
     }
+    
+    public boolean updateMedicinePrice(String medID, double price) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setPrice(price);
+            return true;
+        }
+        return false;
+    }
 
 
     public boolean removeMedicine(String medID) {//
@@ -56,19 +65,22 @@ public class MedicineControl {
         }
 
         System.out.println("\n=== Medicine List ===");
-        System.out.printf("%-15s %-25s %-40s %-15s%n", "MedID", "Name", "Description", "Stock");
-        System.out.println("==================================================================================================================");
+        System.out.printf("%-15s %-25s %-40s %-15s %-10s%n",
+                "MedID", "Name", "Description", "Stock", "Price (RM)");
+        System.out.println("==============================================================================================================================");
 
         Object[] meds = medMap.getValues();
         for (Object obj : meds) {
             Medicine med = (Medicine) obj;
-            System.out.printf("%-15s %-25s %-40s %-15d%n",
+            System.out.printf("%-15s %-25s %-40s %-15d RM%-9.2f%n",
                     med.getMedID(),
                     med.getName(),
                     med.getDesc(),
-                    med.getStock());
+                    med.getStock(),
+                    med.getPrice());
         }
     }
+
 
     
     public Medicine findMedicineById(String medID) {//

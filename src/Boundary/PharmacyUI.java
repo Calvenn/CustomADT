@@ -65,8 +65,6 @@ public class PharmacyUI {
             System.out.println("4. Pharmacy Report");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
-
             choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
             switch (choice) {
@@ -96,7 +94,6 @@ public class PharmacyUI {
             System.out.println("2. Pharmacy Report");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
             choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
@@ -124,10 +121,9 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.println("1. Low Usage Medicine Summary");
             System.out.println("2. Medicine Dispense Summary");
-            System.out.println("3. Medicine Monthly Trend Summary");
+            System.out.println("3. Medicine Revenue Summary");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
             choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
 
@@ -140,7 +136,7 @@ public class PharmacyUI {
                 
                 case 2 -> {pharReport.generateMedicineDispenseSummary();pressEnterToContinue();}
                 
-                case 3 -> {pharReport.generateMonthlyTrendsReport();pressEnterToContinue();}
+                case 3 -> {pharReport.generateRevenueReport();pressEnterToContinue();}
 
                 case 0 -> {System.out.println("Returning to main menu...");return;}
 
@@ -174,7 +170,6 @@ public class PharmacyUI {
             System.out.println("\n1. Dispense this medicine");
             System.out.println("2. Skip patient");
             System.out.println("0. Back to Pharmacy Menu");
-            System.out.print("Enter choice: ");
             System.out.println("=========================");
 
             choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
@@ -247,7 +242,6 @@ public class PharmacyUI {
             System.out.println("5. View all medicines");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
             choice = ValidationHelper.inputValidatedChoice(0,5, "your choice");
 
@@ -269,8 +263,6 @@ public class PharmacyUI {
         }while(choice !=0);
     }
     
-
-    
     public void viewRecord(){
         int choice;
             do{
@@ -283,7 +275,6 @@ public class PharmacyUI {
             System.out.println("4. Search by Medicine ID/Name");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
             choice = ValidationHelper.inputValidatedChoice(0,4, "your choice");
 
@@ -366,6 +357,18 @@ public class PharmacyUI {
                 return;
             }
 
+            //Price
+            System.out.print("Enter Price (RM): ");
+            String priceInput = scanner.nextLine().trim();
+            double price = 0;
+            try {
+                TryCatchThrowFromFile.validatePositiveDouble(priceInput);
+                price = Double.parseDouble(priceInput);
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+                return;
+            }
+            
             // Stock Quantity
         System.out.print("Enter Stock Quantity: ");
         String stockInput = scanner.nextLine().trim();
@@ -378,7 +381,7 @@ public class PharmacyUI {
             return;
         }
 
-        Medicine newMed = new Medicine(medID, name.toLowerCase(), desc, stock);
+        Medicine newMed = new Medicine(medID, name.toLowerCase(), desc, stock, price);
         medControl.addMedicine(newMed);
 
         System.out.println("Medicine added successfully!");
@@ -405,6 +408,7 @@ public class PharmacyUI {
 
         System.out.println("Selected Medicine: " + med.getName() + " (ID: " + med.getMedID() + ")");
         System.out.println("Current Description: " + med.getDesc());
+        System.out.printf("Current Price: RM%.2f\n", med.getPrice());
 
         int choice;
         do {
@@ -413,11 +417,11 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.println("1. Update Name");
             System.out.println("2. Update Description");
+            System.out.println("3. Update Price");
             System.out.println("0. Cancel");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
-            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
 
             switch (choice) {
                 case 1 -> {
@@ -438,6 +442,18 @@ public class PharmacyUI {
                         TryCatchThrowFromFile.validateNotNull(newDesc);
                         medControl.updateMedicineDesc(medID, newDesc);
                         System.out.println("Medicine description updated successfully!");
+                    } catch (InvalidInputException e) {
+                        ValidationUtility.printErrorWithSolution(e);
+                    }
+                }
+                case 3 -> {
+                    System.out.print("Enter new price: ");
+                    String price = scanner.nextLine().trim();
+                    try {
+                        TryCatchThrowFromFile.validatePositiveDouble(price);
+                        double updatePrice = Double.parseDouble(price);
+                        medControl.updateMedicinePrice(medID, updatePrice);
+                        System.out.println("Medicine price updated successfully!");
                     } catch (InvalidInputException e) {
                         ValidationUtility.printErrorWithSolution(e);
                     }

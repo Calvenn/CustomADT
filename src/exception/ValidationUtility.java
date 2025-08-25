@@ -29,6 +29,17 @@ public class ValidationUtility {
             return false;
         }
     }
+    
+    // Check if string is a valid integer
+    public static boolean isValidDouble(String value) {
+        if (isNullOrEmpty(value)) return false;
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
     // Check if string is a valid integer within range
     public static boolean isValidIntegerRange(String value, int min, int max) {

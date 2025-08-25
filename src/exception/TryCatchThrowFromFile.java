@@ -21,6 +21,19 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Value must be a positive integer.");
         }
     }
+    
+    // Validate positive double from String
+    public static void validatePositiveDouble(String value) throws InvalidInputException {
+        validateNotNull(value);
+        if (!ValidationUtility.isValidDouble(value)) {
+            throw new InvalidInputException("Invalid double format.");
+        }
+
+        double doubleValue = Double.parseDouble(value);
+        if (doubleValue < 0) {
+            throw new InvalidInputException("Value must be a positive double.");
+        }
+    }
 
     // Validate positive integer within range from String
     public static void validateIntegerRange(String value, int min, int max) throws InvalidInputException {
