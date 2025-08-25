@@ -250,7 +250,12 @@ public class CSVLoader {
                     // Collected
                     boolean collected = Boolean.parseBoolean(values[5].trim());
                     
-                    Consultation consult = consultManager.getConsultRec(values[6], line);
+                    Consultation consult = consultManager.getConsultRec(values[6], doctor.getID());
+                    
+                    if(consult == null){
+                        System.err.println("Consult Record not found: " + values[6]);
+                        continue;
+                    }
 
                     // Create MedRecord and add to list
                     MedRecord record = new MedRecord(patient, doctor, medicine, quantity, dateTime, collected, consult);
