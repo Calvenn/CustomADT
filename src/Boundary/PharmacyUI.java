@@ -30,9 +30,9 @@ public class PharmacyUI {
             System.out.println("=========================");
             System.out.println("      Pharmacy Menu      ");
             System.out.println("=========================");
-            System.out.println("2. View all medicines");
-            System.out.println("3. View medicine record");
-            System.out.println("4. Pharmacy Report");
+            System.out.println("1. View all medicines");
+            System.out.println("2. View medicine record");
+            System.out.println("3. Pharmacy Report");
             System.out.println("0. Back");
             System.out.println("=========================");
             System.out.print("Enter choice: ");
@@ -163,7 +163,8 @@ public class PharmacyUI {
                                 collectMed.getDoctor(),
                                 med,
                                 collectMed.getQuantityTaken(),
-                                toSave
+                                toSave,
+                                collectMed.getConsult()
                         );
 
                         System.out.println("Medicine dispensed and record saved!");

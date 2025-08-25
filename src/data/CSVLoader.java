@@ -4,6 +4,7 @@
  */
 package data;
 
+import Control.ConsultationManager;
 import Control.DoctorManager;
 import Control.StaffManager;
 import Control.MedicineControl;
@@ -208,7 +209,7 @@ public class CSVLoader {
         }
     }
     
-     public static void loadMedRecordFromCSV(String filePath, PatientManager patientManager, DoctorManager docManager, MedicineControl medControl, List<MedRecord> medRecList) {
+     public static void loadMedRecordFromCSV(String filePath, PatientManager patientManager, DoctorManager docManager, MedicineControl medControl, List<MedRecord> medRecList, ConsultationManager consultManager) {
          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -247,9 +248,11 @@ public class CSVLoader {
 
                     // Collected
                     boolean collected = Boolean.parseBoolean(values[5].trim());
+                    
+                    Consultation consult = consultManager.getConsultRec(values[6], line);
 
                     // Create MedRecord and add to list
-                    MedRecord record = new MedRecord(patient, doctor, medicine, quantity, dateTime, collected);
+                    MedRecord record = new MedRecord(patient, doctor, medicine, quantity, dateTime, collected, consult);
                     medRecList.add(record);
 
                 } catch (Exception e) {
