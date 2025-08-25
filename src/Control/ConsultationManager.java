@@ -10,6 +10,7 @@ import Entity.Consultation;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.Payment;
 import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
@@ -31,22 +32,19 @@ public class ConsultationManager {
     
     private final Heap<Appointment> appointmentHeap;
     private final Heap<Visit> queue;
-    
-    private final Queue<TreatmentAppointment> treatmentQueue;
-    private final Queue<MedRecord> medCollectQueue;
-    
     private final LinkedHashMap<String, List<Consultation>> consultLog;
     
     private static Consultation newConsult = null;
     private final AppointmentManager apptManager;
+    private final List<Payment> paymentRec;
     
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue, AppointmentManager apptManager) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, AppointmentManager apptManager, List<Payment> payment) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultLog = consultLog;
-        this.treatmentQueue = treatmentQueue;
-        this.medCollectQueue = medCollectQueue;
         this.apptManager = apptManager;
+        this.paymentRec = payment;
+        
     }
 
     public Object dispatchNextPatient() {
@@ -103,8 +101,7 @@ public class ConsultationManager {
         }     
         
         TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
-        treatmentQueue.enqueue(trtAppt);
-        treatmentQueue.display();
+        //toPayment(newConsult.getPatient(), Payment.consultPrice + trtAppt.getPrice() , trtAppt, null); wait csv update
         return true;
     }
     
@@ -115,7 +112,13 @@ public class ConsultationManager {
 
         boolean toSaveRec = false;
         MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec, newConsult);
-        medCollectQueue.enqueue(medCollect);
+        toPayment(patient, Payment.consultPrice + med.getPrice(), null, medCollect);
+        return true;
+    }
+    
+    public boolean toPayment(Patient patient, double price, TreatmentAppointment trtAppt, MedRecord medCollect){
+        Payment payment = new Payment(patient, newConsult, price, false, trtAppt, medCollect);
+        paymentRec.add(payment);
         return true;
     }
     
@@ -165,7 +168,7 @@ public class ConsultationManager {
 
         for (int i = 1; i <= consultations.size(); i++) {
             Consultation c = consultations.get(i);
-            if (c.getPatient().getPatientIC().equals(id)) {
+            if (c.getID().equals(id)) {
                 found = c;
             }
         }

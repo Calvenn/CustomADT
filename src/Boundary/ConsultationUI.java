@@ -13,6 +13,7 @@ import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.Payment;
 import Entity.Severity;
 import Entity.Staff;
 import Entity.Visit;
@@ -212,22 +213,22 @@ public class ConsultationUI {
 
                         if (isToPharmacy()) {
                             toPharmacyUI(currentDoc, patient, diagnosis);
-                            Consultation.numOfPharmacy++;
                         }
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(patient,currentDoc, severity, diagnosis);
-                        Consultation.numOfTreatment++;
+                        toTreatmentUI(patient,currentDoc, severity, diagnosis);                        
                         return;
                     }
                     case 3 -> {
                         toPharmacyUI(currentDoc, patient, diagnosis);
-                        Consultation.numOfPharmacy++;
                         return;
                     }
                     case 4 -> {
                         System.out.println("Done.");
+                        if(consultManager.toPayment(patient, Payment.consultPrice ,null, null)){
+                            System.out.println("Thank you. Please ask patient made payment on counter.");
+                        }
                         return;
                     }
                     default -> System.out.println("Please choose a valid option (1-4).");
@@ -270,7 +271,7 @@ public class ConsultationUI {
 
             LocalDateTime time = LocalDateTime.now();
             if (consultManager.toTreatment(doc, selected, room, time, severity)) {
-                System.out.println("Treatment recorded.");
+                System.out.println("Treatment recorded. Please ask patient made payment at counter.");
                 break;
             } else {
                 System.out.println("Missing required information for treatment appointment.");
@@ -311,7 +312,7 @@ public class ConsultationUI {
 
             LocalDateTime time = LocalDateTime.now();
             if (consultManager.toPharmacy(doc, patient, selected, qty, time)) {
-                System.out.println("Medicine collection recorded. Please collect the medicine at counter.");
+                System.out.println("Medicine collection recorded. Please ask patient made payment at counter.");
                 break;
             } else {
                 System.out.println("Missing data for medicine dispensing.");

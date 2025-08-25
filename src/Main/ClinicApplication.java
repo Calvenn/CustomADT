@@ -30,6 +30,7 @@ public class ClinicApplication {
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
     private final LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
+    private final List<Payment> paymentRec = new List<>();
 
     // Control Layer
     private final PatientManager patientManager;
@@ -45,6 +46,7 @@ public class ClinicApplication {
     private final MedRecordControl medRecControl;
     private final PharmacyReport pharReport;
     private final VisitHistoryManager historyManager;
+    private final PaymentManager paymentManager;
 
     // UI Layer
     private final ConsultationUI consultUI;
@@ -55,6 +57,7 @@ public class ClinicApplication {
     private final TreatmentUI treatmentUI;
     private final TreatmentApptUI treatmentApptUI;
     private final PharmacyUI pharUI;
+    private final PaymentUI payUI;
 
     public ClinicApplication() {
         // wire dependencies
@@ -65,12 +68,13 @@ public class ClinicApplication {
         queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue, apptManager.getAppointmentHeap(),
-        docManager, consultLog, treatmentQueue, medCollectQueue, apptManager);
+        docManager, consultLog,apptManager, paymentRec);
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
         treatmentApptManager = new TreatmentApptManager();
         medControl = new MedicineControl(medMap);
         medRecControl = new MedRecordControl(medRecList);
+        paymentManager = new PaymentManager(paymentRec, treatmentQueue, medCollectQueue);
 
         consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
@@ -79,8 +83,9 @@ public class ClinicApplication {
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
+        payUI = new PaymentUI(paymentManager);
         staffLogin = new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI, treatmentUI, pharUI, patientUI, staffUI);
-        staffLoginTest = new StaffLoginTest(queueManager, staffManager, consultUI, treatmentUI, pharUI, patientUI, staffUI); 
+        staffLoginTest = new StaffLoginTest(queueManager, staffManager, consultUI, treatmentUI, pharUI, patientUI, staffUI, payUI); 
     }
     
     public void runTest(){

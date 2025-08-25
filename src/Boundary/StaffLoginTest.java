@@ -30,12 +30,14 @@ public class StaffLoginTest {
     private final PharmacyUI pharUI;
     private final PatientManagementUI patientUI;
     private final StaffManagementUI staffUI;
+    private final PaymentUI payUI;
+    
     
     public String login;        // Used to identify the position type logging in
     public String currID;       // Temporal field for storing ID
     
     // Constructor
-    public StaffLoginTest(QueueManager queueManager, StaffManager staffManager, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI) {
+    public StaffLoginTest(QueueManager queueManager, StaffManager staffManager, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, PaymentUI payUI) {
         this.queueManager = queueManager;
         this.staffManager = staffManager;
         this.consultUI = consultUI;
@@ -43,6 +45,7 @@ public class StaffLoginTest {
         this.pharUI = pharUI;
         this.patientUI = patientUI;
         this.staffUI = staffUI;
+        this.payUI = payUI;
         this.scanner = new Scanner(System.in);
     }
                                            
@@ -86,14 +89,14 @@ public class StaffLoginTest {
         
         if(!checkLogin(id, password)) return;
         System.out.print(login);
-        staffLogin(queueManager, consultUI, treatmentUI, pharUI, patientUI, staffUI);
+        staffLogin(queueManager, consultUI, treatmentUI, pharUI, patientUI, staffUI, payUI);
     }
 
    // HELPER FUNCTION
     // Login Menu Navigator
-    public void staffLogin(QueueManager queueManager,ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI){
+    public void staffLogin(QueueManager queueManager,ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, PaymentUI payUI){
         switch(login){
-            case "ADMIN" -> adminMenu(currID, consultUI, treatmentUI, pharUI, patientUI, staffUI, queueManager);
+            case "ADMIN" -> adminMenu(currID, consultUI, treatmentUI, pharUI, patientUI, staffUI, queueManager, payUI);
             case "DOCTOR" -> doctorMenu(currID, consultUI, treatmentUI, pharUI, staffUI, queueManager);
             case "NURSE" -> nurseMenu(currID, consultUI, pharUI, patientUI, staffUI, queueManager);
         }           
@@ -126,7 +129,7 @@ public class StaffLoginTest {
     }
     
     // Menu for ADMIN
-    public void adminMenu(String userID, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, QueueManager queueManager){
+    public void adminMenu(String userID, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, QueueManager queueManager, PaymentUI payUI){
         while (true){ // Repeat the step if the user input invalid choice
             queueManager.loadVisit();
             printTitle("DOCTOR", staffManager.findStaff(userID).getName());
@@ -134,7 +137,8 @@ public class StaffLoginTest {
             System.out.println("2. Treatment System"); //read only??
             System.out.println("3. Pharmacy System (Read-Only)");
             System.out.println("4. Patient Registration System");
-            System.out.println("5. Staff Management System");
+            System.out.println("5. Payment System");
+            System.out.println("6. Staff Management System");
             System.out.println("0. Log Out");   
             System.out.println("===============================");
             
@@ -146,7 +150,8 @@ public class StaffLoginTest {
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
                 case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
                 case 4 -> patientUI.patientMenu();
-                case 5 -> staffUI.staffMenu(); // Staff Management System
+                case 5 -> payUI.paymentMenu();
+                case 6 -> staffUI.staffMenu(); // Staff Management System
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
