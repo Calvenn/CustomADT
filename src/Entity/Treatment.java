@@ -6,37 +6,26 @@ public class Treatment implements Comparable<Treatment> {
     private String name; 
     private String description; 
     private Duration duration; 
+    private double price;
     private int frequency; 
     
     private static int count = 0; 
     
-//    private static String[] treatments = {
-//        "X-ray", 
-//        "Blood test", 
-//        "Urine test", 
-//        "Vaccination",
-//        "Physical therapy", 
-//        "Ultrasound", 
-//        "Allergic test", 
-//        "Wound care", 
-//        "IV Fluid therapy", 
-//        "Nebuliser", 
-//        "Cryotherapy", 
-//    }; 
-    
-    public Treatment(String name, String description, Duration duration) {
+    public Treatment(String name, String description, Duration duration, double price) {
         this.treatmentId = String.format("T%04d", generateId());
         this.name = name; 
         this.description = description; 
         this.duration = duration; 
+        this.price = price; 
         this.frequency = 0; 
     }
     
-    public Treatment(String name, String description, Duration duration, int frequency) {
+    public Treatment(String name, String description, Duration duration, double price, int frequency) {
         this.treatmentId = String.format("T%04d", generateId());
         this.name = name; 
         this.description = description; 
         this.duration = duration; 
+        this.price = price;
         this.frequency = frequency; 
     }
     
@@ -60,6 +49,10 @@ public class Treatment implements Comparable<Treatment> {
         return duration; 
     }
     
+    public double getPrice() {
+        return price; 
+    }
+    
     public int getFrequency() {
         return frequency; 
     }
@@ -74,6 +67,10 @@ public class Treatment implements Comparable<Treatment> {
     
     public void setDuration(Duration duration) {
         this.duration = duration; 
+    }
+    
+    public void setPrice(Double price) {
+        this.price = price; 
     }
     
     public void doneTreatment() {
@@ -97,8 +94,9 @@ public class Treatment implements Comparable<Treatment> {
                              Treatment Name: %s
                              Description: %s 
                              Duration: %s minutes
+                             Price: RM %,.02f
                              Frequency: %d
                              """, 
-                treatmentId, name, description, duration.toMinutes(), frequency); 
+                treatmentId, name, description, duration.toMinutes(), price, frequency); 
     }
 }

@@ -25,7 +25,7 @@ public class ClinicApplication {
     private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
     private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
-    private final Heap<Appointment> treatmentAppointment = new Heap<>(true);
+    private final LinkedHashMap<String, TreatmentAppointment> trtApptHistory = new LinkedHashMap<>();
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
@@ -71,7 +71,7 @@ public class ClinicApplication {
         docManager, consultLog,apptManager, paymentRec);
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
-        treatmentApptManager = new TreatmentApptManager();
+        treatmentApptManager = new TreatmentApptManager(trtApptHistory);
         medControl = new MedicineControl(medMap);
         medRecControl = new MedRecordControl(medRecList);
         paymentManager = new PaymentManager(paymentRec, treatmentQueue, medCollectQueue);
