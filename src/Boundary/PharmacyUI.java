@@ -362,7 +362,7 @@ public class PharmacyUI {
             String priceInput = scanner.nextLine().trim();
             double price = 0;
             try {
-                TryCatchThrowFromFile.validatePositiveInteger(priceInput);
+                TryCatchThrowFromFile.validatePositiveDouble(priceInput);
                 price = Double.parseDouble(priceInput);
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e);
