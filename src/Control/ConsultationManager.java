@@ -51,7 +51,6 @@ public class ConsultationManager {
 
     public Object dispatchNextPatient() {
         int severity = -1;
-        System.out.println(queue.size());
         Appointment nextAppt = appointmentHeap.peekRoot();
         Visit nextWalkIn = queue.peekRoot();  
         
@@ -76,10 +75,8 @@ public class ConsultationManager {
         System.out.println(nextWalkIn);
         
         if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > severity) {
-            System.out.println("Visit queue extracted");
             return queue.extractRoot();
         } else {
-            System.out.println("Appt queue extracted");
             return appointmentHeap.extractRoot();  // Extract appointment otherwise           
         }
     }   
@@ -101,26 +98,21 @@ public class ConsultationManager {
     }
     
     public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
-        if (doc == null || treatment == null || room == null || time == null || sev == null) {
-            System.out.println("Missing required information for treatment appointment.");
+        if (doc == null || treatment == null || room == null || time == null || sev == null) {  
             return false;
         }     
         
         TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
         treatmentQueue.enqueue(trtAppt);
+        treatmentQueue.display();
         return true;
     }
     
     public boolean toPharmacy(Doctor doc, Patient patient, Medicine med, int qty, LocalDateTime time){
         if (doc == null || patient == null || med == null || time == null) {
-            System.out.println("Missing data for medicine dispensing.");
             return false;
         }
-        
-        if (qty <= 0) {
-            System.out.println("Quantity must be greater than 0.");
-            return false;
-        }
+
         boolean toSaveRec = false;
         MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec);
         medCollectQueue.enqueue(medCollect);

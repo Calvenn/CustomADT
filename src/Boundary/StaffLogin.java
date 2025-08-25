@@ -312,7 +312,7 @@ public class StaffLogin extends javax.swing.JFrame {
                 case 1 -> {                 
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
-                    consultUI.consultMainMenu(); }// Consultation System
+                    consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
                 case 3 -> pharUI.pharmacyMenu(); // Pharmacy System (READ_ONLY)
                 case 4 -> patientUI.patientMenu();
@@ -344,7 +344,7 @@ public class StaffLogin extends javax.swing.JFrame {
                 case 1 -> {                 
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
-                    consultUI.consultMainMenu(); }// Consultation System
+                    consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
                 case 3 -> pharUI.pharmacyMenu(); // Pharmacy System (READ_ONLY)
                 case 4 -> staffUI.staffMenu(); // Staff Management System
@@ -376,7 +376,7 @@ public class StaffLogin extends javax.swing.JFrame {
                 case 1 -> {                 
                     System.out.println("Treatment queue: " + treatmentQueue.size());
                     System.out.println("Med Collection queue: " + medCollectQueue.size());
-                    consultUI.consultMainMenu(); }// Consultation System
+                    consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> pharUI.pharmacyMenu(); // Pharmacy System 
                 case 3 -> patientUI.patientMenu();
                 case 4 -> staffUI.staffMenu(); // Staff Management System

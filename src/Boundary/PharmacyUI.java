@@ -24,6 +24,35 @@ public class PharmacyUI {
         this.pharReport = pharReport;
     }
     
+    public void pharmacyMenuRead(){
+        int choice;
+        do{
+            System.out.println("=========================");
+            System.out.println("      Pharmacy Menu      ");
+            System.out.println("=========================");
+            System.out.println("2. View all medicines");
+            System.out.println("3. View medicine record");
+            System.out.println("4. Pharmacy Report");
+            System.out.println("0. Back");
+            System.out.println("=========================");
+            System.out.print("Enter choice: ");
+
+            choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
+
+            switch (choice) {
+                case 1 -> {medControl.displayAllMedicines();pressEnterToContinue();}
+
+                case 2 -> viewRecord();
+                
+                case 3 -> pharReport();
+
+                case 0 -> {System.out.println("Returning to main menu...");return;}
+
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }while(choice!=0);
+    }
+    
     public void pharmacyMenu(){
         int choice;
         do{
@@ -31,7 +60,7 @@ public class PharmacyUI {
             System.out.println("      Pharmacy Menu      ");
             System.out.println("=========================");
             System.out.println("1. Dispense medicine");
-            System.out.println("2. Medicine management");
+            System.out.println("2. Medicine Management");
             System.out.println("3. View medicine record");
             System.out.println("4. Pharmacy Report");
             System.out.println("0. Back");
