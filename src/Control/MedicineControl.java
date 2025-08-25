@@ -1,6 +1,7 @@
 package Control;
 import Entity.Medicine;
 import adt.LinkedHashMap;
+import adt.List;
 
 public class MedicineControl {
     private LinkedHashMap<String,Medicine> medMap;
@@ -113,6 +114,37 @@ public class MedicineControl {
             medList.add((Medicine) obj);
         }
         return medList;
+    }
+    
+    public List<String> suggestedMeds(String symptoms) {
+        String[][] medicines = {
+            {"Panadol", "fever", "headache", "pain"},
+            {"Amoxicillin", "infection", "bacteria", "throat infection"},
+            {"Vitamin C", "immunity", "cold", "flu"},
+            {"Loratadine", "allergy", "itchy", "runny nose", "sneeze"},
+            {"Omeprazole", "acid", "stomach", "reflux", "heartburn"},
+            {"Paracetamol", "pain", "fever"},
+            {"Ibuprofen", "inflammation", "swelling", "pain"},
+            {"Salbutamol", "asthma", "shortness of breath", "wheezing"},
+            {"Aspirin", "blood clot", "chest pain", "heart", "stroke"},
+            {"Metformin", "diabetes", "sugar", "glucose"}
+        };
+
+        List<String> suggested = new List<>();
+        String lowerSymptoms = symptoms.toLowerCase();
+
+        for (String[] med : medicines) {
+            String medName = med[0];
+            for (int i = 1; i < med.length; i++) {
+                if (lowerSymptoms.contains(med[i].toLowerCase())) {
+                    if (!suggested.contains(medName)) {
+                        suggested.add(medName);
+                    }
+                }
+            }
+        }
+
+        return suggested;
     }
 }
 

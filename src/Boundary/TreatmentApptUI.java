@@ -1,5 +1,6 @@
 package Boundary;
 import Control.TreatmentApptManager;
+import adt.List;
 import exception.InvalidInputException;
 import exception.TryCatchThrowFromFile;
 import exception.ValidationUtility;
@@ -126,6 +127,37 @@ public class TreatmentApptUI {
             }
             if(input.charAt(0) == 'n') return; 
         }
+    }
+    
+    public List<String> suggestedTrt(String symptoms) {
+        List<String> trtType = new List<>();
+        String input = symptoms.toLowerCase();
+
+        if (input.contains("fever") || input.contains("fatigue")) {
+            trtType.add("Blood test");
+            trtType.add("Urine test");
+        } else if (input.contains("cough") || input.contains("shortness of breath")) {
+            trtType.add("X-ray");
+            trtType.add("Nebuliser");
+        } else if (input.contains("allergy") || input.contains("rash")) {
+            trtType.add("Allergy test");
+            trtType.add("Cryotherapy");
+        } else if (input.contains("injury") || input.contains("wound")) {
+            trtType.add("Wound care");
+            trtType.add("Physical therapy");
+        } else if (input.contains("vision problem") || input.contains("blurred vision")) {
+            trtType.add("Eye Examination");
+        } else if (input.contains("dehydration")) {
+            trtType.add("IV Fluid therapy");
+        } else if (input.contains("pregnancy")) {
+            trtType.add("Ultrasound");
+        } else if (input.contains("vaccination") || input.contains("flu prevention")) {
+            trtType.add("Vaccination");
+        } else {
+            trtType.add("General checkup");
+        }
+
+        return trtType;
     }
     
 }
