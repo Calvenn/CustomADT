@@ -8,7 +8,6 @@ import Entity.Medicine;
 import adt.List;
 import adt.LinkedHashMap;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class PharmacyReport {
     private final List<MedRecord> medRecList;
@@ -67,53 +66,37 @@ public class PharmacyReport {
 
 
 
-    public void generateMonthlyTrendsReport() {
-        System.out.println("\n=== Monthly Medicine Trends ===");
+    public void generateRevenueReport() {
+        System.out.println("\n=== Medicine Revenue Report ===");
 
         if (medRecList.isEmpty()) {
             System.out.println("No medicine records available.");
             return;
         }
 
-        // Month -> (Medicine -> total dispensed)
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> monthMap = new LinkedHashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
+        double totalRevenue = 0;
+        LinkedHashMap<String, Double> medRevenue = new LinkedHashMap<>();
 
         for (int i = 1; i <= medRecList.size(); i++) {
             MedRecord rec = medRecList.get(i);
-            String month = rec.getTimestamp().format(formatter);
-            String medName = rec.getMed().getName();
+            Medicine med = rec.getMed();
+            double revenue = rec.getQuantityTaken() * med.getPrice();
 
-            if (!monthMap.containsKey(month)) {
-                monthMap.put(month, new LinkedHashMap<>());
-            }
-
-            LinkedHashMap<String, Integer> medMap = monthMap.get(month);
-            int current = medMap.containsKey(medName) ? medMap.get(medName) : 0;
-            medMap.put(medName, current + rec.getQuantityTaken());
+            double current = medRevenue.containsKey(med.getName()) ? medRevenue.get(med.getName()) : 0;
+            medRevenue.put(med.getName(), current + revenue);
+            totalRevenue += revenue;
         }
 
-        // Step 2: Print monthly top medicine
-        for (Object obj : monthMap.getKeys()) {
-            String month = (String) obj;
-            LinkedHashMap<String, Integer> medMap = monthMap.get(month);
-
-            String topMed = "";
-            int max = 0;
-
-            for (Object medObj : medMap.getKeys()) {
-                String medName = (String) medObj;
-                int qty = medMap.get(medName);
-
-                if (qty > max) {
-                    max = qty;
-                    topMed = medName;
-                }
-            }
-
-            System.out.printf("%-10s -> %-20s (%d)%n", month, topMed, max);
+        System.out.println("Per-Medicine Revenue:");
+        for (Object obj : medRevenue.getKeys()) {
+            String medName = (String) obj;
+            double revenue = medRevenue.get(medName);
+            System.out.printf(" - %-20s : RM %.2f%n", medName, revenue);
         }
+
+        System.out.printf("\nTotal Revenue: RM %.2f%n", totalRevenue);
     }
+
 
    
     public void generateMedicineDispenseSummary() {

@@ -199,8 +199,9 @@ public class CSVLoader {
                 String name = values[1].trim();
                 String desc = values[2].trim();
                 int stock = Integer.parseInt(values[3].trim());
+                double price = Double.parseDouble(values[4].trim());
 
-                medControl.addMedicine(new Medicine(id, name.toLowerCase(), desc, stock));
+                medControl.addMedicine(new Medicine(id, name.toLowerCase(), desc, stock, price));
             }
 
         } catch (IOException e) {
