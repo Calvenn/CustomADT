@@ -25,6 +25,25 @@ public class MedicineControl {
         }
         return false;
     }
+    
+    public boolean updateMedicineName(String medID, String newName) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setName(newName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateMedicineDesc(String medID, String newDesc) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setDesc(newDesc);
+            return true;
+        }
+        return false;
+    }
+
 
     public boolean removeMedicine(String medID) {//
         return medMap.remove(medID) != null;

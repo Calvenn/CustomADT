@@ -7,6 +7,7 @@ import Entity.MedRecord;
 import Entity.Medicine;
 import adt.List;
 import adt.LinkedHashMap;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class PharmacyReport {
@@ -18,44 +19,52 @@ public class PharmacyReport {
         this.medMap = medMap;
     }
     
-    public void generateInactiveMedicinesReport() {
-        System.out.println("\n=== Inactive Medicines ===");
+    public void generateLowUsageMedicinesReport(int threshold, int days) {
+        System.out.println("\n=== Low Usage Medicines (Usage < " + threshold +
+                           " in last " + days + " days) ===");
 
         if (medMap.isEmpty()) {
             System.out.println("No medicines available.");
             return;
         }
 
-        // Step 1: Mark all medicines as "not dispensed"
-        LinkedHashMap<String, Boolean> dispensedMap = new LinkedHashMap<>();
-        Object[] medKeys = medMap.getKeys();
-        for (Object obj : medKeys) {
-            String medID = (String) obj;
-            dispensedMap.put(medID, false);
+        LinkedHashMap<String, Integer> usageMap = new LinkedHashMap<>();
+        for (Object obj : medMap.getKeys()) {
+            usageMap.put((String) obj, 0);
         }
-
-        // Step 2: Mark medicines that were actually dispensed
+        
+        LocalDateTime now = LocalDateTime.now();
         for (int i = 1; i <= medRecList.size(); i++) {
             MedRecord rec = medRecList.get(i);
-            dispensedMap.put(rec.getMed().getMedID(), true);
-        }
+            String medID = rec.getMed().getMedID();
 
-        // Step 3: Print inactive medicines from medMap
-        boolean foundInactive = false;
-        for (Object obj : medKeys) {
-            String medID = (String) obj;
-            if (!dispensedMap.get(medID)) {
-                Medicine med = medMap.get(medID);
-                System.out.printf("MedID: %-5s -> %s (0 dispense records)%n", 
-                                   med.getMedID(), med.getName());
-                foundInactive = true;
+            // convert difference in seconds, then to days
+            long secondsDiff = java.time.Duration.between(rec.getTimestamp(), now).getSeconds();
+            long daysAgo = secondsDiff / (60 * 60 * 24);
+
+            if (daysAgo <= days) {
+                usageMap.put(medID, usageMap.get(medID) + rec.getQuantityTaken());
             }
         }
 
-        if (!foundInactive) {
-            System.out.println("All medicines have been dispensed at least once.");
+        boolean foundLowUsage = false;
+        for (Object obj : medMap.getKeys()) {
+            String medID = (String) obj;
+            int totalDispensed = usageMap.get(medID);
+
+            if (totalDispensed < threshold) {
+                Medicine med = medMap.get(medID);
+                System.out.printf("MedID: %-5s -> %-20s | Dispensed: %d in last %d days%n",
+                                   med.getMedID(), med.getName(), totalDispensed, days);
+                foundLowUsage = true;
+            }
+        }
+
+        if (!foundLowUsage) {
+            System.out.println("All medicines meet the usage threshold in the last " + days + " days.");
         }
     }
+
 
 
     public void generateMonthlyTrendsReport() {
@@ -70,7 +79,6 @@ public class PharmacyReport {
         LinkedHashMap<String, LinkedHashMap<String, Integer>> monthMap = new LinkedHashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
 
-        // Step 1: Aggregate by month and medicine
         for (int i = 1; i <= medRecList.size(); i++) {
             MedRecord rec = medRecList.get(i);
             String month = rec.getTimestamp().format(formatter);
@@ -119,6 +127,7 @@ public class PharmacyReport {
         // Step 1: Aggregate totals
         LinkedHashMap<String, Integer> summaryMap = new LinkedHashMap<>();
         int maxDispensed = 0;
+        int grandTotal = 0; // to calculate percentages
 
         for (int i = 1; i <= medRecList.size(); i++) {
             MedRecord rec = medRecList.get(i);
@@ -132,10 +141,11 @@ public class PharmacyReport {
             if (newTotal > maxDispensed) {
                 maxDispensed = newTotal;
             }
+
+            grandTotal += rec.getQuantityTaken();
         }
 
         Object[] keys = summaryMap.getKeys();
-
 
         // Scale: print ruler in steps of 5
         System.out.print("       ");
@@ -154,15 +164,19 @@ public class PharmacyReport {
                 bar.append("#");
             }
 
-            System.out.printf("%-6s | %-25s (%d)%n", medID, bar.toString(), totalDispensed);
+            // Calculate percentage
+            double percentage = (totalDispensed * 100.0) / grandTotal;
+
+            System.out.printf("%-6s | %-40s (%d) %.2f%%%n",
+                    medID, bar.toString(), totalDispensed, percentage);
         }
 
         // Step 3: Display Table Summary
-        System.out.println("===========================================================");
+        System.out.println("================================================================================");
         System.out.println("                     Tabular Summary                       ");
-        System.out.println("===========================================================");
-        System.out.printf("%-15s %-25s %-15s%n", "Medicine ID", "Medicine Name", "Total Dispensed");
-        System.out.println("===========================================================");
+        System.out.println("================================================================================");
+        System.out.printf("%-15s %-25s %-20s %-15s%n", "Medicine ID", "Medicine Name", "Total Dispensed", "Percentage");
+        System.out.println("================================================================================");
 
         for (Object obj : keys) {
             String medID = (String) obj;
@@ -177,7 +191,12 @@ public class PharmacyReport {
                 }
             }
 
-            System.out.printf("%-15s %-25s %-15d%n", medID, medName, totalDispensed);
+            double percentage = (totalDispensed * 100.0) / grandTotal;
+
+            System.out.printf("%-15s %-25s %-20d %.2f%%%n",
+                    medID, medName, totalDispensed, percentage);
         }
     }
+
+    
 }
