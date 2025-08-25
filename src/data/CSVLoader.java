@@ -9,6 +9,7 @@ import Control.StaffManager;
 import Control.MedicineControl;
 import Control.PatientManager;
 import Control.TreatmentManager;
+import Control.TreatmentApptManager;
 import Entity.Consultation;
 import Entity.Doctor;
 import Entity.Staff;
@@ -16,6 +17,7 @@ import Entity.Staff.Position;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.Treatment;
 import adt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -279,12 +281,13 @@ public class CSVLoader {
                 String treatmentName = values[0].trim();
                 String description = values[1].trim();
                 String durationStr = values[2].trim(); // e.g., PT30M
-                int frequency = Integer.parseInt(values[3].trim());
+                double price = Double.parseDouble(values[3].trim());
+                int frequency = Integer.parseInt(values[4].trim());
 
                 // Convert ISO-8601 duration string to Duration
                 Duration duration = Duration.parse(durationStr);
 
-                trtManager.newTreatment(treatmentName, description, duration, frequency);
+                trtManager.newTreatment(treatmentName, description, duration, price, frequency);
             }
 
         } catch (Exception e) {
@@ -292,4 +295,39 @@ public class CSVLoader {
         }
     }
 
+     public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) { // Skip header line
+                    isHeader = false;
+                    continue;
+                }
+
+                // Split by comma, handle quotes if needed
+                String[] values = line.split(",");
+
+                Doctor doctor = docManager.findDoctor(values[1].trim());
+                
+                String consultId = values[2].trim();
+                //Consult consult = consultManager.findConsult(values[2].trim(););
+                
+                Treatment treatment = trtManager.findTreatmentName(values[3].trim());
+                
+                String room = values[4].trim(); 
+                LocalDateTime apptTime = LocalDate.parse(values[5].trim(), formatter).atStartOfDay();
+                LocalDateTime createdAt = LocalDate.parse(values[6].trim(), formatter).atStartOfDay();
+                
+                //need find consult 
+//                trtApptManager.newTreatmentApptHist(doctor, consult, treatment, room, apptTime, createdAt);
+                
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+     }
 }

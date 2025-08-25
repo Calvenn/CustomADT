@@ -28,6 +28,7 @@ public class TreatmentUI {
     
     private void printTitle(String text, int length) {
         int center = (length + text.length()) / 2; 
+        System.out.println();
         System.out.println("=".repeat(length)); 
         System.out.printf("%" + center + "s\n", text); 
         System.out.println("=".repeat(length)); 
@@ -73,7 +74,10 @@ public class TreatmentUI {
     
     public void showTreatmentsUI() {
         printTitle("Treatments List", 35);
-        treatmentManager.displayAllTreatments(); 
+        Treatment[] treatments = treatmentManager.displayAllTreatments(); 
+        for(Treatment trt : treatments) {
+            System.out.println(trt);
+        }
         System.out.println("Enter to return..."); 
         scanner.nextLine(); 
     }
@@ -147,14 +151,31 @@ public class TreatmentUI {
         return Duration.ofMinutes(Integer.parseInt(duration)); 
     }
     
+    private double inputPrice() {
+        String price; 
+        while(true) {
+            System.out.print("Price (RM): ");
+            price = scanner.nextLine();
+
+            try {
+                TryCatchThrowFromFile.validatePrice(price);
+                break; 
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e); 
+            }
+        }
+        return Double.parseDouble(price); 
+    }
+    
     public void addTreatmentUI() {
         printTitle("Add Treatment", 35);
         
         String name = inputName(); 
         String description = inputDescription(); 
         Duration duration = inputDuration(); 
+        double price = inputPrice();
 
-        treatmentManager.newTreatment(name, description, duration); 
+        treatmentManager.newTreatment(name, description, duration, price); 
     }
     
     public Treatment searchForTreatment() {
@@ -206,41 +227,69 @@ public class TreatmentUI {
                 return; 
             }
             
+            System.out.println("=".repeat(20));
+            System.out.println("Treatment found!");
+            
             System.out.println(treatment); 
             
             String input; 
             
             System.out.println("Select field to modify: "); 
             System.out.println("1. Description"); 
-            System.out.println("2. Duration"); 
-            System.out.println("3. Back"); 
+            System.out.println("2. Duration");
+            System.out.println("3. Price");
+            System.out.println("4. Back"); 
             
             while (true) {
                 System.out.print("Choose > "); 
                 input = scanner.nextLine(); 
                 try {
-                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 3);
+                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 4);
                     break; 
                 } catch(InvalidInputException e) {
                     ValidationUtility.printErrorWithSolution(e);
                 }
             }
-            
+            System.out.println();
             try {
                 switch(Integer.parseInt(input)) {
                     case 1 -> {
-                        if(!treatmentManager.changeDescription(treatment, inputDescription())) {
-                            throw new InvalidInputException("No changes made due to same data.");
+                        String newDescription = inputDescription();
+                        String oldDescription = treatment.getDescription();
+                        if(confirmChange(oldDescription, newDescription)) {
+                            if(!treatmentManager.changeDescription(treatment, newDescription)) {
+                                throw new InvalidInputException("No changes made due to same data.");
+                            }
+                        } else {
+                            System.out.println("Cancelled modify description.");
                         }
                         break; 
                     }
                     case 2 -> {
-                        if(!treatmentManager.changeDuration(treatment, inputDuration())) {
-                            throw new InvalidInputException("No changes made due to same data.");
+                        Duration newDuration  = inputDuration();
+                        Duration oldDuration = treatment.getDuration();
+                        if(confirmChange(oldDuration.toMinutes() + " minutes", newDuration.toMinutes() + " minutes")) {
+                            if(!treatmentManager.changeDuration(treatment, newDuration)) {
+                                throw new InvalidInputException("No changes made due to same data.");
+                            }
+                        } else {
+                            System.out.println("Cancelled modify duration.");
                         }
                         break; 
                     }
                     case 3 -> {
+                        double newPrice  = inputPrice();
+                        double oldPrice = treatment.getPrice();
+                        if(confirmChange(String.format("RM %.02f", oldPrice), String.format("RM %.02f", newPrice))) {
+                            if(!treatmentManager.changePrice(treatment, newPrice)) {
+                                throw new InvalidInputException("No changes made due to same data.");
+                            }
+                        } else {
+                            System.out.println("Cancelled modify price.");
+                        }
+                        break; 
+                    }
+                    case 4 -> {
                         break; 
                     }
                 }
@@ -248,13 +297,14 @@ public class TreatmentUI {
                 ValidationUtility.printErrorWithSolution(e); 
             } 
             
-            System.out.println("After changes: "); 
+            printTitle("After Changes", 35);
             System.out.println(treatment); 
             
             char another; 
             while (true) {
                 System.out.print("Modify another treatment? (y/n): "); 
-                another = scanner.nextLine().charAt(0); 
+                another = scanner.next().charAt(0);
+                scanner.nextLine();
                 try {
                     TryCatchThrowFromFile.validateYesOrNo(another);
                     break; 
@@ -269,6 +319,24 @@ public class TreatmentUI {
             }
         }
         
+    }
+    
+    private boolean confirmChange(String before, String after) {
+        printTitle("Confirm Changes",35);
+        System.out.println("Before: " + before); 
+        System.out.println("After: " + after); 
+        char input; 
+        while(true) {
+            System.out.print("Confirm modification? (y/n): "); 
+            input = scanner.next().charAt(0);
+            try {
+                TryCatchThrowFromFile.validateYesOrNo(input);
+                break; 
+            } catch(InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+        return Character.toLowerCase(input) == 'y';
     }
     
     public void deleteTreatmentUI() {

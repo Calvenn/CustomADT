@@ -78,5 +78,18 @@ public class TryCatchThrowFromFile {
         }
         return obj;
     }
+    
+    //validate price 
+    public static void validatePrice(String value) throws InvalidInputException {
+        validateNotNull(value);
+        if (!ValidationUtility.isValidPrice(value)) {
+            throw new InvalidInputException("Invalid price. Must be only numbers with max 2 decimal points.");
+        }
+
+        double priceValue = Double.parseDouble(value);
+        if (priceValue <= 0) {
+            throw new InvalidInputException("Price must be more than zero.");
+        }
+    }
 
 }

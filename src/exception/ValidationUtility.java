@@ -30,6 +30,22 @@ public class ValidationUtility {
         }
     }
 
+    //check if stirng is valid price
+    public static boolean isValidPrice(String value) {
+        if (isNullOrEmpty(value)) return false;
+        try {
+            Double.parseDouble(value);
+            
+            int decimal = value.indexOf('.');
+            if (decimal == -1) {
+                return true; // No decimal point means no fractional part
+            }
+            return value.length() - decimal - 1 <= 2;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
     // Check if string is a valid integer within range
     public static boolean isValidIntegerRange(String value, int min, int max) {
         if (!isValidInteger(value)) return false;
@@ -110,6 +126,10 @@ public class ValidationUtility {
         }
         if (msg.contains ("not found")) {
             return "OBJECT NOT FOUND ERROR";
+        }
+        if (msg.contains ("invalid price entered") || 
+            msg.contains ("price must be more than zero")) {
+            return "PRICE ERROR";
         }
         return "GENERAL ERROR";
     }
