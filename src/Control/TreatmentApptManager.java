@@ -41,9 +41,9 @@ public class TreatmentApptManager {
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
     
-    public TreatmentApptManager() {
+    public TreatmentApptManager(LinkedHashMap<String, TreatmentAppointment> history) {
         treatmentAppointment = new Heap<>(true);
-        history = new LinkedHashMap<>(); 
+        this.history = history;
     }
     
     //ON TREATMENT APPOINTMENT -----------------------------
@@ -87,6 +87,14 @@ public class TreatmentApptManager {
     }
     
     //ON TREATMENT HISTORY -----------------------
-    
+    public boolean newTreatmentApptHist(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, LocalDateTime createdAt) {
+        if(!validDateTime(treatmentTime)) {
+            throw new IllegalArgumentException("Invalid time entered.");
+        }
+        
+        TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, room, treatmentTime, createdAt); 
+        history.put(appt.getAppointmentId(), appt);
+        return true; 
+    }
     
 }

@@ -1,7 +1,7 @@
 ID,Name,Age,Phone,Gender,Position,Department,DateJoined,Password
-D0001,Dr. Brian Lim,25,012-1231234,Male,DOCTOR,Treatment,2025-08-22,hahaha002
-D0002,Dr. Daniel Ong,30,012-1231234,Male,DOCTOR,Treatment,2025-08-22,danii33
-D0003,Dr. Evelyn Chua,25,012-1231234,Female,DOCTOR,Consult,2025-08-22,evelynchacha99
+D0001,Dr. Brian Lim,25,012-1231234,Man,DOCTOR,Treatment,2025-08-22,hahaha002
+D0002,Dr. Daniel Ong,30,012-1231234,Man,DOCTOR,Treatment,2025-08-22,danii33
+D0003,Dr. Evelyn Chua,25,012-1231234,Female,DOCTOR,Consult,2025-08-22,abc123
 D0004,Dr. Marcus Tan,32,012-8765432,Male,DOCTOR,Treatment,2023-05-14,marcus321
 D0005,Dr. Aisha Rahman,29,017-2233445,Female,DOCTOR,Consult,2024-11-02,aishaR29
 D0006,Dr. Kelvin Ong,40,016-9988776,Male,DOCTOR,Consult,2021-07-19,kelvinong40

@@ -10,6 +10,7 @@ import Entity.Consultation;
 import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.Payment;
 import Entity.Severity;
 import Entity.Visit;
 import Entity.Treatment;
@@ -31,22 +32,19 @@ public class ConsultationManager {
     
     private final Heap<Appointment> appointmentHeap;
     private final Heap<Visit> queue;
-    
-    private final Queue<TreatmentAppointment> treatmentQueue;
-    private final Queue<MedRecord> medCollectQueue;
-    
     private final LinkedHashMap<String, List<Consultation>> consultLog;
     
     private static Consultation newConsult = null;
     private final AppointmentManager apptManager;
+    private final List<Payment> paymentRec;
     
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue, AppointmentManager apptManager) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, AppointmentManager apptManager, List<Payment> payment) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultLog = consultLog;
-        this.treatmentQueue = treatmentQueue;
-        this.medCollectQueue = medCollectQueue;
         this.apptManager = apptManager;
+        this.paymentRec = payment;
+        
     }
 
     public Object dispatchNextPatient() {
@@ -103,8 +101,7 @@ public class ConsultationManager {
         }     
         
         TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
-        treatmentQueue.enqueue(trtAppt);
-        treatmentQueue.display();
+        toPayment(newConsult.getPatient(), Payment.consultPrice + treatment.getPrice() , trtAppt, null);
         return true;
     }
     
@@ -114,8 +111,14 @@ public class ConsultationManager {
         }
 
         boolean toSaveRec = false;
-        MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec);
-        medCollectQueue.enqueue(medCollect);
+        MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec, newConsult);
+        toPayment(patient, Payment.consultPrice + (med.getPrice() * qty), null, medCollect);
+        return true;
+    }
+    
+    public boolean toPayment(Patient patient, double price, TreatmentAppointment trtAppt, MedRecord medCollect){
+        Payment payment = new Payment(patient, newConsult, price, false, trtAppt, medCollect);
+        paymentRec.add(payment);
         return true;
     }
     
@@ -156,66 +159,20 @@ public class ConsultationManager {
         return found;
     }
     
-    public List<String> suggestedTrt(String symptoms) {
-        List<String> trtType = new List<>();
-        String input = symptoms.toLowerCase();
-
-        if (input.contains("fever") || input.contains("fatigue")) {
-            trtType.add("Blood test");
-            trtType.add("Urine test");
-        } else if (input.contains("cough") || input.contains("shortness of breath")) {
-            trtType.add("X-ray");
-            trtType.add("Nebuliser");
-        } else if (input.contains("allergy") || input.contains("rash")) {
-            trtType.add("Allergy test");
-            trtType.add("Cryotherapy");
-        } else if (input.contains("injury") || input.contains("wound")) {
-            trtType.add("Wound care");
-            trtType.add("Physical therapy");
-        } else if (input.contains("vision problem") || input.contains("blurred vision")) {
-            trtType.add("Eye Examination");
-        } else if (input.contains("dehydration")) {
-            trtType.add("IV Fluid therapy");
-        } else if (input.contains("pregnancy")) {
-            trtType.add("Ultrasound");
-        } else if (input.contains("vaccination") || input.contains("flu prevention")) {
-            trtType.add("Vaccination");
-        } else {
-            trtType.add("General checkup");
+    public Consultation getConsultRec(String id, String docId) {
+        Consultation found = null;
+        List<Consultation> consultations = consultLog.get(docId);
+        if (consultations == null || consultations.isEmpty()) {
+            return null;
         }
 
-        return trtType;
-    }
-    
-    public List<String> suggestedMeds(String symptoms) {
-        String[][] medicines = {
-            {"Panadol", "fever", "headache", "pain"},
-            {"Amoxicillin", "infection", "bacteria", "throat infection"},
-            {"Vitamin C", "immunity", "cold", "flu"},
-            {"Loratadine", "allergy", "itchy", "runny nose", "sneeze"},
-            {"Omeprazole", "acid", "stomach", "reflux", "heartburn"},
-            {"Paracetamol", "pain", "fever"},
-            {"Ibuprofen", "inflammation", "swelling", "pain"},
-            {"Salbutamol", "asthma", "shortness of breath", "wheezing"},
-            {"Aspirin", "blood clot", "chest pain", "heart", "stroke"},
-            {"Metformin", "diabetes", "sugar", "glucose"}
-        };
-
-        List<String> suggested = new List<>();
-        String lowerSymptoms = symptoms.toLowerCase();
-
-        for (String[] med : medicines) {
-            String medName = med[0];
-            for (int i = 1; i < med.length; i++) {
-                if (lowerSymptoms.contains(med[i].toLowerCase())) {
-                    if (!suggested.contains(medName)) {
-                        suggested.add(medName);
-                    }
-                }
+        for (int i = 1; i <= consultations.size(); i++) {
+            Consultation c = consultations.get(i);
+            if (c.getID().equals(id)) {
+                found = c;
             }
         }
 
-        return suggested;
+        return found;
     }
-
 }

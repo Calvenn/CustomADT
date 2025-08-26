@@ -1,4 +1,5 @@
 package Control;
+import Entity.Consultation;
 import adt.List;
 import Entity.MedRecord;
 import Entity.Medicine;
@@ -17,14 +18,15 @@ public class MedRecordControl {
         this.recList = recList;
     }
     
-    public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken, boolean toSave) {
+    public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken, boolean toSave, Consultation consult) {
         MedRecord record = new MedRecord(
                 patient,
                 doctor,
                 medicine,
                 quantityTaken,
                 LocalDateTime.now(),
-                toSave
+                toSave, 
+                consult
         );
         recList.add(record);
     }

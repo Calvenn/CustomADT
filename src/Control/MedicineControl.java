@@ -25,6 +25,34 @@ public class MedicineControl {
         }
         return false;
     }
+    
+    public boolean updateMedicineName(String medID, String newName) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setName(newName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateMedicineDesc(String medID, String newDesc) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setDesc(newDesc);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean updateMedicinePrice(String medID, double price) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            med.setPrice(price);
+            return true;
+        }
+        return false;
+    }
+
 
     public boolean removeMedicine(String medID) {//
         return medMap.remove(medID) != null;
@@ -37,19 +65,22 @@ public class MedicineControl {
         }
 
         System.out.println("\n=== Medicine List ===");
-        System.out.printf("%-15s %-25s %-40s %-15s%n", "MedID", "Name", "Description", "Stock");
-        System.out.println("==================================================================================================================");
+        System.out.printf("%-15s %-25s %-40s %-15s %-10s%n",
+                "MedID", "Name", "Description", "Stock", "Price (RM)");
+        System.out.println("==============================================================================================================================");
 
         Object[] meds = medMap.getValues();
         for (Object obj : meds) {
             Medicine med = (Medicine) obj;
-            System.out.printf("%-15s %-25s %-40s %-15d%n",
+            System.out.printf("%-15s %-25s %-40s %-15d RM%-9.2f%n",
                     med.getMedID(),
                     med.getName(),
                     med.getDesc(),
-                    med.getStock());
+                    med.getStock(),
+                    med.getPrice());
         }
     }
+
 
     
     public Medicine findMedicineById(String medID) {//
@@ -128,4 +159,3 @@ public class MedicineControl {
         return suggested;
     }
 }
-

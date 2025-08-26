@@ -11,14 +11,16 @@ public class MedRecord {
     private int quantityTaken;  
     private LocalDateTime timestamp;        // DateTime of when the medicine was issued
     private boolean toSave;
+    private Consultation consult;
 
-    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp, boolean toSave) {
+    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp, boolean toSave, Consultation consult) {
         this.recordID = "MR" + String.format("%04d", generateId(toSave)); 
         this.patient = patient;
         this.doc = doc;
         this.med = med;
         this.quantityTaken = quantityTaken;
         this.timestamp = timestamp;
+        this.consult = consult;
     }
     
     public MedRecord() {
@@ -52,5 +54,8 @@ public class MedRecord {
     }
     public LocalDateTime getTimestamp() {
         return timestamp; 
+    }
+    public Consultation getConsult(){
+        return consult;
     }
 }

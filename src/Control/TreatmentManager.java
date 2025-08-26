@@ -39,6 +39,14 @@ public class TreatmentManager {
         return true; 
     }
     
+    public boolean changePrice(Treatment treatment, double price) {
+        if(treatment.getPrice() == price) {
+            return false; 
+        }
+        treatment.setPrice(price); 
+        return true; 
+    }
+    
     public boolean checkIDFormat(String id) {
         return id.matches("^T\\d{4}$");
     }
@@ -48,16 +56,16 @@ public class TreatmentManager {
     }
     
     //trigger to add new treatment 
-    public boolean newTreatment(String treatmentName, String description, Duration duration) {
+    public boolean newTreatment(String treatmentName, String description, Duration duration, double price) {
         treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
-        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration); 
+        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, price); 
         providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
         return true; 
     }
     
-    public boolean newTreatment(String treatmentName, String description, Duration duration, int frequency) {
+    public boolean newTreatment(String treatmentName, String description, Duration duration, double price, int frequency) {
         treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
-        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, frequency); 
+        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, price, frequency); 
         providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
         return true; 
     }
@@ -67,8 +75,13 @@ public class TreatmentManager {
     }
     
     //show all available treatments 
-    public void displayAllTreatments() {
-        providedTreatments.display(); 
+    public Treatment[] displayAllTreatments() {
+        Object[] objects = providedTreatments.getValues();
+        Treatment[] treatments = new Treatment[objects.length];
+        for (int i = 0; i < objects.length; i++) {
+            treatments[i] = (Treatment) objects[i];
+        }
+        return treatments;
     }
     
     public boolean deleteTreatment(Treatment treatment) {
