@@ -62,8 +62,8 @@ public class ClinicApplication {
     public ClinicApplication() {
         // wire dependencies
         patientManager = new PatientManager();
-        docManager = new DoctorManager();
-        staffManager = new StaffManager();
+        docManager = new DoctorManager(doctorLookup, sharedDoc);
+        staffManager = new StaffManager(staffLookup);
         historyManager = new VisitHistoryManager();
         queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);

@@ -21,11 +21,25 @@ public class Staff {
     protected Position position;    // Doctor - Nurse - Admin
     protected LocalDateTime dateJoined;   // 23 January 2023
     protected String password;
-    protected static int staffCount = 0;
+    protected static int adminCount = 0;
+    protected static int doctorCount = 0;
+    protected static int nurseCount = 0;
     
     // Constructor
     public Staff(){}
+    public Staff(String name, int age, String phoneNo, String gender, Position position, LocalDateTime dateJoined, String password){
+        increaseCount(position);
+        this.id = generateID(position);
+        this.name = name;
+        this.age = age;
+        this.phoneNo = phoneNo;
+        this.gender = gender;
+        this.position = position;
+        this.dateJoined = dateJoined;
+        this.password = password;
+    }
     public Staff(String id, String name, int age, String phoneNo, String gender, Position position, LocalDateTime dateJoined, String password){
+        increaseCount(position);
         this.id = id;
         this.name = name;
         this.age = age;
@@ -34,9 +48,24 @@ public class Staff {
         this.position = position;
         this.dateJoined = dateJoined;
         this.password = password;
-        staffCount++;
     }
     
+    // Helper
+    private String generateID(Position position){
+        return switch(position){
+            case ADMIN -> String.format("%c%04d", 'A', adminCount);
+            case DOCTOR -> String.format("%c%04d", 'A', doctorCount);
+            case NURSE -> String.format("%c%04d", 'A', nurseCount);
+        };
+    }
+    private void increaseCount(Position position){
+        switch(position){
+            case ADMIN -> adminCount++;
+            case DOCTOR -> doctorCount++;
+            case NURSE -> nurseCount++;
+
+        }
+    }
     
     // Setters
     public void setName(String name){ this.name = name; }
@@ -55,11 +84,22 @@ public class Staff {
     public Position getPosition() { return position; }
     public LocalDateTime getDateJoined() { return dateJoined; }
     public String getPassword() { return password; }
-    
+    public static int getAdminCount() { return adminCount; }
+    public static int getDoctorCount() { return doctorCount; }
+    public static int getNurseCount() { return nurseCount; }
+    public static int getTotalStaffCount() { return adminCount + doctorCount + nurseCount; }
     // toString
     @Override
     public String toString(){
-        return "id: " + this.id;
+        return "\nID   : " + this.id +
+               "\nName : " + this.name +
+               "\nAge  : " + this.age + 
+               "\nGender: " + this.gender +
+               "\nPhoneNo : " + this.phoneNo + 
+               "\nPosition: " + this.position +
+               "\nDate Joined: " + this.dateJoined +
+               "\nPassword: " + this.password;
+               
         
     }
     

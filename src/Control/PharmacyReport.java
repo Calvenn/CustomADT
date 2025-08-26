@@ -180,6 +180,4 @@ public class PharmacyReport {
                     medID, medName, totalDispensed, percentage);
         }
     }
-
-    
 }

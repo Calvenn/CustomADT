@@ -12,8 +12,13 @@ public class Doctor extends Staff implements Comparable<Doctor>{
     private String department; // Treatment - Consult
     
     // Constructor
-    public Doctor(){ super(); this.patientCount = 0; }
-    public Doctor(String id, String name, int age, String phoneNo, String gender, Position position, String department, LocalDateTime dateJoined, String password){
+    public Doctor(String name, int age, String phoneNo, String gender, Staff.Position position, String department, LocalDateTime dateJoined, String password){
+        super(name, age, phoneNo, gender, position, dateJoined, password);
+        this.patientCount = 0;
+        this.department = department;
+    }
+        
+    public Doctor(String id, String name, int age, String phoneNo, String gender, Staff.Position position, String department, LocalDateTime dateJoined, String password){
         super(id, name, age, phoneNo, gender, position, dateJoined, password);
         this.patientCount = 0;
         this.department = department;
@@ -53,7 +58,9 @@ public class Doctor extends Staff implements Comparable<Doctor>{
     // toString
     @Override
     public String toString(){
-        return super.toString();
+        return super.toString() + 
+                "\nDepartment: " + department +
+                "\nPatient Count: " + patientCount;
     }
     
     

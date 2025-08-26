@@ -1,9 +1,10 @@
 package Control;
 import Entity.Doctor;
 import Control.StaffManager;
+import Entity.Staff;
 import adt.Heap;
 import adt.LinkedHashMap;
-import adt.List;
+import java.time.LocalDateTime;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
 // 2. (A)IF THE DOCTOR IS APPOINTED NEW TASK then use updateDoctorInc(Doctor minWorkDoctor), to update the doctor back into heap
@@ -18,16 +19,22 @@ public class DoctorManager {
     private Heap<Doctor> doctorHeap;
     
     // Constructor
-    public DoctorManager(){
-        doctorLookup = new LinkedHashMap();
-        doctorHeap = new Heap<>(false);
+    public DoctorManager(LinkedHashMap<String, Doctor> doctorLookup, Heap<Doctor> doctorHeap){
+        this.doctorLookup = doctorLookup;
+        this.doctorHeap = doctorHeap;
     }
     
   // Functions
     public boolean addNewDoctor(Doctor newDoctor){
-        //super.addNewStaff(newDoctor);
         doctorLookup.put(newDoctor.getID(), newDoctor);
         doctorHeap.insert(newDoctor);
+        return true;
+    }
+    
+    public boolean addNewDoctor(String name, int age, String phoneNo, String gender, Staff.Position position, String department, LocalDateTime dateJoined, String password){
+        Doctor s = new Doctor(name, age, phoneNo, gender, position, department, dateJoined, password);
+        doctorLookup.put(s.getID(), s);
+        doctorHeap.insert(s);
         return true;
     }
     
@@ -49,35 +56,26 @@ public class DoctorManager {
         return doctor;
     }
     
+    public void printDoctor(Doctor d){
+         System.out.println(d.toString());
+    }
+    
+    public void printDoctor(Doctor[] doctor){
+        for(Doctor d: doctor){
+            System.out.println(d.toString());
+        }
+    }
+            
     // Find Doctor 
     public Doctor findDoctor(String id){
         return doctorLookup.get(id);
     }
     
-    // Extract doctor from min-heap root (least workload), used in "visit queue"
-    public Doctor getMinWorkDoctor() {
-        List<Doctor> temp = new List<>();
-        Doctor chosen = null;
-
-        while (!doctorHeap.isEmpty()) {
-            Doctor doc = doctorHeap.extractRoot();
-            if (doc.getDepartment().equalsIgnoreCase("CONSULT")) {
-                chosen = doc;
-                break;
-            } else {
-                temp.add(doc);
-            }
-        }
-
-        // Put back the other doctors
-        for (int i = 1; i <= temp.size(); i++) {
-            Doctor d = doctorHeap.get(i-1);
-            doctorHeap.insert(d);
-        }
-
-        return chosen; 
+    // Extract doctor from min-heap root (least workload), used in "bookAppointment"
+    public Doctor getMinWorkDoctor(){
+        Doctor minWorkDoctor = doctorHeap.extractRoot();
+        return minWorkDoctor;
     }
-
     
     // Peek lowest patientCount doctor
     public Doctor peekRootDoctor(){
@@ -103,9 +101,16 @@ public class DoctorManager {
         return doctorHeap.size();
     }
     
-    // Remove Doctor (from doctorHeap, staffList, staffLookup)
+    // Remove Doctor (from doctorHeap, doctorLookup)
     public void removeDoctor(String id){
         Doctor d = doctorLookup.remove(id);
         doctorHeap.remove(d);
     }
+    
+    // isDoctor
+    public boolean isDoctor(Staff staff){
+        return (staff instanceof Doctor);
+    }
+    
+    
 }

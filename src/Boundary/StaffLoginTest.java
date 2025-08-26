@@ -1,12 +1,8 @@
 package Boundary;
 
 import java.util.Scanner;
-import Control.DoctorManager;
 import Control.QueueManager;
 import Control.StaffManager;
-import Entity.MedRecord;
-import Entity.TreatmentAppointment;
-import adt.Queue;
 import exception.*;
 
 
@@ -81,11 +77,38 @@ public class StaffLoginTest {
         String id;
         String password;
         
-        System.out.print("User ID: ");
-        id = scanner.nextLine();
+        System.out.println("\n===================================");
+        System.out.printf("               Login");
+        System.out.println("\n===================================");
         
-        System.out.print("Password: ");
-        password = scanner.nextLine();
+
+        // USER ID
+        while(true){
+            System.out.print("User ID: ");
+            id = scanner.nextLine();
+            try {
+                TryCatchThrowFromFile.validateNotNull(id);
+                if(!idFormat(id)) throw new InvalidInputException("ID format is incorrect!");
+                if(staffManager.findStaff(id) == null) throw new InvalidInputException("ID not found!");
+                break;
+            } catch (InvalidInputException e){
+                ValidationUtility.printErrorWithSolution(e);
+            }
+            
+        }
+        
+        // PASSWORD
+        while (true){
+            System.out.print("Password: ");
+            password = scanner.nextLine();
+            try{
+                TryCatchThrowFromFile.validateNotNull(password);
+                if (!password.equalsIgnoreCase(staffManager.findStaff(id).getPassword())) throw new InvalidInputException("Invalid Password!");
+                break;
+            } catch (InvalidInputException e){
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
         
         if(!checkLogin(id, password)) return;
         System.out.print(login);
@@ -105,6 +128,7 @@ public class StaffLoginTest {
     // Check Correct ID format using REGEX
     private boolean idFormat(String id){
         return id.matches("^[ADN]\\d{4}$");
+        
     }
     
     // Get the position of a id
@@ -135,7 +159,7 @@ public class StaffLoginTest {
             printTitle("DOCTOR", staffManager.findStaff(userID).getName());
             System.out.println("1. Consultation System"); //read only
             System.out.println("2. Treatment System"); //read only??
-            System.out.println("3. Pharmacy System (Read-Only)");
+            System.out.println("3. Pharmacy System");
             System.out.println("4. Patient Registration System");
             System.out.println("5. Payment System");
             System.out.println("6. Staff Management System");
@@ -168,18 +192,16 @@ public class StaffLoginTest {
             System.out.println("1. Consultation System");
             System.out.println("2. Treatment System");
             System.out.println("3. Pharmacy System (Read-Only)");
-            System.out.println("4. Staff Management System");
             System.out.println("0. Log Out");   
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
 
             switch(choice){
                 case 1 -> {                 
                     consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
-                case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
-                case 4 -> staffUI.staffMenu(); // Staff Management System
+                case 3 -> pharUI.pharmacyMenuRead();// Pharmacy System (READ_ONLY) 
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
@@ -196,18 +218,16 @@ public class StaffLoginTest {
             //System.out.println("1. Consultation System");
             System.out.println("1. Pharmacy Control System");
             System.out.println("2. Patient Registration System");
-            System.out.println("3. Staff Management System");
             System.out.println("0. Exit");   
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
 
             switch(choice){
                /* case 1 -> {                 
                     consultUI.consultMainMenu(staffManager.findStaff(userID)); }// Consultation System*/
                 case 1 -> pharUI.pharmacyMenu(); // Pharmacy System 
                 case 2 -> patientUI.patientMenu();
-                case 3 -> staffUI.staffMenu(); // Staff Management System
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
