@@ -37,7 +37,7 @@ public class PaymentUI {
 
             switch(choice){
                 case 1 -> payment();
-                //case 2 -> 
+                case 2 -> displayHistoryPayment();
                 case 0 -> {return;}
                 default -> System.out.printf("\nInvalid choice entered. Please choose again.");
             }
@@ -58,7 +58,9 @@ public class PaymentUI {
         Payment payment = paymentManager.getPaymentInfo(ic);
 
         if (payment != null) {
-            System.out.println("\n====== PAYMENT =======");
+            System.out.println("\n" + "=".repeat(35));
+            System.out.println("        Payment");
+            System.out.println("=".repeat(35));
             System.out.println("Payment ID          : " + payment.getPaymentId());
             System.out.println("Patient             : " + payment.getPatient().getPatientName());
             System.out.println("Consultation        : " + payment.getConsult().getID());
@@ -71,8 +73,7 @@ public class PaymentUI {
                 System.out.println("Treatment           : " + payment.getTrtAppt().getTreatment());
             } 
             System.out.println("Created At          : " + payment.getCreatedAt().format(dtf));
-            System.out.println("Paid                : " + (payment.getIsPay() ? "Yes" : "No"));
-            System.out.println("=========================");   
+            System.out.println("=".repeat(35));  
             System.out.println("1. Mark as Paid");
             System.out.println("0. Exit");
             System.out.print("Choose option: ");
@@ -90,7 +91,7 @@ public class PaymentUI {
                     } else {                                       
                         System.out.println("Payment done");
                     }
-
+                    payment.generateReceiptId();
                     break;
                 case 0:
                     System.out.println("Exiting Payment Menu...");
@@ -100,4 +101,12 @@ public class PaymentUI {
             }
         }
     }
+     
+     public void displayHistoryPayment(){
+        List<Payment> history = paymentManager.findPendingPayment();
+        
+        for(int i = 0; i < history.size(); i++){
+            System.out.println(history);
+        }
+     }
 }

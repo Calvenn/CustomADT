@@ -66,4 +66,16 @@ public class PaymentManager {
         Consultation.numOfPharmacy++;
         return true;
     }   
+    
+    public List<Payment> displayPaymentHistory(){
+        Payment payment = null;
+        List<Payment> historyPayment = new List<>();
+        for(int i = 1; i <= paymentRec.size(); i++){
+            payment = paymentRec.get(i);
+            if(payment.getIsPay()){
+                historyPayment.add(payment);
+            }
+        }
+        return historyPayment;
+    }
 }

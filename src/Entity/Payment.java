@@ -78,6 +78,10 @@ public class Payment {
         return isPay;
     }
     
+    public void generateReceiptId(){
+        this.receiptId = "R" + String.format("%04d", generateId()); ;
+    }
+    
     public void setIsPay(boolean isPay){
         this.isPay = isPay;
     }
@@ -86,4 +90,19 @@ public class Payment {
         this.paymentAt = paymentAt;
     }
     
+    @Override
+    public String toString() {
+        java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return "===== PAYMENT INFO =====\n" +
+               "Payment ID   : " + paymentId +
+               (receiptId != null ? "\nReceipt ID   : " + receiptId + "\n" : "") +
+               "\nPatient      : " + patient.getPatientName() +
+               "\nConsultation : " + consult.getID() +
+               "\nTreatment    : " + (trtAppt != null? trtAppt.getTreatment().getName() : "") +
+               "\nMedRecord    : " + (medRec != null? medRec.getMed().getMedID(): "") +
+               "\nPrice (RM)   : " + String.format("%.2f", price) + "\n" +
+               "\nCreated At   : " + createdAt.format(dtf) +
+               "========================";
+    }
 }
