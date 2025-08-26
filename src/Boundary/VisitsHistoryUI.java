@@ -20,10 +20,10 @@ public class VisitsHistoryUI {
     }
 
     private void visitsTableHeader() {
-        System.out.println("-".repeat(101));
-        System.out.println(String.format("| %-10s | %-14s | %-14s | %-17s | %-30s |",
+        System.out.println("-".repeat(107));
+        System.out.println(String.format("| %-10s | %-14s | %-20s | %-17s | %-30s |",
                 "Visit ID", "Severity", "Doctor", "Register Time", "Symptoms"));
-        System.out.println("-".repeat(101));
+        System.out.println("-".repeat(107));
     }
 
     //show 10 records per page
@@ -60,8 +60,8 @@ public class VisitsHistoryUI {
 
         List<Visit> filteredVisits = historyManager.getVisitsByMonthYear(month, year);
         System.out.println("Total visits in selected period: " + filteredVisits.size());
-        System.out.println(("-".repeat(101)));
-        int width = 99; 
+        System.out.println(("-".repeat(107)));
+        int width = 106; 
         String title = "VISIT HISTORY FOR " + month + "/" + year;
         System.out.printf("| %-"+(width-2)+"s |%n", title);
         if (filteredVisits.size() == 0) {
