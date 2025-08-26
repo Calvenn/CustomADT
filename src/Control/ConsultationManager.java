@@ -101,7 +101,7 @@ public class ConsultationManager {
         }     
         
         TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
-        //toPayment(newConsult.getPatient(), Payment.consultPrice + trtAppt.getPrice() , trtAppt, null); wait csv update
+        toPayment(newConsult.getPatient(), Payment.consultPrice + treatment.getPrice() , trtAppt, null);
         return true;
     }
     
@@ -112,7 +112,7 @@ public class ConsultationManager {
 
         boolean toSaveRec = false;
         MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec, newConsult);
-        toPayment(patient, Payment.consultPrice + med.getPrice(), null, medCollect);
+        toPayment(patient, Payment.consultPrice + (med.getPrice() * qty), null, medCollect);
         return true;
     }
     
