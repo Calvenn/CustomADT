@@ -41,8 +41,6 @@ public class PatientManagementUI {
                 case 7 -> handlePatientStatistics();
                 case 8 -> handleClearAllPatients();
             }
-
-            if (choice != 0) pauseForUser();
         } while (choice != 0);
     }
 
@@ -194,26 +192,20 @@ public class PatientManagementUI {
         }
 
         Patient[] patients = patientManager.getAllPatients();
-        int pageSize = 10;
         int totalPatients = patients.length;
-        int page = 0;
 
-        while (page * pageSize < totalPatients) {
-            int start = page * pageSize;
-            int end = Math.min(start + pageSize, totalPatients);
+        patientTableHeader();
 
-            patientTableHeader();
-
-            for (int i = start; i < end; i++) {
-                Patient patient = patients[i];
-                System.out.printf("| %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n", patient.getPatientIC(), patient.getPatientName(), patient.getPatientPhoneNo(), patient.getPatientAge(), patient.getPatientGender(), patient.getPatientAddress());
-                System.out.println("-".repeat(122));
-            }
-            page++;
-            if (end < totalPatients) {
-                System.out.print("\nPress Enter to see next page...");
-                scanner.nextLine();
-            }
+        for (int i = 0; i < totalPatients; i++) {
+            Patient patient = patients[i];
+            System.out.printf("| %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
+                    patient.getPatientIC(),
+                    patient.getPatientName(),
+                    patient.getPatientPhoneNo(),
+                    patient.getPatientAge(),
+                    patient.getPatientGender(),
+                    patient.getPatientAddress());
+            System.out.println("-".repeat(122));
         }
     }
 
@@ -238,17 +230,14 @@ public class PatientManagementUI {
         }
 
         System.out.println("1. Age Distribution Report");
-        System.out.println("2. Gender Distribution Report");
         System.out.println("0. Back");
         System.out.println("=".repeat(40));
         int choice;
-        do {
-            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
-            switch (choice) {
-                case 1 -> displayAgeDistribution();
-                case 2 -> displayGenderDistribution();
-            }
-        } while (choice != 0);
+        choice = ValidationHelper.inputValidatedChoice(0, 1, "your choice");
+        switch (choice) {
+            case 1 -> displayGenderDistribution();
+            case 0 -> System.out.println("Returning to previous menu.");
+        }
     }
 
     // Helper method to display chart + table
@@ -280,11 +269,7 @@ public class PatientManagementUI {
         // Table
         System.out.println("       " + title + " TABLE");
         System.out.println("-".repeat(40));
-        if (title.toLowerCase().contains("age")) {
-            System.out.printf("%-10s %-8s %-10s%n", "Range", "Count", "Percentage");
-        } else {
-            System.out.printf("%-8s %-8s %-10s%n", "Gender", "Count", "Percentage");
-        }
+        System.out.printf("%-8s %-8s %-10s%n", "Gender", "Count", "Percentage");
         System.out.println("-".repeat(40));
 
         for (int i = 0; i < labels.length; i++) {
@@ -293,23 +278,6 @@ public class PatientManagementUI {
 
         System.out.println("-".repeat(40));
         System.out.println("Total Patients: " + total);
-    }
-
-    private void displayAgeDistribution() {
-        Patient[] patients = patientManager.getAllPatients();
-        int[] ageGroups = new int[5]; // 0–18, 19–35, 36–50, 51–65, 65+
-
-        for (Patient p : patients) {
-            int age = p.getPatientAge();
-            if (age <= 18) ageGroups[0]++;
-            else if (age <= 35) ageGroups[1]++;
-            else if (age <= 50) ageGroups[2]++;
-            else if (age <= 65) ageGroups[3]++;
-            else ageGroups[4]++;
-        }
-
-        String[] ranges = {"0-18", "19-35", "36-50", "51-65", "65+"};
-        printChartAndTable("AGE DISTRIBUTION", ranges, ageGroups);
     }
 
     private void displayGenderDistribution() {
@@ -349,10 +317,5 @@ public class PatientManagementUI {
         } else {
             System.out.println("\nClear operation cancelled.");
         }
-    }
-
-    private void pauseForUser () {
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
     }
 }

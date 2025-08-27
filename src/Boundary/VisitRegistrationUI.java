@@ -10,10 +10,7 @@ import exception.TryCatchThrowFromFile;
 import exception.ValidationHelper;
 import exception.ValidationUtility;
 
-import java.util.Scanner;
-
 public class VisitRegistrationUI {
-    private Scanner scanner;
     private QueueManager queueManager;
     private PatientManager patientManager;
     private VisitsHistoryUI visitsHistoryUI;
@@ -22,7 +19,6 @@ public class VisitRegistrationUI {
         this.queueManager = queueManager;
         this.patientManager = patientManager;
         this.visitsHistoryUI = new VisitsHistoryUI(historyManager);
-        this.scanner = new Scanner(System.in);
     }
 
     public void visitsMenu() {
@@ -43,7 +39,6 @@ public class VisitRegistrationUI {
                 case 9 -> handleProcessNextPatient();
             }
 
-            if (choice != 0) pauseForUser();
         } while (choice != 0);
     }
 
@@ -189,7 +184,6 @@ public class VisitRegistrationUI {
         } else {
             System.out.println("\nEmergency override failed for visit: " + visitId);
         }
-        pauseForUser();
     }
 
     private void displayLiveQueueStatus() {
@@ -258,10 +252,5 @@ public class VisitRegistrationUI {
             case 2 -> visitsHistoryUI.displaySeverityReport();
             case 0 -> System.out.println("Returning to main menu...");
         }
-    }
-
-    private void pauseForUser() {
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
     }
 }
