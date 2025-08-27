@@ -6,17 +6,13 @@ import Entity.Visit;
 import adt.List;
 import exception.ValidationHelper;
 
-import java.util.Scanner;
-
 import java.time.LocalDate;
 
 public class VisitsHistoryUI {
-    private Scanner scanner;
     private final VisitHistoryManager historyManager;
 
     public VisitsHistoryUI(VisitHistoryManager historyManager) {
         this.historyManager = historyManager;
-        this.scanner = new Scanner(System.in);
     }
 
     private void visitsTableHeader() {
@@ -24,30 +20,6 @@ public class VisitsHistoryUI {
         System.out.println(String.format("| %-10s | %-14s | %-20s | %-17s | %-30s |",
                 "Visit ID", "Severity", "Doctor", "Register Time", "Symptoms"));
         System.out.println("-".repeat(107));
-    }
-
-    //show 10 records per page
-    //if more than 10 records, prompt user to press enter to see next page
-    private void displayVisitsPaginated(List<Visit> visits) {
-        int pageSize = 10;
-        int totalVisits = visits.size();
-        int page = 0;
-
-        while (page * pageSize < totalVisits) {
-            int start = page * pageSize;
-            int end = Math.min(start + pageSize, totalVisits);
-
-            visitsTableHeader();
-            for (int i = start + 1; i <= end; i++) {
-                System.out.println(visits.get(i));
-            }
-
-            page++;
-            if (end < totalVisits) {
-                System.out.print("\nPress Enter to see next page...");
-                scanner.nextLine();
-            }
-        }
     }
 
     public void displayHistoricalVisits() {
@@ -59,9 +31,9 @@ public class VisitsHistoryUI {
         int year = ValidationHelper.inputValidatedChoice(2020, LocalDate.now().getYear(), "year");
 
         List<Visit> filteredVisits = historyManager.getVisitsByMonthYear(month, year);
-        System.out.println("Total visits in selected period: " + filteredVisits.size());
+        System.out.println("\nTotal visits in selected period: " + filteredVisits.size());
         System.out.println(("-".repeat(107)));
-        int width = 106; 
+        int width = 105; 
         String title = "VISIT HISTORY FOR " + month + "/" + year;
         System.out.printf("| %-"+(width-2)+"s |%n", title);
         if (filteredVisits.size() == 0) {
@@ -69,14 +41,19 @@ public class VisitsHistoryUI {
             System.out.println(("-".repeat(101)));
             return;
         }
-        displayVisitsPaginated(filteredVisits);
+        
+        // Display all visits
+        visitsTableHeader();
+        for (int i = 1; i <= filteredVisits.size(); i++) {
+            System.out.println(filteredVisits.get(i));
+        }
     }
 
     public void displayPatientHistory(Patient patient) {
         if (patient == null) return; 
-        System.out.println(("-".repeat(101)));
-        int width = 99; 
-        String title = "VISIT HISTORY FOR PATIENT: " + patient.getPatientIC();
+        System.out.println(("-".repeat(107)));
+        int width = 105; 
+        String title = "VISIT HISTORY FOR PATIENT " + patient.getPatientIC();
         System.out.printf("| %-"+(width-2)+"s |%n", title);
         List<Visit> patientVisits = historyManager.getVisitsByPatient(patient.getPatientIC());
         if (patientVisits.size() == 0) {
@@ -84,7 +61,7 @@ public class VisitsHistoryUI {
             return;
         }
         visitsTableHeader();
-        for (int i = 1; i <= patientVisits.size(); i++) {  // keep 1-based if your List ADT is 1-based
+        for (int i = 1; i <= patientVisits.size(); i++) { 
             System.out.println(patientVisits.get(i));
         }
     }
