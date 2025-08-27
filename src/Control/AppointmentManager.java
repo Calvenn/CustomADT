@@ -254,6 +254,7 @@ public class AppointmentManager {
     public void displayAllAppointmentByDoctor(String docId){
         refreshHeapFromConsultations();
         boolean found = false;
+        System.out.println(Consultation.getHeader());
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
             if (appt.getDoctor().getID().equalsIgnoreCase(docId)) {

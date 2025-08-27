@@ -162,7 +162,7 @@ public class CSVLoader {
                 String notes = values[4];
 
                 LocalDateTime consultTime = LocalDateTime.parse(values[5], formatter);
-                LocalDateTime apptDateTime = values[6].equals("null") ? null : LocalDateTime.parse(values[8], formatter);
+                LocalDateTime apptDateTime = values[6].equals("null") ? null : LocalDateTime.parse(values[6], formatter);
                 LocalDateTime createdAt = LocalDateTime.parse(values[7], formatter);
 
                 Consultation c = new Consultation(severity, patient, disease, notes, doc,
@@ -304,8 +304,8 @@ public class CSVLoader {
         }
     }
 
-     public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+     public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager, ConsultationManager consultManager) {
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isHeader = true;
@@ -317,21 +317,27 @@ public class CSVLoader {
                 }
 
                 // Split by comma, handle quotes if needed
-                String[] values = line.split(",");
+                String[] values = line.split(",");               
 
-                Doctor doctor = docManager.findDoctor(values[1].trim());
-                
-                String consultId = values[2].trim();
-                //Consult consult = consultManager.findConsult(values[2].trim(););
-                
-                Treatment treatment = trtManager.findTreatmentName(values[3].trim());
-                
-                String room = values[4].trim(); 
-                LocalDateTime apptTime = LocalDate.parse(values[5].trim(), formatter).atStartOfDay();
-                LocalDateTime createdAt = LocalDate.parse(values[6].trim(), formatter).atStartOfDay();
+                Doctor doctor = docManager.findDoctor(values[0].trim());
+                String consultId = values[1].trim();
+                Treatment treatment = trtManager.findTreatmentName(values[2].trim());
+                String room = values[3].trim();
+
+                LocalDateTime apptTime = LocalDateTime.parse(values[4].trim(), formatter);
+                LocalDateTime createdAt = LocalDateTime.parse(values[5].trim(), formatter);
+
+                Consultation consultRec = consultManager.getConsultRec(consultId, docManager);
+                if (consultRec == null) {
+                    System.out.println(consultId + " not found");
+                } else {
+                    System.out.println("Found consult: " + consultRec.getID());
+                    trtApptManager.newTreatmentApptHist(doctor, consultRec, treatment, room, apptTime, createdAt);
+                }
+
                 
                 //need find consult 
-//                trtApptManager.newTreatmentApptHist(doctor, consult, treatment, room, apptTime, createdAt);
+                trtApptManager.newTreatmentApptHist(doctor, consultRec, treatment, room, apptTime, createdAt);
                 
             }
 
