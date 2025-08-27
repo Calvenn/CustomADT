@@ -95,12 +95,12 @@ public class ConsultationManager {
         }
     }
     
-    public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
-        if (doc == null || treatment == null || room == null || time == null || sev == null) {  
+    public boolean toTreatment(Doctor doc, Treatment treatment, LocalDateTime time, Severity sev){
+        if (doc == null || treatment == null || time == null || sev == null) {  
             return false;
         }     
         
-        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
+        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, time);
         toPayment(newConsult.getPatient(), Payment.consultPrice + treatment.getPrice() , trtAppt, null);
         return true;
     }
@@ -174,5 +174,31 @@ public class ConsultationManager {
         }
 
         return found;
+    }
+    
+    private List<Consultation> extractConsultRec(String id, DoctorManager docManager) {
+        List<Consultation> allConsultations = new List<>();
+        Doctor[] doctors = docManager.viewAllDoctor();
+
+        for (int i = 0; i < doctors.length; i++) {
+            List<Consultation> doctorConsults = consultLog.get(doctors[i].getID());
+            if (doctorConsults != null) {
+                for (int j = 1; j <= doctorConsults.size(); j++) { // your ADT is 1-based
+                    allConsultations.add(doctorConsults.get(j));
+                }
+            }
+        }
+        return allConsultations;
+    }
+    
+    public Consultation getConsultRec(String id, DoctorManager docManager) {
+        List<Consultation> consultations = extractConsultRec(id, docManager);
+        for (int i = 1; i <= consultations.size(); i++) {
+            Consultation c = consultations.get(i);
+            if (c != null && c.getID().equals(id)) {
+                return c;
+            }
+        }
+        return null;
     }
 }

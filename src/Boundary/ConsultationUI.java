@@ -41,9 +41,10 @@ public class ConsultationUI {
     private final MedicineControl medControl;
     private static Doctor currentDoc = null;
     private final ConsultationReport consultReport;
+    private final TreatmentApptUI treatmentApptUI; 
     private final Scanner scanner;
 
-    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport) {
+    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport, TreatmentApptUI treatmentApptUI) {
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
@@ -51,6 +52,7 @@ public class ConsultationUI {
         this.trtManager = trtManager;
         this.medControl = medControl;
         this.consultReport = consultReport;
+        this.treatmentApptUI = treatmentApptUI; 
         this.scanner = new Scanner(System.in);
     }
     
@@ -217,7 +219,8 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(patient,currentDoc, severity, diagnosis);                        
+//                        toTreatmentUI(patient,currentDoc, severity, diagnosis);  
+                        treatmentApptUI.addNewAppointmentUI(consultInfo);
                         return;
                     }
                     case 3 -> {
@@ -237,47 +240,44 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Patient patient, Doctor doc, Severity severity, String diagnosis) {
-        String trtGiven = "";
-        List<String> trtType;  
-
-        while (true) {
-            System.out.println("\n--- Suggested Treatment ---");      
-            trtType = trtManager.suggestedTrt(diagnosis);
-
-            if (trtType.size() == 1) {
-                // only 1 suggestion
-                System.out.println("Suggested Treatment: " + trtType.get(0));
-                trtGiven = trtType.get(0);
-            } else {
-                // multiple suggestions
-                for (int i = 1; i <= trtType.size(); i++) {
-                    System.out.println("[" + (i) + "] " + trtType.get(i));
-                }
-                int choice = ValidationHelper.inputValidatedChoice(1, trtType.size(), "treatment type");
-                trtGiven = trtType.get(choice);
-            }         
-
-            Treatment selected = trtManager.findTreatmentName(trtGiven);
-            if (selected == null) {
-                System.out.println("Treatment not found. Please try again.\n");
-                continue;
-            }
-            
-            System.out.println("\nTreatment: " + trtGiven);
-
-            System.out.print("Enter room: ");
-            String room = scanner.nextLine();
-
-            LocalDateTime time = LocalDateTime.now();
-            if (consultManager.toTreatment(doc, selected, room, time, severity)) {
-                System.out.println("Treatment recorded. Please ask patient made payment at counter.");
-                break;
-            } else {
-                System.out.println("Missing required information for treatment appointment.");
-            }
-        }
-    }
+//    private void toTreatmentUI(Patient patient, Doctor doc, Severity severity, String diagnosis) {
+//        String trtGiven = "";
+//        List<String> trtType;  
+//
+//        while (true) {
+//            System.out.println("\n--- Suggested Treatment ---");      
+//            trtType = trtManager.suggestedTrt(diagnosis);
+//
+//            if (trtType.size() == 1) {
+//                // only 1 suggestion
+//                System.out.println("Suggested Treatment: " + trtType.get(0));
+//                trtGiven = trtType.get(0);
+//            } else {
+//                // multiple suggestions
+//                for (int i = 1; i <= trtType.size(); i++) {
+//                    System.out.println("[" + (i) + "] " + trtType.get(i));
+//                }
+//                int choice = ValidationHelper.inputValidatedChoice(1, trtType.size(), "treatment type");
+//                trtGiven = trtType.get(choice);
+//            }         
+//
+//            Treatment selected = trtManager.findTreatmentName(trtGiven);
+//            if (selected == null) {
+//                System.out.println("Treatment not found. Please try again.\n");
+//                continue;
+//            }
+//            
+//            System.out.println("\nTreatment: " + trtGiven);
+//
+//            LocalDateTime time = LocalDateTime.now();
+//            if (consultManager.toTreatment(doc, selected, time, severity)) {
+//                System.out.println("Treatment recorded. Please ask patient made payment at counter.");
+//                break;
+//            } else {
+//                System.out.println("Missing required information for treatment appointment.");
+//            }
+//        }
+//    }
 
     private void toPharmacyUI(Doctor doc, Patient patient, String diagnosis) {
         String medGiven = "";

@@ -25,7 +25,7 @@ public class ClinicApplication {
     private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
     private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
-    private final LinkedHashMap<String, TreatmentAppointment> trtApptHistory = new LinkedHashMap<>();
+    private final LinkedHashMap<String, List<TreatmentAppointment>> trtApptHistory = new LinkedHashMap<>();
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
@@ -76,16 +76,16 @@ public class ClinicApplication {
         medRecControl = new MedRecordControl(medRecList);
         paymentManager = new PaymentManager(paymentRec, treatmentQueue, medCollectQueue);
 
-        consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
-        patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         treatmentUI = new TreatmentUI(trtManager);
-        treatmentApptUI = new TreatmentApptUI(treatmentApptManager);
+        treatmentApptUI = new TreatmentApptUI(treatmentApptManager, docManager, treatmentUI);
+        consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport, treatmentApptUI);
+        patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
         payUI = new PaymentUI(paymentManager);
         staffLogin = new StaffLogin(docManager, staffManager, treatmentQueue, medCollectQueue, consultUI, treatmentUI, pharUI, patientUI, staffUI);
-        staffLoginTest = new StaffLoginTest(queueManager, staffManager, consultUI, treatmentUI, pharUI, patientUI, staffUI, payUI); 
+        staffLoginTest = new StaffLoginTest(queueManager, staffManager, consultUI, treatmentUI, treatmentApptUI, pharUI, patientUI, staffUI, payUI); 
     }
     
     public void runTest(){
@@ -94,6 +94,7 @@ public class ClinicApplication {
         CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
+        CSVLoader.loadTreatmentApptFromCSV("src/data/treatmentAppt.csv", treatmentApptManager, docManager, trtManager, consultManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList, consultManager);
           

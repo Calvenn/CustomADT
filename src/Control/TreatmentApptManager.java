@@ -2,7 +2,9 @@ package Control;
 import Entity.Consultation;
 import Entity.Doctor;
 import Entity.Patient;
-import adt.Heap; 
+import adt.List;
+import adt.Queue;
+import adt.Heap;
 import adt.LinkedHashMap; 
 import Entity.TreatmentAppointment; 
 import Entity.Treatment; 
@@ -15,86 +17,118 @@ import java.time.LocalTime;
  * @author MeganYeohTzeXuan
  */
 
-//how to make new appointment to get treatment 
-//doctor go in system, open treatment appt page 
-//    private final String appointmentId; -- system auto 
-//    private String doctorId; -- need auto also, only choosable by time, linked with time -> need from appt 
-//    private final String consultationId;  //need change to entity afterwards 
-//    private final Treatment treatment; 
-//    private final String room;
-//    private LocalDateTime treatmentTime;  
-//    private Severity severity; 
-//    private String treatmentStatus; 
-//doctor need select these fields 
-
-/*
-Treatment appointment new 
-1. select which consultation 
-2. select time 
-3. check doctor availabiltiy by time -> select doctor 
-4. select treatment 
-5. select room 
-*/
 public class TreatmentApptManager {
-    private Heap<Appointment> treatmentAppointment;
-    private LinkedHashMap<String, TreatmentAppointment> history; 
+    private LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
+    private LinkedHashMap<String, List<TreatmentAppointment>> history;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
     
-    public TreatmentApptManager(LinkedHashMap<String, TreatmentAppointment> history) {
-        treatmentAppointment = new Heap<>(true);
+    public TreatmentApptManager(LinkedHashMap<String, List<TreatmentAppointment>> history) {
+        incomingAppointment = new LinkedHashMap<>();
         this.history = history;
     }
     
     //ON TREATMENT APPOINTMENT -----------------------------
     
     //check if chosen appt time is within working hours and after now 
-    private boolean validDateTime(LocalDateTime time) {
+    public boolean validDateTime(LocalDateTime time) {
         return (time.toLocalTime().isAfter(WORK_START) && time.toLocalTime().isBefore(WORK_END) && time.isAfter(LocalDateTime.now()));
     }
     
-    //get list of treatment doctors -> send into this function to check which doctor is available, only can display 
-    public Heap<Doctor> checkDoctorTime(Heap<Doctor> doctors, LocalDateTime treatmentTime) {
-        return null; 
-    }
-    
-    public boolean newTreatmentAppt(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime) {
-        if(!validDateTime(treatmentTime)) {
-            throw new IllegalArgumentException("Invalid time entered.");
+    public boolean newTreatmentToHeap(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime) {
+        if(!searchDoctor(doctor)) {
+            addNewDoctorKey(doctor); 
         }
-        
-        TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, room, treatmentTime); 
-        treatmentAppointment.insert(appt); 
+        TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, treatmentTime); 
+        incomingAppointment.get(doctor.getID().toUpperCase()).insert(appt);
         return true; 
     }
-       
-    public TreatmentAppointment nextAppointment() {
-        return (TreatmentAppointment) treatmentAppointment.peekRoot();
-    }
     
-    public Heap<Appointment> upcomingAppointments() {
-        return treatmentAppointment; 
-    }
-    
-    public boolean completeTreatment(TreatmentAppointment appointment) {
-        if(nextAppointment().equals(appointment)) {
-            //something to set appointment status 
-            TreatmentAppointment treatAppt = (TreatmentAppointment) treatmentAppointment.extractRoot();
-            history.put(treatAppt.getAppointmentId(), treatAppt);
-            return true; 
+    public TreatmentAppointment searchAppt(String doctorID, String trtApptID) {
+        Heap<Appointment> apptHeap = incomingAppointment.get(doctorID.toUpperCase());
+        if(apptHeap.isEmpty()) return null; 
+        for(int i = 1; i <= apptHeap.size(); i++) {
+            TreatmentAppointment appt = (TreatmentAppointment) apptHeap.get(i); 
+            if(appt.getAppointmentId().equalsIgnoreCase(trtApptID)) {
+                return appt; 
+            }
         }
-        return false; 
+        return null; //if nothing found
+    }
+
+    //called when new doctor
+    private void addNewDoctorKey(Doctor doctor) {
+        String doctorID = doctor.getID();
+        incomingAppointment.put(doctorID, new Heap<>(true));
+        history.put(doctorID, new List<>());
+    }
+    
+    //search if doctor already exist as key 
+    private boolean searchDoctor(Doctor doctor) {
+        String doctorID = doctor.getID(); 
+        return incomingAppointment.containsKey(doctorID) && history.containsKey(doctorID);
+    }
+    
+    public List<String> checkDoctorAvailability(LocalDateTime time) {
+        List<String> availableDoctors = new List<>(); 
+        for(Object doctor : incomingAppointment.getKeys()) {
+            Heap<Appointment> appt = incomingAppointment.get((String)doctor); 
+            for(int i = 1; i <= appt.size(); i++) {
+                if(time.isEqual(appt.get(i).getDateTime())) break; 
+            }
+            availableDoctors.add((String) doctor); 
+        }
+
+        return availableDoctors; 
+    }
+    
+    public Heap<Appointment> getIncomingAppt(String doctorID) {
+        Heap<Appointment> incoming = incomingAppointment.get(doctorID);
+        if(incoming.isEmpty()) {
+            return null;
+        } else {
+            return incoming; 
+        }
+    }
+    
+    //viw next appointment
+    public TreatmentAppointment nextAppt(String doctorID) {
+        if(incomingAppointment.get(doctorID).isEmpty()) return null; 
+        Appointment next = incomingAppointment.get(doctorID).peekRoot();
+        return (TreatmentAppointment) next; 
+    }
+    
+    public void cancelTreatmentAppt(TreatmentAppointment appt) {
+        incomingAppointment.get(appt.getDoctor().getID().toUpperCase()).remove((Appointment) appt); 
     }
     
     //ON TREATMENT HISTORY -----------------------
-    public boolean newTreatmentApptHist(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, LocalDateTime createdAt) {
-        if(!validDateTime(treatmentTime)) {
-            throw new IllegalArgumentException("Invalid time entered.");
+    
+    //treatment already done -> will pop out of queue and go into history list 
+    public boolean completeAppt(String doctorID) {
+        TreatmentAppointment next = nextAppt(doctorID);
+        if(next.getDateTime().isAfter(LocalDateTime.now())) {
+            return false; //UI will show error, say appointment time havent reached 
         }
-        
-        TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, room, treatmentTime, createdAt); 
-        history.put(appt.getAppointmentId(), appt);
+        incomingAppointment.get(doctorID).extractRoot();
+        history.get(doctorID).add(next);
         return true; 
     }
     
+    //to receive history records from csv 
+    public boolean newTreatmentApptHist(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime, LocalDateTime createdAt) {
+        TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, treatmentTime, createdAt); 
+        
+        String doctorID = doctor.getID().toUpperCase(); 
+        if(!searchDoctor(doctor)) {
+            addNewDoctorKey(doctor);
+        }
+        
+        history.get(doctorID).add(appt);
+        return true; 
+    }
+    
+    public List<TreatmentAppointment> getHistoryList(String doctorID) {
+        return history.get(doctorID); 
+    }
 }

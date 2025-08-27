@@ -108,4 +108,17 @@ public class DoctorManager {
         Doctor d = doctorLookup.remove(id);
         doctorHeap.remove(d);
     }
+    
+    public List<Doctor> getTreatmentDoctors() {
+        if(doctorLookup.isEmpty()) {
+            return null;
+        }
+        List<Doctor> doctors = new List<>(); 
+        for(Doctor doctor : viewAllDoctor()) {
+            if(doctor.getDepartment().equals("Treatment")) {
+                doctors.add(doctor);
+            }
+        }
+        return doctors;
+    }
 }

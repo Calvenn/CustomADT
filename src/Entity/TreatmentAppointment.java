@@ -7,27 +7,24 @@ public class TreatmentAppointment extends Appointment{
     private final String appointmentId; 
     final private Consultation consult; 
     private final Treatment treatment; 
-    private final String room;
     private final LocalDateTime createdAt; 
     
-    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"); 
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
     private static int idNo = 0; 
     
-    public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime) {
+    public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime) {
         super(consult.getPatient(), doctor, treatmentTime);
-        appointmentId = "T" + String.format("%04d", generateId()); 
+        appointmentId = "R" + String.format("%04d", generateId()); 
         this.consult = consult; 
         this.treatment = treatment; 
-        this.room = room; 
         this.createdAt = LocalDateTime.now(); 
     }
     
-    public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, LocalDateTime createdAt) {
+    public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime, LocalDateTime createdAt) {
         super(consult.getPatient(), doctor, treatmentTime);
-        appointmentId = "T" + String.format("%04d", generateId()); 
+        appointmentId = "R" + String.format("%04d", generateId()); 
         this.consult = consult; 
         this.treatment = treatment; 
-        this.room = room; 
         this.createdAt = createdAt; 
     }
     
@@ -52,23 +49,24 @@ public class TreatmentAppointment extends Appointment{
     public Treatment getTreatment() {
         return treatment; 
     }
-     
-    public String getRoom() {
-        return room; 
-    }
+    
 
     @Override
     public String toString() {
         return String.format("""
-            Appointment Id: %s
-            Doctor: %s
-            Consultation: %s
+            Appointment ID: %s
+            Doctor: %s -- %s
+            Consultation: %s -- %s
             Treatment: %s
-            Room: %s
             Treatment Time: %s
             Created At: %s
             """, 
-           this.appointmentId, getDoctor(), this.consult, this.treatment, this.room, getDateTime().format(dateFormat), this.createdAt.format(dateFormat)
+           this.appointmentId, 
+           super.getDoctor().getID(),super.getDoctor().getName(), 
+           this.consult.getID(), super.getPatient().getPatientName(), 
+           this.treatment.getName(), 
+           super.getDateTime().format(dateFormat), 
+           this.createdAt.format(dateFormat)
         ); 
     }
     

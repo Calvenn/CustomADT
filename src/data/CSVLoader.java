@@ -304,7 +304,7 @@ public class CSVLoader {
         }
     }
 
-     public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager) {
+     public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager, ConsultationManager consultManager) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -319,19 +319,16 @@ public class CSVLoader {
                 // Split by comma, handle quotes if needed
                 String[] values = line.split(",");
 
-                Doctor doctor = docManager.findDoctor(values[1].trim());
+                Doctor doctor = docManager.findDoctor(values[0].trim());
                 
-                String consultId = values[2].trim();
-                //Consult consult = consultManager.findConsult(values[2].trim(););
+                Consultation consult = consultManager.getConsultRec(values[1].trim(), docManager);
                 
-                Treatment treatment = trtManager.findTreatmentName(values[3].trim());
-                
-                String room = values[4].trim(); 
-                LocalDateTime apptTime = LocalDate.parse(values[5].trim(), formatter).atStartOfDay();
-                LocalDateTime createdAt = LocalDate.parse(values[6].trim(), formatter).atStartOfDay();
-                
-                //need find consult 
-//                trtApptManager.newTreatmentApptHist(doctor, consult, treatment, room, apptTime, createdAt);
+                Treatment treatment = trtManager.findTreatmentName(values[2].trim());
+
+                LocalDateTime apptTime = LocalDateTime.parse(values[3].trim(), formatter);
+                LocalDateTime createdAt = LocalDateTime.parse(values[4].trim(), formatter);
+
+                trtApptManager.newTreatmentApptHist(doctor, consult, treatment, apptTime, createdAt);
                 
             }
 
