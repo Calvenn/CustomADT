@@ -14,6 +14,7 @@ public interface QueueInterface<E> {
     E dequeue();
     E peek();
     E remove(E data);
+    E get(int index);
     void display();
     boolean isEmpty();
     int size();

@@ -85,7 +85,7 @@ public class PaymentUI {
                     payment.setIsPay(true);
                     payment.setPaymentAt(java.time.LocalDateTime.now());
                     if(paymentManager.isTrtAppt(payment)){
-                        System.out.println("Payment done. Please ask patient go to room " + payment.getTrtAppt().getRoom() + ".");
+                        System.out.println("Payment done. Please ask patient to wait for treatment time.");
                     } else if(paymentManager.isMedCollect(payment)){
                         System.out.println("Payment done. Please ask patient go collect medicine.");
                     } else {                                       

@@ -164,10 +164,9 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     }
     
     public E get(int index) {
-    if (index >= 0 && index < size) {
-        return heap[index];
+        if (index >= 0 && index < size) {
+            return heap[index];
+        }
+        return null;
     }
-    return null;
-}
-
 }

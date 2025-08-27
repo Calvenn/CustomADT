@@ -24,12 +24,11 @@ public class ClinicApplication {
     private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
     private final LinkedHashMap<String,Staff> staffLookup = new LinkedHashMap<>();
     private final List<MedRecord> medRecList = new List<>(); 
-    private final LinkedHashMap<String, TreatmentAppointment> trtApptHistory = new LinkedHashMap<>();
+    private final LinkedHashMap<String, List<TreatmentAppointment>> trtApptHistory = new LinkedHashMap<>();
     private final Queue<TreatmentAppointment> treatmentQueue = new Queue<>();
     private final Queue<MedRecord> medCollectQueue = new Queue<>(); 
     private final LinkedHashMap<String, Queue<Appointment>> missAppt = new LinkedHashMap<>();  
     private final LinkedHashMap<String, List<Consultation>> consultLog = new LinkedHashMap<>();
-    private final List<Payment> paymentRec = new List<>();
 
     // Control Layer
     private final PatientManager patientManager;
@@ -65,23 +64,23 @@ public class ClinicApplication {
         queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, historyManager);
         apptManager = new AppointmentManager(missAppt, consultLog, apptQueue,docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue,apptManager.getAppointmentHeap(),
-        consultLog, trtApptHistory, medRecList,docManager,apptManager, paymentRec);
+        consultLog, trtApptHistory, medRecList,docManager,apptManager);
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
         treatmentApptManager = new TreatmentApptManager(trtApptHistory);
         medControl = new MedicineControl(medMap);
         medRecControl = new MedRecordControl(medRecList);
-        paymentManager = new PaymentManager(paymentRec, treatmentQueue, medCollectQueue);
-
-        consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport);
+        paymentManager = new PaymentManager(treatmentQueue, medCollectQueue);
+    
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         treatmentUI = new TreatmentUI(trtManager);
-        treatmentApptUI = new TreatmentApptUI(treatmentApptManager);
+        treatmentApptUI = new TreatmentApptUI(treatmentApptManager, docManager, treatmentUI);
+        consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport, treatmentApptUI);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
         payUI = new PaymentUI(paymentManager);
-        staffLogin = new StaffLogin(queueManager, staffManager, consultUI, treatmentUI, pharUI, patientUI, staffUI, payUI); 
+        staffLogin = new StaffLogin(queueManager, staffManager, consultUI, treatmentUI, treatmentApptUI, pharUI, patientUI, staffUI, payUI); 
     }
     
     public void run(){
@@ -91,9 +90,9 @@ public class ClinicApplication {
         CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
+        CSVLoader.loadTreatmentApptFromCSV("src/data/treatmentAppt.csv", treatmentApptManager, docManager, trtManager, consultManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList, consultManager);
-        CSVLoader.loadTreatmentApptFromCSV("src/data/treatmentAppt.csv", treatmentApptManager, docManager, trtManager, consultManager);
         staffLogin.login();
 
     }

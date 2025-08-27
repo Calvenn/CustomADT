@@ -4,6 +4,7 @@ import Control.StaffManager;
 import Entity.Staff;
 import adt.Heap;
 import adt.LinkedHashMap;
+import adt.List;
 import java.time.LocalDateTime;
 
 // 1. Use getMinWorkDoctor(), which is doctor with least patient
@@ -121,5 +122,16 @@ public class DoctorManager {
         return (staff instanceof Doctor);
     }
     
-    
+    public List<Doctor> getTreatmentDoctors() {
+        if(doctorLookup.isEmpty()) {
+            return null;
+        }
+        List<Doctor> doctors = new List<>(); 
+        for(Doctor doctor : viewAllDoctor()) {
+            if(doctor.getDepartment().equals("Treatment")) {
+                doctors.add(doctor);
+            }
+        }
+        return doctors;
+    }
 }

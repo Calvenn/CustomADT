@@ -5,6 +5,7 @@ import Control.ConsultationManager;
 import Control.ConsultationReport;
 import Control.DoctorManager;   
 import Control.MedicineControl;
+import Control.PaymentManager;
 import Control.TreatmentManager;
 
 import Entity.Doctor;
@@ -35,6 +36,7 @@ public class ConsultationUI {
     private final AppointmentUI apptUI;
     private final AppointmentManager apptManager;
     private final ConsultationManager consultManager;
+    private final TreatmentApptUI treatmentApptUI;
     private final DoctorManager docManager;
     private final TreatmentManager trtManager;
     private final MedicineControl medControl;
@@ -42,7 +44,7 @@ public class ConsultationUI {
     private final ConsultationReport consultReport;
     private final Scanner scanner;
 
-    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport) {
+    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport, TreatmentApptUI treatmentApptUI) {
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
@@ -50,6 +52,7 @@ public class ConsultationUI {
         this.trtManager = trtManager;
         this.medControl = medControl;
         this.consultReport = consultReport;
+        this.treatmentApptUI = treatmentApptUI;
         this.scanner = new Scanner(System.in);
     }
     
@@ -80,7 +83,6 @@ public class ConsultationUI {
             System.out.println("Staff " + staff.getID() + " unable to access");
             return;
         }
-        apptManager.checkMissedAppt(currentDoc.getID());
         
         while (true) {
             consultationApptSummary();
@@ -237,7 +239,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        toTreatmentUI(patient,currentDoc, severity, diagnosis);                        
+                        treatmentApptUI.addNewAppointmentUI(consultInfo);                       
                         return;
                     }
                     case 3 -> {
@@ -246,9 +248,7 @@ public class ConsultationUI {
                     }
                     case 4 -> {
                         System.out.println("Done.");
-                        if(consultManager.toPayment(patient, Payment.consultPrice ,null, null)){
-                            System.out.println("Thank you. Please ask patient made payment on counter.");
-                        }
+                        PaymentManager.paymentRec.add(new Payment(patient, consultInfo, Payment.consultPrice, false, null, null));
                         return;
                     }
                     default -> System.out.println("Please choose a valid option (1-4).");
@@ -257,48 +257,6 @@ public class ConsultationUI {
         }
     }
     
-    private void toTreatmentUI(Patient patient, Doctor doc, Severity severity, String diagnosis) {
-        String trtGiven = "";
-        List<String> trtType;  
-
-        while (true) {
-            System.out.println("\n--- Suggested Treatment ---");      
-            trtType = trtManager.suggestedTrt(diagnosis);
-
-            if (trtType.size() == 1) {
-                // only 1 suggestion
-                System.out.println("Suggested Treatment: " + trtType.get(0));
-                trtGiven = trtType.get(0);
-            } else {
-                // multiple suggestions
-                for (int i = 1; i <= trtType.size(); i++) {
-                    System.out.println("[" + (i) + "] " + trtType.get(i));
-                }
-                int choice = ValidationHelper.inputValidatedChoice(1, trtType.size(), "treatment type");
-                trtGiven = trtType.get(choice);
-            }         
-
-            Treatment selected = trtManager.findTreatmentName(trtGiven);
-            if (selected == null) {
-                System.out.println("Treatment not found. Please try again.\n");
-                continue;
-            }
-            
-            System.out.println("\nTreatment: " + trtGiven);
-
-            System.out.print("Enter room: ");
-            String room = scanner.nextLine();
-
-            LocalDateTime time = LocalDateTime.now();
-            if (consultManager.toTreatment(doc, selected, room, time, severity)) {
-                System.out.println("Treatment recorded. Please ask patient made payment at counter.");
-                break;
-            } else {
-                System.out.println("Missing required information for treatment appointment.");
-            }
-        }
-    }
-
     private void toPharmacyUI(Doctor doc, Patient patient, String diagnosis) {
         String medGiven = "";
         List<String> med;   

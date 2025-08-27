@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class TreatmentUI {
     private final TreatmentManager treatmentManager; 
     private Scanner scanner;
-    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"); 
+    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
     
     public TreatmentUI(TreatmentManager treatmentManager) {
         this.treatmentManager = treatmentManager; 
@@ -110,14 +110,20 @@ public class TreatmentUI {
         }
     }
     
+    private boolean checkCancel(String input) {
+        return input.trim().equalsIgnoreCase("x");
+    }
+    
     private String inputName() {
         String name; 
         while (true) {
+            System.out.println("Enter x to cancel.");
             System.out.print("Treatment Name: "); 
             name = scanner.nextLine().trim();
 
             try {
                 TryCatchThrowFromFile.validateNotNull(name);
+                if(checkCancel(name)) return null;
                 if(treatmentManager.treatmentExist(name)) {
                     throw new InvalidInputException("Treatment " + name + " already exist."); 
                 }
@@ -130,19 +136,23 @@ public class TreatmentUI {
     }
     
     private String inputDescription() {
+        System.out.println("Enter x to cancel.");
         System.out.print("Description: ");
         String description = scanner.nextLine(); 
+        if(checkCancel(description)) return null; 
         return description; 
     }
     
     private Duration inputDuration() {
         String duration; 
         while(true) {
+            System.out.println("Enter x to cancel.");
             System.out.print("Duration (minutes): ");
             duration = scanner.nextLine();
 
             try {
                 TryCatchThrowFromFile.validatePositiveInteger(duration);
+                if(checkCancel(duration)) return null;
                 break; 
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e); 
@@ -154,10 +164,12 @@ public class TreatmentUI {
     private double inputPrice() {
         String price; 
         while(true) {
+            System.out.println("Enter x to cancel.");
             System.out.print("Price (RM): ");
             price = scanner.nextLine();
 
             try {
+                if(checkCancel(price)) return 0;
                 TryCatchThrowFromFile.validatePrice(price);
                 break; 
             } catch (InvalidInputException e) {
@@ -170,12 +182,32 @@ public class TreatmentUI {
     public void addTreatmentUI() {
         printTitle("Add Treatment", 35);
         
-        String name = inputName(); 
-        String description = inputDescription(); 
-        Duration duration = inputDuration(); 
-        double price = inputPrice();
+        while(true) {
+            String name = inputName(); 
+            if(name == null) break; 
+            System.out.println();
+            
+            String description = inputDescription(); 
+            if(description == null) break; 
+            System.out.println();
+            
+            Duration duration = inputDuration(); 
+            if(duration == null) break; 
+            System.out.println();
+            
+            double price = inputPrice();
+            if(price == 0) break; 
+            System.out.println();
 
-        treatmentManager.newTreatment(name, description, duration, price); 
+            treatmentManager.newTreatment(name, description, duration, price); 
+            System.out.println("Add treatment success!");
+            System.out.println("Enter to continue...");
+            scanner.nextLine();
+            return; 
+        }
+        System.out.println("\nAdd treatment cancelled.");
+        System.out.println("Enter to continue...");
+        scanner.nextLine();
     }
     
     public Treatment searchForTreatment() {
