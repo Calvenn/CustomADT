@@ -185,7 +185,8 @@ public class StaffLogin {
     
     // Menu for DOCTOR
     public void doctorMenu(String userID, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, StaffManagementUI staffUI, QueueManager queueManager){
-        while (true){        
+        while (true){    
+            queueManager.loadVisit();
             printTitle(staffManager.findStaff(userID));
             System.out.println("1. Consultation System");
             System.out.println("2. Treatment System");
@@ -211,6 +212,7 @@ public class StaffLogin {
     // Menu for NURSE
         public void nurseMenu(String userID, ConsultationUI consultUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, QueueManager queueManager){
         while (true){ // Repeat the step if the user input invalid choice
+            queueManager.loadVisit();
             printTitle(staffManager.findStaff(userID));
             System.out.println("1. Consultation System");
             System.out.println("2. Pharmacy Control System");

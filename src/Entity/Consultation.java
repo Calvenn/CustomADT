@@ -52,13 +52,6 @@ public class Consultation extends Appointment{
         this.createdAt = createdAt;
     }
     
-    //Constructor to view all trt appt and med record of a patient
-    public Consultation(String consultationID, int severity, Patient patient, String disease, String notes, Doctor doc, LocalDateTime consultTime, LocalDateTime apptDateTime, LocalDateTime createdAt, TreatmentAppointment trtAppt, MedRecord medRec) {
-        this(consultationID, severity, patient, disease, notes, doc, consultTime, apptDateTime, createdAt);
-        this.trtAppt = trtAppt;
-        this.medRec = medRec;
-    }
-    
     private static int generateId() {
         idNo += 1; 
         return idNo; 
@@ -189,5 +182,4 @@ public class Consultation extends Appointment{
 
         return report;
     }
-
 }

@@ -331,10 +331,10 @@ public class CSVLoader {
                 LocalDateTime createdAt = LocalDateTime.parse(values[5].trim(), formatter);
 
                 Consultation consultRec = consultManager.getConsultRec(consultId, docManager);
+                
                 if (consultRec == null) {
                     System.out.println(consultId + " not found");
                 } else {
-                    System.out.println("Found consult: " + consultRec.getID());
                     trtApptManager.newTreatmentApptHist(doctor, consultRec, treatment, room, apptTime, createdAt);
                 }
 
@@ -401,8 +401,7 @@ public class CSVLoader {
                 Visit visit = new Visit(visitId, patient, symptoms, severity, doctor, registrationTime);
                 historyManager.addHistoricalVisit(visit);
             }
-
-            System.out.println("Visit history loaded successfully from " + filePath);
+       
             } catch (IOException e) {
             System.err.println("Error reading visit CSV file: " + e.getMessage());
         }

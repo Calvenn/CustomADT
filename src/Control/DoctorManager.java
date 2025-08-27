@@ -72,9 +72,18 @@ public class DoctorManager {
     }
     
     // Extract doctor from min-heap root (least workload), used in "bookAppointment"
-    public Doctor getMinWorkDoctor(){
-        Doctor minWorkDoctor = doctorHeap.extractRoot();
-        return minWorkDoctor;
+    public Doctor getMinWorkDoctorByDept(String dept) {
+        Doctor minDoctor = null;
+
+        for (int i = 0; i < doctorHeap.size(); i++) {
+            Doctor d = doctorHeap.get(i);
+            if (d.getDepartment().equalsIgnoreCase(dept)) {
+                if (minDoctor == null || d.getPatientCount() < minDoctor.getPatientCount()) {
+                    minDoctor = d;
+                }
+            }
+        }
+        return minDoctor;
     }
     
     // Peek lowest patientCount doctor

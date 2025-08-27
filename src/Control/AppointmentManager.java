@@ -28,8 +28,8 @@ public class AppointmentManager {
     private final LocalTime WORK_END = LocalTime.of(20, 0);    // 17:00 //RMB CHANGEEEEEEEEEE
 
     
-    public AppointmentManager(LinkedHashMap<String, Queue<Appointment>> missAppt, LinkedHashMap<String, List<Consultation>> consultLog, DoctorManager docManager, QueueManager queueManager) {
-        this.apptQueue = new Heap<>(false);
+    public AppointmentManager(LinkedHashMap<String, Queue<Appointment>> missAppt, LinkedHashMap<String, List<Consultation>> consultLog, Heap<Appointment> apptQueue, DoctorManager docManager, QueueManager queueManager) {
+        this.apptQueue = apptQueue;
         this.missAppt = missAppt;
         this.consultLog = consultLog;
         this.docManager = docManager;
@@ -257,7 +257,7 @@ public class AppointmentManager {
         System.out.println(Consultation.getHeader());
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
-            if (appt.getDoctor().getID().equalsIgnoreCase(docId)) {
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
                 System.out.println(appt); 
                 found = true;
             }
@@ -306,10 +306,10 @@ public class AppointmentManager {
         }
 
         Queue<Appointment> docQueue = missAppt.get(docId);
-
+        
         for (int i = apptQueue.size() - 1; i >= 0; i--) {
             Appointment appt = apptQueue.get(i);
-
+            
             if (appt.getDoctor().getID().equalsIgnoreCase(docId)
                     && (appt.getDateTime().isBefore(LocalDateTime.now()) 
                     || appt.getDateTime().equals(LocalDateTime.now()))) {

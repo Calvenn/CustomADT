@@ -28,7 +28,7 @@ public class QueueManager {
     private Visit nextPatient;
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager) {
+    public QueueManager(Heap<Visit> sharedQueue, Heap<Appointment> apptQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         this.queueNumber = 1000;
@@ -36,7 +36,7 @@ public class QueueManager {
         // Initialize tracking structures
         this.severityCount = new LinkedHashMap<>();
         this.consultLog = consultLog;
-        this.apptQueue = new Heap<>(false);
+        this.apptQueue = apptQueue;
 
         this.historyManager = historyManager;
         
@@ -48,43 +48,51 @@ public class QueueManager {
     
     public void loadVisit() {
         String[] allDocID = docManager.peekAllDoctorID();
-        Appointment consultAppt = null;
 
         for (int i = 0; i < allDocID.length; i++) { 
             List<Consultation> consultations = consultLog.get(allDocID[i]);
-
             if (consultations == null) continue;
 
-            for (int j = 1; j <= consultations.size(); j++) {
-                consultAppt = consultations.get(j);
+            for (int j = 1; j <= consultations.size(); j++) {   
+                Consultation consultAppt = consultations.get(j);
+                if (consultAppt == null || consultAppt.getDateTime() == null) continue;
 
-                if (consultAppt instanceof Consultation) {
-                    if (consultAppt == null || consultAppt.getDateTime() == null) continue; 
-                    Consultation appt = (Consultation) consultAppt;
+                LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
 
-                    if (consultAppt.getDateTime() != null) {
-                        LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
-                        apptQueue.insert(appt);
-
-                        if (apptDate.equals(LocalDate.now())) {
-                            boolean exists = false;
-                            for (int k = 0; k < visitQueue.size(); k++) { 
-                                Visit v = visitQueue.get(k);
-                                if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
-                                    exists = true;
-                                    break;
-                                }
-                            }
-
-                            if (!exists) {
-                                createVisit(consultAppt.getPatient(), appt.getDisease(), false, true);
-                            }
+                boolean apptExists = false;
+                for (int k = 1; k <= apptQueue.size(); k++) {
+                    Appointment a = apptQueue.get(k);
+                        if(a instanceof Consultation){
+                            Consultation existing = (Consultation) a;
+                        if (a != null && existing.getID().equals(consultAppt.getID())) { 
+                            apptExists = true;
+                            break;
                         }
+                    }
+                }
+
+                if (!apptExists) {
+                    apptQueue.insert(consultAppt);
+                }
+
+                if (apptDate.equals(LocalDate.now())) {
+                    boolean visitExists = false;
+                    for (int k = 0; k < visitQueue.size(); k++) { 
+                        Visit v = visitQueue.get(k);
+                        if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
+                            visitExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!visitExists) {
+                        createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
                     }
                 }
             }
         }
     }
+
 
     public boolean isEmpty() {
         return visitQueue.isEmpty();
@@ -94,7 +102,7 @@ public class QueueManager {
         String visitId = generateId(isAppt);
         Severity severityLevel = Entity.Symptoms.assessSeverity(symptoms, isLifeThreatening);
 
-        Doctor doctor = docManager.getMinWorkDoctor();
+        Doctor doctor = docManager.getMinWorkDoctorByDept("CONSULT");
         Visit visit = new Visit(visitId, patient, symptoms, severityLevel, doctor);
         docManager.updateDoctorInc(doctor);
         visitQueue.insert(visit);
