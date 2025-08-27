@@ -18,6 +18,7 @@ public class ClinicApplication {
     // Shared ADTs
     private final Heap<Doctor> sharedDoc = new Heap<>(false);
     private final Heap<Visit> sharedVisitQueue = new Heap<>(true);
+    private final Heap<Appointment> apptQueue = new Heap<>(false);
     private final LinkedHashMap<String,Treatment> providedTreatments = new LinkedHashMap<>();
     private final LinkedHashMap<String,Medicine> medMap = new LinkedHashMap<>();
     private final LinkedHashMap<String,Doctor> doctorLookup = new LinkedHashMap<>();
@@ -61,8 +62,8 @@ public class ClinicApplication {
         docManager = new DoctorManager(doctorLookup, sharedDoc);
         staffManager = new StaffManager(staffLookup);
         historyManager = new VisitHistoryManager();
-        queueManager = new QueueManager(sharedVisitQueue, docManager, consultLog, historyManager);
-        apptManager = new AppointmentManager(missAppt, consultLog, docManager, queueManager);
+        queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, historyManager);
+        apptManager = new AppointmentManager(missAppt, consultLog, apptQueue,docManager, queueManager);
         consultManager = new ConsultationManager(sharedVisitQueue,apptManager.getAppointmentHeap(),
         consultLog, trtApptHistory, medRecList,docManager,apptManager, paymentRec);
         consultReport = new ConsultationReport(consultLog, apptManager);

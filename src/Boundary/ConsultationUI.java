@@ -80,6 +80,7 @@ public class ConsultationUI {
             System.out.println("Staff " + staff.getID() + " unable to access");
             return;
         }
+        apptManager.checkMissedAppt(currentDoc.getID());
         
         while (true) {
             consultationApptSummary();
@@ -413,10 +414,10 @@ public class ConsultationUI {
     
     /**REPORT SECTION**/
     public void consultationApptSummary(){
-        // Collect values first
+        apptManager.checkMissedAppt(currentDoc.getID());
         int total = apptManager.totalAppointments(currentDoc.getID());
-        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getID());
         int missed = apptManager.getNumMissedAppt(currentDoc.getID());
+        Appointment incoming = apptManager.getIncomingAppointment(currentDoc.getID());
 
         // Print table header
         System.out.println("\n=================== Appointment Summary ====================");

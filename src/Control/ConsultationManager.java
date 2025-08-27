@@ -58,7 +58,7 @@ public class ConsultationManager {
         
         if (nextAppt instanceof Consultation) severity = ((Consultation) nextAppt).getSeverity();
         
-        while (nextAppt != null && !nextAppt.getDoctor().getID().equals(currentDoc.getID())) {
+        while (nextAppt != null && (!nextAppt.getDoctor().getID().equals(currentDoc.getID()) || nextAppt.getDateTime().isBefore(LocalDateTime.now()))) {
             appointmentHeap.extractRoot(); // skip unrelated doctor
             nextAppt = appointmentHeap.peekRoot();
         }
@@ -73,8 +73,6 @@ public class ConsultationManager {
         if (nextWalkIn == null) return appointmentHeap.extractRoot();
 
         boolean isToday = nextAppt.getDateTime().toLocalDate().equals(LocalDate.now());
-
-        System.out.println(nextWalkIn);
         
         if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > severity) {
             return queue.extractRoot();
@@ -199,7 +197,6 @@ public class ConsultationManager {
         }
         return resultList;
     }
-
     
     public Consultation getConsultRec(String id, String docId) {
         Consultation found = null;
