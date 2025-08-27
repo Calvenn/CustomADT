@@ -4,7 +4,6 @@
  */
 package Main;
 
-import Boundary.StaffLogin;
 import Boundary.*;
 import Control.*;
 import Entity.*;
@@ -91,12 +90,13 @@ public class ClinicApplication {
     public void runTest(){
         CSVLoader.loadPatientFromCSV("src/data/patients.csv", patientManager);
         CSVLoader.loadDoctorsFromCSV("src/data/doctor.csv", docManager, staffManager);
+        CSVLoader.loadVisitHistoryFromCSV("src/data/visits.csv", patientManager, docManager, historyManager);
         CSVLoader.loadStaffFromCSV("src/data/staff.csv", staffManager);
         CSVLoader.loadConsultRecFromCSV("src/data/consultation.csv", patientManager, docManager, consultLog);
         CSVLoader.loadTreatmentFromCSV("src/data/treatment.csv", trtManager);
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList, consultManager);
-          
+         
         staffLoginTest.login();
     }
     

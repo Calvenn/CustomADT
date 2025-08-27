@@ -79,10 +79,10 @@ public class Visit implements Comparable<Visit> {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("| %-10s | %-14s | %-14s | %-17s | %-30s |\n", visitId, severityLevel, doctor.getName(), registrationTime.format(formatter), symptoms));
-        sb.append("-".repeat(101));
+        sb.append(String.format("| %-10s | %-14s | %-20s | %-17s | %-30s |\n", visitId, severityLevel, doctor.getName(), registrationTime.format(formatter), symptoms));
+        sb.append("-".repeat(107));
 
         return sb.toString();
     }
