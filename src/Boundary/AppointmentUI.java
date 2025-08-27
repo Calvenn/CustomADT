@@ -7,6 +7,7 @@ package Boundary;
 import Entity.Appointment;
 import Entity.Doctor;
 import Control.AppointmentManager;
+import Control.DoctorManager;
 import Entity.Consultation;
 
 import exception.*;
@@ -29,6 +30,57 @@ public class AppointmentUI {
     public AppointmentUI(AppointmentManager shared) {
         this.apptManager = shared;
         scanner = new Scanner(System.in);     
+    }
+    
+    public void apptMenu(DoctorManager doctorManager) {
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("Select doctor to view appointment: ");
+        Doctor[] doc = doctorManager.viewAllDoctor();
+        for(int i = 0; i < doc.length ; i++){
+            System.out.println("[" + (i + 1) + "]" + doc[i].getName());
+        }
+        System.out.println("\n" + "=".repeat(35));
+        int select = ValidationHelper.inputValidatedChoice(1, doc.length + 1, "selected doctor");
+        Doctor currentDoc = doc[select-1];
+        
+        int choice;
+        while (true) {         
+            System.out.println("\n" + "=".repeat(35));
+            System.out.println("        APPOINTMENT MENU");
+            System.out.println("=".repeat(35));
+            System.out.println("1. View Appointments");
+            System.out.println("2. Update Appointment");
+            System.out.println("3. Delete Appointment");        
+            System.out.print(missedFlag == true? 
+                    "4. Reschedule Miss Appointment"
+                    :"");
+            System.out.println("0. Back");
+            System.out.println("=".repeat(35));         
+
+            if (!missedFlag) {
+                choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
+                switch (choice) {
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
+                    case 2 -> updateAppointmentUI();
+                    case 3 -> cancelAppointmentUI();
+                    case 0 -> {return;}
+                    default -> System.out.println("Invalid choice.\n");
+                }
+            } else {
+                choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
+                switch (choice) {
+                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
+                    case 2 -> updateAppointmentUI();
+                    case 3 -> cancelAppointmentUI();
+                    case 4 -> rescheduleMissedApptUI(currentDoc);
+                    case 0 -> {
+                        System.out.println("Returning to main menu");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice.\n");
+                }
+            }
+        }
     }
     
     public void apptMenu(Doctor currentDoc) {

@@ -3,9 +3,8 @@ package Boundary;
 import Control.AppointmentManager;
 import Control.ConsultationManager;
 import Control.ConsultationReport;
-import Control.DoctorManager; //TEMP
+import Control.DoctorManager;   
 import Control.MedicineControl;
-import Control.StaffManager;
 import Control.TreatmentManager;
 
 import Entity.Doctor;
@@ -52,6 +51,26 @@ public class ConsultationUI {
         this.medControl = medControl;
         this.consultReport = consultReport;
         this.scanner = new Scanner(System.in);
+    }
+    
+    public void consultMainMenuRead() {
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("1. Consultation History");
+        System.out.println("2. Appointment Record");
+        System.out.println("0. Back");
+        System.out.println("=".repeat(35));
+
+        int choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
+        
+        switch (choice) {
+            case 1 -> displayRecordUIAll(); 
+            case 2 -> apptUI.apptMenu(docManager);
+            case 0 -> {
+                System.out.println("Returning to main menu...");
+                return;
+            }
+            default -> System.out.println("Invalid choice.");
+        }
     }
     
     public void consultMainMenu(Staff staff) {     
@@ -330,31 +349,67 @@ public class ConsultationUI {
         }
     } 
     
+    public void displayRecordUIAll(){
+        List<Consultation> record = consultManager.getRecordsAll();
+        
+        if(record == null) {
+            System.out.println("No record found.");
+            return;
+        }
+        
+        System.out.println(Consultation.getHeader());
+        for(int i = 1; i<= record.size(); i++){
+            Consultation c = record.get(i);
+            System.out.println(c);
+        }
+    }
+    
     private void displayRecordUI(){
-        if(!consultManager.displayAllRecordsByDoctor(currentDoc)){
+        List<Consultation> allConsultRec = consultManager.displayAllRecordsByDoctor(currentDoc);
+        if(allConsultRec == null){
             System.out.println("No consultation records found for Doctor " + currentDoc.getID());
         } else {
+            System.out.println(Consultation.getHeader());
+            for(int i = 1; i<= allConsultRec.size(); i++){
+                Consultation c = allConsultRec.get(i);
+                System.out.println(c);
+            }
             Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to sort by patient IC?");
 
             if (choice == 'y' || choice == 'Y') {
-                while (true) {
-                    System.out.print("Please enter patient IC (press 'x' to exit): ");
-                    String rawInput = scanner.nextLine().trim();
-
-                    if (rawInput.equalsIgnoreCase("x")) {
-                        return; // exit search loop
-                    }
-
-                    String searchedIc = ValidationHelper.validateICOnce(rawInput);
-                    if (searchedIc == null) continue; // invalid → try again
-
-                    if (!consultManager.displayRecordsByIC(searchedIc)) {
-                        System.out.println("Patient IC " + searchedIc + " not found");
-                    }
-                }
+                displayByIC();
             }
         }
     }
+    
+    private void displayByIC() {
+        while (true) {
+            System.out.print("\nPlease enter patient IC (press 'x' to exit): ");
+            String rawInput = scanner.nextLine().trim();
+
+            if (rawInput.equalsIgnoreCase("x")) {
+                return; // exit search loop
+            }
+
+            String searchedIc = ValidationHelper.validateICOnce(rawInput);
+            if (searchedIc == null) continue; // invalid → try again
+
+            List<Consultation> consultations = consultManager.displayRecordsByIC(searchedIc);
+
+            // if no record found
+            if (consultations == null || consultations.isEmpty()) {
+                System.out.println("No record found for " + searchedIc);
+                continue;
+            }
+
+            // instead of table header + toString, print each full report
+            for (int i = 1; i <= consultations.size(); i++) {
+                Consultation c = consultations.get(i);
+                System.out.println(c.generateFullReport());
+            }
+        }
+    }
+
     
     /**REPORT SECTION**/
     public void consultationApptSummary(){
@@ -410,26 +465,36 @@ public class ConsultationUI {
         System.out.println("=".repeat(46));
         displayDiagnosisTrends();
     }
-    
+
     public void displayDiagnosisTrends() {
         LinkedHashMap<String, Integer> trends = consultReport.generateDiagnosisTrends();
-        
-        if (trends == null) {
+
+        if (trends == null || trends.isEmpty()) {
             System.out.println("\nNo consultation records or diagnoses available.");
             return;
         }
 
+        System.out.println("[1] Top 5 Diagnosis Trends");
+        System.out.println("[2] View All Diagnosis Trends");
+        int choice = ValidationHelper.inputValidatedChoice(1, 2, "your choice");
+
+        Object[] keys = trends.getKeys();
+
+        // 🔹 Sort using helper function
+        bubbleSortByCountDesc(keys, trends);
+
         System.out.println("\n" + "=".repeat(46));
         System.out.println("           Diagnosis Frequency Report");
         System.out.println("=".repeat(46));
-        System.out.printf("| %-22s | %-7s |\n", "Diagnosis", "Count");
-        System.out.println("|------------------------|---------|");
+        System.out.printf("| %-4s | %-22s | %-7s |\n", "Rank", "Diagnosis", "Count");
+        System.out.println("|------|------------------------|---------|");
 
-        Object[] keys = trends.getKeys();
-        for (Object keyObj : keys) {
-            String key = (String) keyObj;
+        int limit = (choice == 1) ? Math.min(5, keys.length) : keys.length;
+
+        for (int i = 0; i < limit; i++) {
+            String key = (String) keys[i];
             int count = trends.get(key);
-            System.out.printf("| %-22s | %7d |\n", key, count);
+            System.out.printf("| %-4d | %-22s | %7d |\n", i + 1, key, count);
         }
 
         System.out.println("=".repeat(46));
@@ -459,5 +524,27 @@ public class ConsultationUI {
         }
 
         System.out.println("=".repeat(70));
+    }
+    
+    // ===== Helper method Sorting =====
+    private void swap(Object[] arr, int i, int j) {
+        Object temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    private void bubbleSortByCountDesc(Object[] keys, LinkedHashMap<String, Integer> trends) {
+        for (int i = 0; i < keys.length - 1; i++) {
+            for (int j = 0; j < keys.length - i - 1; j++) {
+                String key1 = (String) keys[j];
+                String key2 = (String) keys[j + 1];
+                int count1 = trends.get(key1);
+                int count2 = trends.get(key2);
+
+                if (count1 < count2) { // descending order
+                    swap(keys, j, j + 1);
+                }
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@ public class MedRecordControl {
                 consult
         );
         recList.add(record);
+        //consultLog.add()
     }
     
     public void viewAllRecords() {

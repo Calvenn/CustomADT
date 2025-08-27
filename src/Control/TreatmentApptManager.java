@@ -88,9 +88,9 @@ public class TreatmentApptManager {
     
     //ON TREATMENT HISTORY -----------------------
     public boolean newTreatmentApptHist(Doctor doctor, Consultation consult, Treatment treatment, String room, LocalDateTime treatmentTime, LocalDateTime createdAt) {
-        if(!validDateTime(treatmentTime)) {
+        /*if(!validDateTime(treatmentTime)) {
             throw new IllegalArgumentException("Invalid time entered.");
-        }
+        }*/
         
         TreatmentAppointment appt = new TreatmentAppointment(doctor, consult, treatment, room, treatmentTime, createdAt); 
         history.put(appt.getAppointmentId(), appt);
