@@ -32,15 +32,14 @@ public class ConsultationManager {
     private final Heap<Appointment> appointmentHeap;
     private final Heap<Visit> queue;
     private final LinkedHashMap<String, List<Consultation>> consultLog;
-    private final LinkedHashMap<String, TreatmentAppointment> trtApptHistory;
+    private final LinkedHashMap<String, List<TreatmentAppointment>> trtApptHistory;
     private final List<MedRecord> medRecList;
     
     private static Consultation newConsult = null;
     private final AppointmentManager apptManager;
     private final DoctorManager doctorManager;
-    private final List<Payment> paymentRec;
     
-    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, LinkedHashMap<String, List<Consultation>> consultLog, LinkedHashMap<String, TreatmentAppointment> trtApptHistory, List<MedRecord> medRecList,DoctorManager doctorManager, AppointmentManager apptManager, List<Payment> payment) {
+    public ConsultationManager(Heap<Visit> queue, Heap<Appointment> appointmentHeap, LinkedHashMap<String, List<Consultation>> consultLog, LinkedHashMap<String, List<TreatmentAppointment>> trtApptHistory, List<MedRecord> medRecList,DoctorManager doctorManager, AppointmentManager apptManager) {
         this.queue = queue;
         this.appointmentHeap = appointmentHeap;
         this.consultLog = consultLog;
@@ -48,7 +47,6 @@ public class ConsultationManager {
         this.doctorManager = doctorManager;
         this.trtApptHistory = trtApptHistory;
         this.medRecList = medRecList;
-        this.paymentRec = payment;
     }
 
     public Object dispatchNextPatient() {
@@ -97,16 +95,6 @@ public class ConsultationManager {
         }
     }
     
-    public boolean toTreatment(Doctor doc, Treatment treatment, String room, LocalDateTime time, Severity sev){
-        if (doc == null || treatment == null || room == null || time == null || sev == null) {  
-            return false;
-        }     
-        
-        TreatmentAppointment trtAppt = new TreatmentAppointment(doc, newConsult, treatment, room, time);
-        toPayment(newConsult.getPatient(), Payment.consultPrice + treatment.getPrice() , trtAppt, null);
-        return true;
-    }
-    
     public boolean toPharmacy(Doctor doc, Patient patient, Medicine med, int qty, LocalDateTime time){
         if (doc == null || patient == null || med == null || time == null) {
             return false;
@@ -114,13 +102,7 @@ public class ConsultationManager {
 
         boolean toSaveRec = false;
         MedRecord medCollect = new MedRecord(patient, doc, med, qty, time,toSaveRec, newConsult);
-        toPayment(patient, Payment.consultPrice + (med.getPrice() * qty), null, medCollect);
-        return true;
-    }
-    
-    public boolean toPayment(Patient patient, double price, TreatmentAppointment trtAppt, MedRecord medCollect){
-        Payment payment = new Payment(patient, newConsult, price, false, trtAppt, medCollect);
-        paymentRec.add(payment);
+        PaymentManager.paymentRec.add(new Payment(patient, newConsult, Payment.consultPrice + (med.getPrice() * qty), false, null, medCollect));
         return true;
     }
     
@@ -179,19 +161,21 @@ public class ConsultationManager {
 
                 // treatment appointments
                 Object[] trtHistory = trtApptHistory.getValues();  
+
                 for (Object obj : trtHistory) {
-                    System.out.println("test");
-                    if (obj instanceof TreatmentAppointment) {
-                        TreatmentAppointment t = (TreatmentAppointment) obj;
-                        if(t == null) System.out.println("Null trt appt");
-                        System.out.println(t);
-                        System.out.println(t.getConsultation().getID());
-                        if (t.getConsultation() != null && t.getConsultation().getID().equals(cid)) {
+                    if (!(obj instanceof List)) continue; // skip invalid entries
+
+                    List<TreatmentAppointment> trtList = (List<TreatmentAppointment>) obj;
+
+                    for (int k = 1; k <= trtList.size(); k++) {
+                        TreatmentAppointment t = trtList.get(k);
+                        if (t == null || t.getConsultation() == null) continue;
+
+                        if (t.getConsultation().getID().equals(cid)) {
                             c.addTreatmentAppointment(t);
                         }
                     }
                 }
-
                 resultList.add(c);
             }
         }

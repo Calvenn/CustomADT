@@ -308,7 +308,7 @@ public class CSVLoader {
     }
 
      public static void loadTreatmentApptFromCSV(String filePath, TreatmentApptManager trtApptManager, DoctorManager docManager, TreatmentManager trtManager, ConsultationManager consultManager) {
-         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isHeader = true;
@@ -320,27 +320,18 @@ public class CSVLoader {
                 }
 
                 // Split by comma, handle quotes if needed
-                String[] values = line.split(",");               
+                String[] values = line.split(",");
 
                 Doctor doctor = docManager.findDoctor(values[0].trim());
-                String consultId = values[1].trim();
+                
+                Consultation consult = consultManager.getConsultRec(values[1].trim(), docManager);
+                
                 Treatment treatment = trtManager.findTreatmentName(values[2].trim());
-                String room = values[3].trim();
 
-                LocalDateTime apptTime = LocalDateTime.parse(values[4].trim(), formatter);
-                LocalDateTime createdAt = LocalDateTime.parse(values[5].trim(), formatter);
+                LocalDateTime apptTime = LocalDateTime.parse(values[3].trim(), formatter);
+                LocalDateTime createdAt = LocalDateTime.parse(values[4].trim(), formatter);
 
-                Consultation consultRec = consultManager.getConsultRec(consultId, docManager);
-                
-                if (consultRec == null) {
-                    System.out.println(consultId + " not found");
-                } else {
-                    trtApptManager.newTreatmentApptHist(doctor, consultRec, treatment, room, apptTime, createdAt);
-                }
-
-                
-                //need find consult 
-                trtApptManager.newTreatmentApptHist(doctor, consultRec, treatment, room, apptTime, createdAt);
+                trtApptManager.newTreatmentApptHist(doctor, consult, treatment, apptTime, createdAt);
                 
             }
 

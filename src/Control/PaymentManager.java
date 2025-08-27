@@ -6,6 +6,7 @@ package Control;
 
 import Entity.Consultation;
 import Entity.MedRecord;
+import Entity.Patient;
 import Entity.Payment;
 import Entity.TreatmentAppointment;
 import adt.List;
@@ -16,14 +17,14 @@ import adt.Queue;
  * @author calve
  */
 public class PaymentManager {
-    private final List<Payment> paymentRec;
     private final Queue<TreatmentAppointment> treatmentQueue;
     private final Queue<MedRecord> medCollectQueue;
+    public static List<Payment> paymentRec = new List<>();
     
-    public PaymentManager(List<Payment> paymentRec, Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue){
-        this.paymentRec = paymentRec;
+    public PaymentManager(Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue){
         this.treatmentQueue = treatmentQueue;
         this.medCollectQueue = medCollectQueue;
+        this.paymentRec = new List<>();
     }
     
     public List<Payment> findPendingPayment(){

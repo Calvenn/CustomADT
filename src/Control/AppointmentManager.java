@@ -56,7 +56,7 @@ public class AppointmentManager {
                 }
             }
         }
-        queueManager.loadVisit();
+        //queueManager.loadVisit();
     }
 
     // Helper to check if apptQueue already has this appointment
@@ -138,26 +138,16 @@ public class AppointmentManager {
                 }
             }
             
-            int index = findConsultRecIndex(newConsult);       
-            System.out.println(index);
+            int index = findOldApptIndex(newConsult);       
+            System.out.println(index); //-1
             String doctorId = newConsult.getDoctor().getID();
             List<Consultation> consultations = consultLog.get(doctorId);
-            String oldID = consultations.get(index).getID();
             
-            // Create a new Consultation with the new date
-            Consultation consult = new Consultation(
-                    oldID,
-                newConsult.getSeverity(),
-                newConsult.getPatient(),
-                newConsult.getDisease(),
-                newConsult.getNotes(),
-                newConsult.getDoctor(),
-                newConsult.getConsultTime(),
-                dateTime,
-                newConsult.getCreatedAt()
-            );                 
-
-            if(index != -1) consultations.replace(index, consult);
+            if(index != -1){
+               Consultation consult = consultations.get(index);
+               consult.setTime(dateTime);
+            }
+            
             refreshHeapFromConsultations();
             return true;
         }   
@@ -252,12 +242,13 @@ public class AppointmentManager {
     }
     
     public void displayAllAppointmentByDoctor(String docId){
-        refreshHeapFromConsultations();
+        //refreshHeapFromConsultations();
         boolean found = false;
+        System.out.println(apptQueue.size());
         System.out.println(Consultation.getHeader());
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
-            if (appt.getDoctor().getID().equalsIgnoreCase(docId) && appt.getDateTime().isAfter(LocalDateTime.now())) {
+            if (appt.getDoctor().getID().equalsIgnoreCase(docId)) {
                 System.out.println(appt); 
                 found = true;
             }
@@ -306,29 +297,42 @@ public class AppointmentManager {
         }
 
         Queue<Appointment> docQueue = missAppt.get(docId);
-        
+
+        // iterate backwards (heap index starts from 1, not 0)
         for (int i = apptQueue.size() - 1; i >= 0; i--) {
             Appointment appt = apptQueue.get(i);
-            
-            if (appt.getDoctor().getID().equalsIgnoreCase(docId)
-                    && (appt.getDateTime().isBefore(LocalDateTime.now()) 
-                    || appt.getDateTime().equals(LocalDateTime.now()))) {
 
-                // Check for duplicates 
-                boolean exists = false;
-                for (int j = 0; j < docQueue.size(); j++) {
-                    Appointment existing = docQueue.peek();
-                    if (existing.equals(appt)) { 
-                        exists = true;
+            if (appt instanceof Consultation) {
+                Consultation consultAppt = (Consultation) appt;
+
+                if (consultAppt.getDoctor().getID().equalsIgnoreCase(docId)
+                    && (consultAppt.getDateTime().isBefore(LocalDateTime.now())
+                        || consultAppt.getDateTime().equals(LocalDateTime.now()))) {
+
+                    // enqueue missed appt
+                    boolean exists = false;
+                    for (int k = 0; k < docQueue.size(); k++) {
+                        Appointment existing = docQueue.get(k);
+                        if (existing instanceof Consultation) {
+                            Consultation existingC = (Consultation) existing;
+                            if (existingC.getID().equals(consultAppt.getID())) {
+                                exists = true;
+                                break;
+                            }
+                        }
                     }
-                }
 
-                if (!exists) {
-                    docQueue.enqueue(appt);
+                    if (!exists) {
+                        docQueue.enqueue(consultAppt);
+                    }
+
+                    // remove safely
+                    apptQueue.remove(consultAppt);
+                    System.out.println("Missed appointment moved to queue for " + docId);
                 }
-                apptQueue.remove(appt);
             }
         }
+        System.out.println(apptQueue.size());
     }
 
     public int getNumMissedAppt(String docId) {

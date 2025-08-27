@@ -47,52 +47,55 @@ public class QueueManager {
     }
     
     public void loadVisit() {
-        String[] allDocID = docManager.peekAllDoctorID();
+        Doctor[] allDocID = docManager.viewAllDoctor();
 
         for (int i = 0; i < allDocID.length; i++) { 
-            List<Consultation> consultations = consultLog.get(allDocID[i]);
-            if (consultations == null) continue;
+            if (allDocID[i].getDepartment().equalsIgnoreCase("CONSULT")) {
+                List<Consultation> consultations = consultLog.get(allDocID[i].getID());
+                if (consultations == null) continue;
 
-            for (int j = 1; j <= consultations.size(); j++) {   
-                Consultation consultAppt = consultations.get(j);
-                if (consultAppt == null || consultAppt.getDateTime() == null) continue;
+                for (int j = 1; j <= consultations.size(); j++) {
+                    Consultation consultAppt = consultations.get(j);
+                    if (consultAppt == null || consultAppt.getDateTime() == null) continue;
 
-                LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
+                    LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
 
-                boolean apptExists = false;
-                for (int k = 1; k <= apptQueue.size(); k++) {
-                    Appointment a = apptQueue.get(k);
-                        if(a instanceof Consultation){
-                            Consultation existing = (Consultation) a;
-                        if (a != null && existing.getID().equals(consultAppt.getID())) { 
-                            apptExists = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!apptExists) {
-                    apptQueue.insert(consultAppt);
-                }
-
-                if (apptDate.equals(LocalDate.now())) {
-                    boolean visitExists = false;
-                    for (int k = 0; k < visitQueue.size(); k++) { 
-                        Visit v = visitQueue.get(k);
-                        if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
-                            visitExists = true;
-                            break;
+                    // ✅ Check if already exists in apptQueue before inserting
+                    boolean apptExists = false;
+                    for (int k = 1; k <= apptQueue.size(); k++) {
+                        Appointment existing = apptQueue.get(k);
+                        if (existing instanceof Consultation) {
+                            Consultation existingC = (Consultation) existing;
+                            if (existingC.getID().equals(consultAppt.getID())) {
+                                apptExists = true;
+                                break;
+                            }
                         }
                     }
 
-                    if (!visitExists) {
-                        createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
+                    if (!apptExists) {
+                        apptQueue.insert(consultAppt);
+                    }
+
+                    // ✅ Only insert into visitQueue if for today and not already inside
+                    if (apptDate.equals(LocalDate.now())) {
+                        boolean visitExists = false;
+                        for (int k = 0; k < visitQueue.size(); k++) {
+                            Visit v = visitQueue.get(k);
+                            if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
+                                visitExists = true;
+                                break;
+                            }
+                        }
+
+                        if (!visitExists) {
+                            createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
+                        }
                     }
                 }
             }
         }
     }
-
 
     public boolean isEmpty() {
         return visitQueue.isEmpty();

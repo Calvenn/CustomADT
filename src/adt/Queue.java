@@ -67,6 +67,14 @@ public class Queue<E> implements QueueInterface<E> {
             System.out.println(items[index]);
         }
     }
+    
+    public E get(int index) {
+        if (index < 0 || index >= count) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + count);
+        }
+        int actualIndex = (front + index) % SIZE;
+        return (E) items[actualIndex];
+    }
 
     @Override
     public E remove(E data) {

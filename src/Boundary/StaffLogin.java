@@ -24,6 +24,7 @@ public class StaffLogin {
     private final StaffManager staffManager;
     private final ConsultationUI consultUI;
     private final TreatmentUI treatmentUI;
+    private final TreatmentApptUI treatmentApptUI;
     private final PharmacyUI pharUI;
     private final PatientManagementUI patientUI;
     private final StaffManagementUI staffUI;
@@ -34,11 +35,12 @@ public class StaffLogin {
     public String currID;       // Temporal field for storing ID
     
     // Constructor
-    public StaffLogin(QueueManager queueManager, StaffManager staffManager, ConsultationUI consultUI, TreatmentUI treatmentUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, PaymentUI payUI) {
+    public StaffLogin(QueueManager queueManager, StaffManager staffManager, ConsultationUI consultUI, TreatmentUI treatmentUI, TreatmentApptUI treatmentApptUI, PharmacyUI pharUI, PatientManagementUI patientUI, StaffManagementUI staffUI, PaymentUI payUI) {
         this.queueManager = queueManager;
         this.staffManager = staffManager;
         this.consultUI = consultUI;
         this.treatmentUI = treatmentUI;
+        this.treatmentApptUI = treatmentApptUI;
         this.pharUI = pharUI;
         this.patientUI = patientUI;
         this.staffUI = staffUI;
@@ -156,24 +158,26 @@ public class StaffLogin {
         while (true){ // Repeat the step if the user input invalid choice
             queueManager.loadVisit();
             printTitle(staffManager.findStaff(userID));
-            System.out.println("1. Consultation System");
-            System.out.println("2. Treatment System"); 
-            System.out.println("3. Pharmacy System");
-            System.out.println("4. Patient Registration System");
-            System.out.println("5. Payment System");
-            System.out.println("6. Staff Management System");
-            System.out.println("0. Log Out");   
+            System.out.println("1. Consultation System"); //read only
+            System.out.println("2. Treatment System"); //read only??
+            System.out.println("3. Treatment Appointment System");
+            System.out.println("4. Pharmacy System (Read-Only)");
+            System.out.println("5. Patient Registration System");
+            System.out.println("6. Payment System");
+            System.out.println("7. Staff Management System");
+            System.out.println("0. Log Out");     
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 5, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 7, "your choice");
 
             switch(choice){
                 case 1 -> consultUI.consultMainMenuRead(); // Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
-                case 3 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
-                case 4 -> patientUI.patientMenu();
-                case 5 -> payUI.paymentMenu();
-                case 6 -> staffUI.staffMenu(); // Staff Management System
+                case 3 -> treatmentApptUI.treatmentApptMenu(userID); // treatment appointment system
+                case 4 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
+                case 5 -> patientUI.patientMenu();
+                case 6 -> payUI.paymentMenu();
+                case 7 -> staffUI.staffMenu();  // Staff Management System
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();
@@ -190,16 +194,20 @@ public class StaffLogin {
             printTitle(staffManager.findStaff(userID));
             System.out.println("1. Consultation System");
             System.out.println("2. Treatment System");
-            System.out.println("3. Pharmacy System (Read-Only)");
-            System.out.println("0. Log Out");   
+            System.out.println("3. Treatment Appointment System");
+            System.out.println("4. Pharmacy System (Read-Only)");
+            System.out.println("5. Staff Management System");
+            System.out.println("0. Log Out");     
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 5, "your choice");
 
             switch(choice){
                 case 1 -> consultUI.consultMainMenu(staffManager.findStaff(userID)); // Consultation System
                 case 2 -> treatmentUI.treatmentMenu(); // Treatment System
-                case 3 -> pharUI.pharmacyMenuRead();// Pharmacy System (READ_ONLY) 
+                case 3 -> treatmentApptUI.treatmentApptMenu(userID); //treatment appointment system
+                case 4 -> pharUI.pharmacyMenuRead(); // Pharmacy System (READ_ONLY)
+                case 5 -> staffUI.staffMenu(); 
                 case 0 -> { // Exit
                     System.out.println("\nThank you for using Doctor Management System");
                     login();

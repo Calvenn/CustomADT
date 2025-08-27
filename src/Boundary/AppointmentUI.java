@@ -51,7 +51,7 @@ public class AppointmentUI {
             System.out.println("1. View Appointments");
             System.out.println("2. Update Appointment");
             System.out.println("3. Delete Appointment");        
-            System.out.print(missedFlag == true? 
+            System.out.println(missedFlag == true? 
                     "4. Reschedule Miss Appointment"
                     :"");
             System.out.println("0. Back");
