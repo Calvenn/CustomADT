@@ -25,8 +25,8 @@ public class PatientManager {
         return patientMap.containsKey(ic);
     }
 
-    public Patient registerNewPatient(String ic, String name, String phone, int age, char gender, String address) {
-        Patient patient = new Patient(ic, name, phone, age, gender, address);
+    public Patient registerNewPatient(String ic, String id, String name, String phone, int age, char gender, String address) {
+        Patient patient = new Patient(ic, id, name, phone, age, gender, address);
 
         patientMap.put(patient.getPatientIC(), patient);
 

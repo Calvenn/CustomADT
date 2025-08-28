@@ -46,7 +46,7 @@ public class PatientManagementUI {
 
     private void displayMenu() {
         System.out.println("\n" + "=".repeat(35));
-        System.out.println("      PATIENT MANAGEMENT MENU");
+        System.out.println("     PATIENT MANAGEMENT MENU");
         System.out.println("=".repeat(35));
         System.out.println("1. Add New Patient");
         System.out.println("2. Register Visit");
@@ -77,13 +77,14 @@ public class PatientManagementUI {
             break;
         }
 
+        String id = ValidationHelper.inputValidatedStudentID("\nEnter Student ID: ");
         String name = ValidationHelper.inputValidatedString("\nEnter name: ");
-        String phone = ValidationHelper.inputValidatedString("\nEnter phone number: ");
+        String phone = ValidationHelper.inputValidatedPhone("\nEnter phone number: ");
         int age = ValidationHelper.inputValidatedPositiveInt("\nEnter age: ");
         char gender = ValidationHelper.inputValidatedGender("\nEnter gender (M/F): ");
         String address = ValidationHelper.inputValidatedString("\nEnter address: ");
 
-        Patient newPatient = patientManager.registerNewPatient(ic, name, phone, age, gender, address);
+        Patient newPatient = patientManager.registerNewPatient(ic, id, name, phone, age, gender, address);
         if (newPatient != null) {
             System.out.println("\nPatient registered successfully!");
             System.out.println(newPatient);
@@ -142,12 +143,13 @@ public class PatientManagementUI {
         }
 
         System.out.println("\nEnter new information (press Enter to keep current value):");
+        String newStudentID = ValidationHelper.inputOptionalValidatedString("New Student ID", existingPatient.getStudentID());
         String finalName = ValidationHelper.inputOptionalValidatedString("New name", existingPatient.getPatientName());
         String finalPhone = ValidationHelper.inputOptionalValidatedPhone("New phone", existingPatient.getPatientPhoneNo());
         int finalAge = ValidationHelper.inputOptionalValidatedPositiveInt("New age", existingPatient.getPatientAge());
         char finalGender = ValidationHelper.inputOptionalValidatedGender("New gender", existingPatient.getPatientGender());
         String finalAddress = ValidationHelper.inputOptionalValidatedString("New address", existingPatient.getPatientAddress());
-        Patient updatedPatient = new Patient(existingPatient.getPatientIC(), finalName, finalPhone, finalAge, finalGender, finalAddress);
+        Patient updatedPatient = new Patient(existingPatient.getPatientIC(), newStudentID, finalName, finalPhone, finalAge, finalGender, finalAddress);
 
         if (patientManager.updatePatient(existingPatient.getPatientIC(), updatedPatient)) {
             System.out.println("\nPatient information updated successfully!");
@@ -165,7 +167,10 @@ public class PatientManagementUI {
 
         // Step 1: Reuse search logic to get the patient
         Patient patient = handleSearchPatient();
-        if (patient == null) return;
+        if (patient == null) {
+            System.out.println("\nPatient deletion cancelled."); 
+            return;
+        }
 
         char confirm = ValidationHelper.inputValidateYesOrNo("\nAre you sure you want to delete this patient?");
 
@@ -198,21 +203,22 @@ public class PatientManagementUI {
 
         for (int i = 0; i < totalPatients; i++) {
             Patient patient = patients[i];
-            System.out.printf("| %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
+            System.out.printf("| %-15s | %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
                     patient.getPatientIC(),
+                    patient.getStudentID(),
                     patient.getPatientName(),
                     patient.getPatientPhoneNo(),
                     patient.getPatientAge(),
                     patient.getPatientGender(),
                     patient.getPatientAddress());
-            System.out.println("-".repeat(122));
+            System.out.println("-".repeat(140));
         }
     }
 
     public void patientTableHeader() {
-        System.out.println("-".repeat(122));
-        System.out.println(String.format("| %-15s | %-20s | %-15s | %-5s | %-8s | %-40s |", "Patient IC", "Patient Name", "Phone Number", "Age", "Gender", "Address"));
-        System.out.println("-".repeat(122));
+        System.out.println("-".repeat(140));
+        System.out.println(String.format("| %-15s | %-15s | %-20s | %-15s | %-5s | %-8s | %-40s |", "Patient IC", "Student ID", "Patient Name", "Phone Number", "Age", "Gender", "Address"));
+        System.out.println("-".repeat(140));
     }
 
     private void handlePatientStatistics() {
