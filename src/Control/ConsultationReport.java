@@ -48,7 +48,6 @@ public class ConsultationReport {
         Object[] lists = consultLog.getValues(); // Each is a List<Consultation>
 
         for (Object obj : lists) {
-            System.out.println("No record...............");
             List<Consultation> consultationList = (List<Consultation>) obj;
 
             for (int i = 1; i <= consultationList.size(); i++) {
@@ -94,7 +93,7 @@ public class ConsultationReport {
                 if (c == null) continue;
 
                 long wait = java.time.Duration.between(
-                        c.getCreatedAt(), c.getConsultTime()
+                        c.getConsultTime(), c.getCreatedAt()
                 ).toMinutes();
 
                 if (c.getDateTime() != null) { // Appointment
@@ -138,5 +137,27 @@ public class ConsultationReport {
         });
 
         return report;
+    }
+    
+    // ===== Helper method Sorting =====
+    private void swap(Object[] arr, int i, int j) {
+        Object temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    public void bubbleSortByCountDesc(Object[] keys, LinkedHashMap<String, Integer> trends) {
+        for (int i = 0; i < keys.length - 1; i++) {
+            for (int j = 0; j < keys.length - i - 1; j++) {
+                String key1 = (String) keys[j];
+                String key2 = (String) keys[j + 1];
+                int count1 = trends.get(key1);
+                int count2 = trends.get(key2);
+
+                if (count1 < count2) { // descending order
+                    swap(keys, j, j + 1);
+                }
+            }
+        }
     }
 }

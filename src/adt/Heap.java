@@ -107,6 +107,15 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
         return false;
     }
     
+    @Override
+    public void clear() {
+        for (int i = 0; i < size; i++) {
+            heap[i] = null;   // remove references (helps GC)
+        }
+        size = 0;
+    }
+
+    
     /****************helper function**************/
     private void ensureSize(){
         if(size == heap.length){

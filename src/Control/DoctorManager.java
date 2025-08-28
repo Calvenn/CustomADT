@@ -122,13 +122,13 @@ public class DoctorManager {
         return (staff instanceof Doctor);
     }
     
-    public List<Doctor> getTreatmentDoctors() {
+    public List<Doctor> getDoctorsByDept(String dept) {
         if(doctorLookup.isEmpty()) {
             return null;
         }
         List<Doctor> doctors = new List<>(); 
         for(Doctor doctor : viewAllDoctor()) {
-            if(doctor.getDepartment().equals("Treatment")) {
+            if(doctor.getDepartment().equalsIgnoreCase(dept)) {
                 doctors.add(doctor);
             }
         }

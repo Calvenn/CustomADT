@@ -47,11 +47,10 @@ public class QueueManager {
     }
     
     public void loadVisit() {
-        Doctor[] allDocID = docManager.viewAllDoctor();
+        List<Doctor> doc = docManager.getDoctorsByDept("CONSULT");
 
-        for (int i = 0; i < allDocID.length; i++) { 
-            if (allDocID[i].getDepartment().equalsIgnoreCase("CONSULT")) {
-                List<Consultation> consultations = consultLog.get(allDocID[i].getID());
+        for (int i = 1; i <= doc.size(); i++) { 
+            List<Consultation> consultations = consultLog.get(doc.get(i).getID());
                 if (consultations == null) continue;
 
                 for (int j = 1; j <= consultations.size(); j++) {
@@ -60,7 +59,6 @@ public class QueueManager {
 
                     LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
 
-                    // ✅ Check if already exists in apptQueue before inserting
                     boolean apptExists = false;
                     for (int k = 1; k <= apptQueue.size(); k++) {
                         Appointment existing = apptQueue.get(k);
@@ -77,7 +75,6 @@ public class QueueManager {
                         apptQueue.insert(consultAppt);
                     }
 
-                    // ✅ Only insert into visitQueue if for today and not already inside
                     if (apptDate.equals(LocalDate.now())) {
                         boolean visitExists = false;
                         for (int k = 0; k < visitQueue.size(); k++) {
@@ -93,7 +90,6 @@ public class QueueManager {
                         }
                     }
                 }
-            }
         }
     }
 
