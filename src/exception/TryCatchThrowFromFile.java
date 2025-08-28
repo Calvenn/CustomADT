@@ -69,6 +69,14 @@ public class TryCatchThrowFromFile {
         }
     }
 
+    //Validate student ID
+    public static void validateStudentID(String studentID) throws InvalidInputException {
+        validateNotNull(studentID);
+        if (!ValidationUtility.isValidStudentID(studentID)) {
+            throw new InvalidInputException("Invalid Student ID format.");
+        }
+    }
+
     // Validate gender
     public static void validateGender(char gender) throws InvalidInputException {
         validateNotNull(gender);
@@ -104,5 +112,6 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Price must be more than zero.");
         }
     }
+
 
 }

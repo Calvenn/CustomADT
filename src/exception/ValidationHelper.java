@@ -76,6 +76,19 @@ public class ValidationHelper {
             }
         }
     }
+
+    public static String inputValidatedStudentID(String prompt) {
+        while (true) {
+            System.out.print(prompt + ": ");
+            String studentID = scanner.nextLine().trim();
+            try {
+                TryCatchThrowFromFile.validateStudentID(studentID);
+                return studentID;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
     
     public static char inputValidateYesOrNo(String prompt) {
         while (true) {
@@ -132,6 +145,19 @@ public class ValidationHelper {
             try {
                 TryCatchThrowFromFile.validateGender(gender);
                 return gender;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
+    public static String inputValidatedPhone(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                TryCatchThrowFromFile.validatePhone(input);
+                return input;
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e);
             }

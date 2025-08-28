@@ -50,21 +50,22 @@ public class CSVLoader {
                 }
 
                 // Split CSV values
-                String[] values = line.split(",", 6); 
-                if (values.length < 6) {
+                String[] values = line.split(",", 7); 
+                if (values.length < 7) {
                     System.err.println("Skipping invalid line: " + line);
                     continue;
                 }
 
                 String patientIc = values[0].trim();
-                String name = values[1].trim();
-                String phone = values[2].trim();
-                int age = Integer.parseInt(values[3].trim());
-                char gender = values[4].trim().charAt(0);
-                String address = values[5].trim();
+                String studentId = values[1].trim();
+                String name = values[2].trim();
+                String phone = values[3].trim();
+                int age = Integer.parseInt(values[4].trim());
+                char gender = values[5].trim().charAt(0);
+                String address = values[6].trim().replaceAll("^\"|\"$", "");
 
                 // Register into patient manager
-                patientManager.registerNewPatient(patientIc, name, phone, age, gender, address);
+                patientManager.registerNewPatient(patientIc, studentId, name, phone, age, gender, address);
             }
 
         } catch (IOException e) {

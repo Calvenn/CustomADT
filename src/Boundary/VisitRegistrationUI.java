@@ -5,10 +5,8 @@ import Control.VisitHistoryManager;
 import Entity.Visit;
 import Entity.Severity;
 
-import exception.InvalidInputException;
 import exception.TryCatchThrowFromFile;
 import exception.ValidationHelper;
-import exception.ValidationUtility;
 
 public class VisitRegistrationUI {
     private QueueManager queueManager;
@@ -25,18 +23,17 @@ public class VisitRegistrationUI {
         int choice;
         do {
             displayVisitsMenu();
-            choice = ValidationHelper.inputValidatedChoice(0, 9, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 8, "your choice");
 
             switch (choice) {
                 case 1 -> handleVisitRegistration();
                 case 2 -> displayQueue();
-                case 3 -> displayQueueComposition();
-                case 4 -> searchVisitsFunctionality();
-                case 5 -> handleEmergencyOverride();
-                case 6 -> visitsHistoryUI.displayHistoricalVisits();
-                case 7 -> handleSummaryReports();
-                case 8 -> displayLiveQueueStatus();
-                case 9 -> handleProcessNextPatient();
+                case 3 -> searchVisitsFunctionality();
+                case 4 -> handleEmergencyOverride();
+                case 5 -> visitsHistoryUI.displayHistoricalVisits();
+                case 6 -> handleSummaryReports();
+                case 7 -> displayLiveQueueStatus();
+                case 8 -> handleProcessNextPatient();
             }
 
         } while (choice != 0);
@@ -48,21 +45,20 @@ public class VisitRegistrationUI {
         System.out.println("=".repeat(35));
         System.out.println("1. Register New Visit");
         System.out.println("2. Display Current Queue");
-        System.out.println("3. Queue Composition by Severity");
-        System.out.println("4. Search Functionality");
-        System.out.println("5. Emergency Override");
-        System.out.println("6. Display Historical Visits");
-        System.out.println("7. Reports");
-        System.out.println("8. Live Queue Status");
-        System.out.println("9. Process Next Patient");
+        System.out.println("3. Search Functionality");
+        System.out.println("4. Emergency Override");
+        System.out.println("5. Display Historical Visits");
+        System.out.println("6. Reports");
+        System.out.println("7. Live Queue Status");
+        System.out.println("8. Process Next Patient");
         System.out.println("0. Exit");
         System.out.println("=".repeat(35));
     }
 
     public void visitsTableHeader(){
-        System.out.println("-".repeat(101));
-        System.out.println(String.format("| %-10s | %-14s | %-14s | %-17s | %-30s |", "Visit ID", "Severity", "Doctor", "Register Time", "Symptoms"));
-        System.out.println("-".repeat(101));
+        System.out.println("-".repeat(107));
+        System.out.println(String.format("| %-10s | %-14s | %-20s | %-17s | %-30s |", "Visit ID", "Severity", "Doctor", "Register Time", "Symptoms"));
+        System.out.println("-".repeat(107));
     }
 
     public void handleVisitRegistration() {
@@ -102,7 +98,6 @@ public class VisitRegistrationUI {
             return;
         }
         System.out.println("Total patients in queue: " + queueManager.getQueueSize());
-        System.out.println("=".repeat(35));
         visitsTableHeader();
         queueManager.displayQueueDetails();
         displayQueueComposition();
@@ -131,31 +126,31 @@ public class VisitRegistrationUI {
 
     private Visit promptForVisitById() {
         while (true) {
+            int numberPart = ValidationHelper.inputValidatedPositiveInt("Enter Visit Number (e.g., 1000) or 0 to cancel: ");
+            if (numberPart == 0) {
+                return null; // User chose to cancel
+            }   
+            String visitId = "V" + numberPart;
             try {
-                int numberPart = ValidationHelper.inputValidatedPositiveInt("Enter Visit Number (e.g., 1000) or 0 to cancel: ");
-                if (numberPart == 0) {
-                    return null; // user chose to exit
-                }
-                String visitId = "V" + numberPart;
-                return TryCatchThrowFromFile.findObjectOrThrow(
-                    queueManager.getAllVisits(),
-                    Visit::getVisitId,
-                    visitId,
-                    "Visit",
-                    "ID"
-                );
-            } catch (InvalidInputException e) {
-                ValidationUtility.printErrorWithSolution(e);
+                return TryCatchThrowFromFile.findObjectOrThrow(queueManager.getAllVisits(), Visit::getVisitId, visitId, "Visit", "ID"); 
+            } catch (Exception e) {
+                System.out.println("No visit found with ID " + visitId + ". Please try again.");
             }
         }
     }
 
     private void searchVisitsFunctionality() {
         Visit result = promptForVisitById();
+
+        if (result == null) {
+            System.out.println("Search canceled.");
+            return;
+        }
+
         System.out.println("\nVisit found:");
         visitsTableHeader();
         System.out.println(result + "\n");
-        System.out.println("Patient Details:" + result.getPatient());
+        System.out.println(result.getPatient());
     }
 
     private void handleEmergencyOverride() {
@@ -193,7 +188,7 @@ public class VisitRegistrationUI {
         
         int width = 58;  
         String line = "-".repeat(width);
-        String title = "Live Queue Status";
+        String title = "LIVE QUEUE STATUS";
         System.out.println("\n" + line);
         System.out.printf("| %-"+(width-4)+"s |%n", title);  // auto pad
         System.out.println(line);

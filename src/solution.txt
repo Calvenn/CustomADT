@@ -52,6 +52,12 @@ The requested object could not be found in the system.
 
 ================================================================================
 
+STUDENT ID ERROR:
+Please enter a valid student ID.
+Format: 12PXX34567
+
+================================================================================
+
 GENERAL ERROR:
 Please check your input.
 
