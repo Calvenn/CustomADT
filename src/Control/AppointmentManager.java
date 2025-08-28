@@ -12,28 +12,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Appointment Manager - handles appointment booking, validation,
- * and next available consultation slot search using min-heap.
- * 
- * Author: calve
+ *
+ * @author CalvenPhnuahKahHong
  */
 public class AppointmentManager {
     private final Heap<Appointment> apptQueue;
     private final LinkedHashMap<String, Queue<Appointment>> missAppt;
     private final LinkedHashMap<String, List<Consultation>> consultLog;
     private final DoctorManager docManager;
-    private final QueueManager queueManager;
+    public boolean missedFlag;
     
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(20, 0);    // 17:00 //RMB CHANGEEEEEEEEEE
 
     
-    public AppointmentManager(LinkedHashMap<String, Queue<Appointment>> missAppt, LinkedHashMap<String, List<Consultation>> consultLog, Heap<Appointment> apptQueue, DoctorManager docManager, QueueManager queueManager) {
+    public AppointmentManager(LinkedHashMap<String, Queue<Appointment>> missAppt, LinkedHashMap<String, List<Consultation>> consultLog, Heap<Appointment> apptQueue, DoctorManager docManager) {
         this.apptQueue = apptQueue;
         this.missAppt = missAppt;
         this.consultLog = consultLog;
         this.docManager = docManager;
-        this.queueManager = queueManager;
         refreshHeapFromConsultations();
     }
     
@@ -57,7 +54,6 @@ public class AppointmentManager {
                 }
             }
         }
-        //queueManager.loadVisit();
     }
 
     // Helper to check if apptQueue already has this appointment
@@ -81,7 +77,6 @@ public class AppointmentManager {
 
         // Dates to check: 1 week, 1 month, 3 months later
         LocalDate[] baseDates = new LocalDate[] {
-            now.toLocalDate().plusDays(1), //TESTING PURPOSE
             now.toLocalDate().plusWeeks(1),
             now.toLocalDate().plusMonths(1),
             now.toLocalDate().plusMonths(3)
@@ -139,8 +134,7 @@ public class AppointmentManager {
                 }
             }
             
-            int index = findOldApptIndex(newConsult);       
-            System.out.println(index); //-1
+            int index = findOldApptIndex(newConsult, true);  
             String doctorId = newConsult.getDoctor().getID();
             List<Consultation> consultations = consultLog.get(doctorId);
             
@@ -156,7 +150,7 @@ public class AppointmentManager {
     }
     
     public boolean updateAppointment(Appointment oldAppt, LocalDateTime newDateTime) {
-        int index = findOldApptIndex(oldAppt);
+        int index = findOldApptIndex(oldAppt, false);
         List<Consultation> consultations = findOldAppt(oldAppt);
         String oldID = consultations.get(index).getID();
             if(oldAppt instanceof Consultation oldConsult && index != -1 && oldAppt.getDateTime() != null){
@@ -170,7 +164,7 @@ public class AppointmentManager {
     }    
     
     public boolean cancelAppointment(Appointment appt){
-        int index = findOldApptIndex(appt);
+        int index = findOldApptIndex(appt, false);
         List<Consultation> consultations = findOldAppt(appt);
         String oldID = consultations.get(index).getID();
             if(appt instanceof Consultation oldConsult && index != -1){
@@ -189,20 +183,26 @@ public class AppointmentManager {
         return consultations;
     }
    
-    private int findOldApptIndex(Appointment oldAppt){
+    private int findOldApptIndex(Appointment oldAppt, boolean isNew) {
         int index = -1;
         List<Consultation> consultations = findOldAppt(oldAppt);
-    
-        if(consultations == null) return -1;
-        for (int i = 1; i <= consultations.size(); i++) {
+
+        if (consultations == null) return -1;
+
+        for (int i = 1; i <= consultations.size(); i++) { 
             Consultation consult = consultations.get(i);
             if (consult == null) {
                 System.out.println("Consultation at index " + i + " is null!");
-                continue; // Skip nulls safely
+                continue;
             }
-            if (consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC()) &&
-                consult.getDoctor().getID().equals(oldAppt.getDoctor().getID()) && 
-                consult.getDateTime() != null) {
+            
+            Consultation appt = (Consultation) oldAppt;
+            boolean sameID = consult.getID().equals(appt.getID());
+            boolean samePatient = consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC());
+            boolean sameDoctor = consult.getDoctor().getID().equals(oldAppt.getDoctor().getID());
+            boolean matchDateTime = (isNew && consult.getDateTime() == null) || (!isNew && consult.getDateTime() != null);
+
+            if (sameID && samePatient && sameDoctor && matchDateTime) {
                 index = i;
                 break;
             }
@@ -215,20 +215,18 @@ public class AppointmentManager {
         apptQueue.display();
     }
     
-    public void displayAllAppointmentByDoctor(String docId){
+    public List<Appointment> getAllAppointmentsByDoctor(String docId) {
         refreshHeapFromConsultations();
-        boolean found = false;
-        System.out.println(Consultation.getHeader());
+        List<Appointment> doctorAppointments = new List<>();
+
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
             if (appt.getDoctor().getID().equalsIgnoreCase(docId)) {
-                System.out.println(appt); 
-                found = true;
+                doctorAppointments.add(appt);
             }
         }
-        if(!found){
-            System.out.println("No appointment found");
-        }
+
+        return doctorAppointments;
     }
     
     public Heap<Appointment> getAppointmentHeap() {
@@ -264,6 +262,16 @@ public class AppointmentManager {
         return totalAppt;
     }
     
+    //to refresh the flag
+    public void checkMissedAppt(Doctor currentDoc){
+        if(getNumMissedAppt(currentDoc.getID()) != 0){
+            missedFlag = true;
+        } else {
+            missedFlag = false;
+        }
+    }
+    
+    //to refresh the collection
     public void checkMissedAppt(String docId) {
         if (!missAppt.containsKey(docId)) {
             missAppt.put(docId, new Queue<>());
@@ -298,8 +306,6 @@ public class AppointmentManager {
                     if (!exists) {
                         docQueue.enqueue(consultAppt);
                     }
-
-                    // remove safely
                     apptQueue.remove(consultAppt);
                 }
             }
@@ -354,5 +360,30 @@ public class AppointmentManager {
 
         missAppt.put(doc.getID(), tempQueue);
         return removed;
+    }
+    
+    //Sorting
+     public void sortByDate(List<Appointment> list, boolean ascending) {
+        if (list == null || list.isEmpty()) return;
+
+        // Bubble sort using custom ADT (1-based index)
+        for (int i = 1; i <= list.size(); i++) {
+            for (int j = 1; j <= list.size() - i; j++) {
+                Appointment a1 = list.get(j);
+                Appointment a2 = list.get(j + 1);
+
+                boolean needSwap = false;
+                if (ascending && a1.getDateTime().isAfter(a2.getDateTime())) {
+                    needSwap = true;
+                } else if (!ascending && a1.getDateTime().isBefore(a2.getDateTime())) {
+                    needSwap = true;
+                }
+
+                if (needSwap) {
+                    list.replace(j, a2);
+                    list.replace(j + 1, a1);
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class PaymentUI {  
     private final PaymentManager paymentManager;
