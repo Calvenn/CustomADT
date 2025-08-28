@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public abstract class Appointment implements Comparable<Appointment>{
     private Patient patient;
@@ -39,14 +39,6 @@ public abstract class Appointment implements Comparable<Appointment>{
     @Override
     public int compareTo(Appointment other){
         return this.dateTime.compareTo(other.dateTime);
-    }
-    
-    @Override
-    public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return "Appointment Details:\n"
-             + " Date & Time : " + dateTime.format(formatter) + "\n"
-             + " Doctor      : " + doctor.getName() + "\n";
     }
     
     @Override

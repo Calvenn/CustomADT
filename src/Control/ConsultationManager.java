@@ -11,9 +11,7 @@ import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Payment;
-import Entity.Severity;
 import Entity.Visit;
-import Entity.Treatment;
 import Entity.TreatmentAppointment;
 
 import adt.Heap;
@@ -24,7 +22,7 @@ import java.time.LocalDateTime;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class ConsultationManager {
     public Doctor currentDoc;

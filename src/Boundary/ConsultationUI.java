@@ -24,13 +24,12 @@ import adt.List;
 import exception.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 /**
- * Boundary class to handle user interface for consultation booking.
- * Handles input, displays options, and interacts with AppointmentManager.
- * 
- * Author: calve
+ *
+ * @author CalvenPhnuahKahHong
  */
 public class ConsultationUI {
     private final AppointmentUI apptUI;
@@ -56,14 +55,6 @@ public class ConsultationUI {
         this.scanner = new Scanner(System.in);
     }
     
-    private void checkMissedAppt(){
-        if(apptManager.getNumMissedAppt(currentDoc.getID()) != 0){
-                apptUI.missedFlag = true;
-            } else {
-                apptUI.missedFlag = false;
-            }
-    }
-    
     public void consultMainMenuRead() {
         System.out.println("\n" + "=".repeat(35));
         System.out.println("Select doctor to view record: ");
@@ -77,7 +68,7 @@ public class ConsultationUI {
         currentDoc = doc.get(select);
         
         consultationApptSummary();
-        checkMissedAppt();
+        apptManager.checkMissedAppt(currentDoc);
         System.out.println("\n" + "=".repeat(35));
         System.out.println("1. Consultation History By " + currentDoc.getName());
         System.out.println("2. Appointment Record");
@@ -109,7 +100,7 @@ public class ConsultationUI {
         
         while (true) {
             consultationApptSummary();
-            checkMissedAppt();
+            apptManager.checkMissedAppt(currentDoc);
             
             System.out.println("\n" + "=".repeat(35));
             System.out.println("        CONSULTATION MENU");
@@ -319,7 +310,7 @@ public class ConsultationUI {
     
     private boolean isToPharmacy(){
         while(true){
-            Character input = ValidationHelper.inputValidateYesOrNo("Does patient need to collect medicine?");
+            Character input = ValidationHelper.inputValidateYesOrNo("\nDoes patient need to collect medicine?");
 
             if (input == 'y' || input == 'Y') return true;
             else if (input == 'n' || input == 'N') return false;
@@ -403,12 +394,11 @@ public class ConsultationUI {
             List<Consultation> consultations = consultManager.displayRecordsByIC(searchedIc);
 
             // if no record found
-            if (consultations == null || consultations.isEmpty()) {
+            if (consultations.isEmpty()) {
                 System.out.println("No record found for " + searchedIc);
                 continue;
             }
 
-            // instead of table header + toString, print each full report
             for (int i = 1; i <= consultations.size(); i++) {
                 Consultation c = consultations.get(i);
                 System.out.println(c.generateFullReport());
@@ -434,7 +424,7 @@ public class ConsultationUI {
             (total == 0 ? "No appointment found" : total));
 
         System.out.printf("| %-20s | %-34s |%n", "Incoming Appointment", 
-            (incoming == null ? "No incoming appointment found" : incoming.getPatient().getPatientName() + " " + incoming.getDateTime()));
+            (incoming == null ? "No incoming appointment found" : incoming.getPatient().getPatientName() + " " + incoming.getDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))));
 
         System.out.printf("| %-20s | %-34s |%n", "Missed Appointments", 
             (missed == 0 ? "No appointment missed" : missed));
@@ -485,6 +475,7 @@ public class ConsultationUI {
         System.out.println("=".repeat(35));
         System.out.println("[1] Top 5 Diagnosis Trends");
         System.out.println("[2] View All Diagnosis Trends");
+        System.out.println("=".repeat(35));
         int choice = ValidationHelper.inputValidatedChoice(1, 2, "your choice");
 
         Object[] keys = trends.getKeys();
@@ -495,8 +486,8 @@ public class ConsultationUI {
         System.out.println("\n" + "=".repeat(46));
         System.out.println("           Diagnosis Frequency Report");
         System.out.println("=".repeat(46));
-        System.out.printf("| %-4s | %-26s | %-7s |\n", "Rank", "Diagnosis", "Count");
-        System.out.println("|------|----------------------------|---------|");
+        System.out.printf("| %-4s | %-25s | %-7s |\n", "Rank", "Diagnosis", "Count");
+        System.out.println("|------|---------------------------|---------|");
 
         int limit = (choice == 1) ? Math.min(5, keys.length) : keys.length;
 

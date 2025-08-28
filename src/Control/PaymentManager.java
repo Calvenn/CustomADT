@@ -14,7 +14,7 @@ import adt.Queue;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class PaymentManager {
     private final Queue<TreatmentAppointment> treatmentQueue;

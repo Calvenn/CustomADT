@@ -5,12 +5,14 @@
 package Entity;
 import adt.List;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class Consultation extends Appointment{
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private List<MedRecord> medRecords = new List<>();
     private List<TreatmentAppointment> trtAppts = new List<>();
     //for report purpose
@@ -89,10 +91,6 @@ public class Consultation extends Appointment{
         return medRec;
     }
     
-    public void setNotes(){
-        this.notes = notes;
-    }
-    
     //Helper method to see the all record
     public void addMedRecord(MedRecord m) {
         if (m != null) medRecords.add(m);
@@ -120,7 +118,7 @@ public class Consultation extends Appointment{
         return String.format(
             "%-8s | %-18s | %-15s | %-8d | %-30s | %-60s | %-20s | %-20s | %-20s | %-20s\n" + "-".repeat(242),
             consultationID,getPatient().getPatientName(),getPatient().getPatientIC(),severity,disease,notes == null ? "" : notes,getDoctor().getName(),
-            getConsultTime(),(getDateTime() == null ? "" : getDateTime()),getCreatedAt()
+            getConsultTime().format(formatter),(getDateTime() == null ? "" : getDateTime().format(formatter)),getCreatedAt().format(formatter)
         );
     } 
     
@@ -158,9 +156,9 @@ public class Consultation extends Appointment{
         report.append(String.format("%-18s: %s\n", "Diagnosis", disease));
         report.append(String.format("%-18s: %s\n", "Notes", (notes == null || notes.isEmpty() ? "-" : notes)));
         report.append(String.format("%-18s: %s\n", "Doctor", getDoctor().getName()));
-        report.append(String.format("%-18s: %s\n", "Consult Time", consultTime));
+        report.append(String.format("%-18s: %s\n", "Consult Time", consultTime.format(formatter)));
         report.append(String.format("%-18s: %s\n", "Appointment Time", 
-                (getDateTime() == null ? "-" : getDateTime())));
+                (getDateTime() == null ? "-" : getDateTime().format(formatter))));
         report.append(String.format("%-18s: %s\n", "Created At", createdAt));
 
         // --- Medical Records ---
@@ -176,7 +174,7 @@ public class Consultation extends Appointment{
                 MedRecord m = medRecords.get(i);
                 report.append(String.format("%-10s %-20s %-40s\n",
                         m.getRecordID(),
-                        m.getTimestamp(),
+                        m.getTimestamp().format(formatter),
                         m.getMed().getName()));
             }
         }
@@ -194,7 +192,7 @@ public class Consultation extends Appointment{
                 TreatmentAppointment t = trtAppts.get(i);
                 report.append(String.format("%-10s %-20s %-40s\n",
                         t.getAppointmentId(),
-                        t.getDateTime(),
+                        t.getDateTime().format(formatter),
                         t.getTreatment().getName()));
             }
         }

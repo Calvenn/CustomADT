@@ -9,6 +9,7 @@ import Entity.Doctor;
 import Control.AppointmentManager;
 import Control.DoctorManager;
 import Entity.Consultation;
+import adt.List;
 
 import exception.*;
 
@@ -19,12 +20,11 @@ import java.util.Scanner;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class AppointmentUI {
     private final AppointmentManager apptManager;
     private final Scanner scanner;
-    protected boolean missedFlag;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
     public AppointmentUI(AppointmentManager shared) {
@@ -40,17 +40,17 @@ public class AppointmentUI {
             System.out.println("=".repeat(35));
             System.out.println("1. View Appointments");
             System.out.println("2. Update Appointment");
-            System.out.println("3. Delete Appointment");        
-            System.out.print(missedFlag == true? 
+            System.out.println("3. Cancel Appointment");        
+            System.out.print(apptManager.missedFlag == true? 
                     "4. Reschedule Miss Appointment\n"
                     :"");
             System.out.println("0. Back");
             System.out.println("=".repeat(35));         
 
-            if (!missedFlag) {
+            if (!apptManager.missedFlag) {
                 choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
+                    case 1 -> displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 0 -> {return;}
@@ -59,7 +59,7 @@ public class AppointmentUI {
             } else {
                 choice = ValidationHelper.inputValidatedChoice(0, 4, "your choice");
                 switch (choice) {
-                    case 1 -> apptManager.displayAllAppointmentByDoctor(currentDoc.getID());
+                    case 1 -> displayAllAppointmentByDoctor(currentDoc.getID());
                     case 2 -> updateAppointmentUI();
                     case 3 -> cancelAppointmentUI();
                     case 4 -> rescheduleMissedApptUI(currentDoc);
@@ -79,23 +79,65 @@ public class AppointmentUI {
             LocalDateTime time = ValidationHelper.inputValidatedDateTime("Enter appointment date and time");
 
             if (apptManager.bookAppointment(consultAppt, time)) {
-                System.out.println("Appointment booked successfully!");
+                System.out.println("\nAppointment booked successfully!");
                 break;
             } else {
                 System.out.println("Time slot already taken. Please try a different time.");
             }
         }
     }
+    
+    private void displayAllAppointmentByDoctor(String docId) {
+        List<Appointment> doctorAppointments = apptManager.getAllAppointmentsByDoctor(docId);
+
+        if (doctorAppointments.isEmpty()) {
+            System.out.println("No appointment found");
+            return;
+        }
+        apptManager.sortByDate(doctorAppointments, true);
+
+        System.out.println(Consultation.getHeader());
+        for (int i = 1; i <= doctorAppointments.size(); i++) {
+            Consultation appt = (Consultation) doctorAppointments.get(i);
+            System.out.println(appt);
+        }
+        Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to search records by patient ic");
+        if(choice == 'y' || choice == 'Y') displayByIC();
+    }
+    
+    private void displayByIC() {
+        while (true) {
+            System.out.print("\nPlease enter patient IC (press 'x' to exit): ");
+            String rawInput = scanner.nextLine().trim();
+
+            if (rawInput.equalsIgnoreCase("x")) {
+                return; 
+            }
+
+            String searchedIc = ValidationHelper.validateICOnce(rawInput);
+            if (searchedIc == null) continue;
+
+            Appointment oldData = apptManager.findPatienInfo(searchedIc);
+            if(oldData == null) {
+                System.out.println("No record found for " + searchedIc);
+                continue;
+            }
+            System.out.println(Consultation.getHeader());
+            System.out.println(oldData);
+        }
+    }
+
 
     protected void updateAppointmentUI() {
         if(apptManager.getAppointmentHeap().isEmpty()) {
             System.out.println("No appointment record found");
             return;
         }
-        String ic = ValidationHelper.inputValidatedIC("Enter patient IC number");  
+        String ic = ValidationHelper.inputValidatedIC("\nEnter patient IC number");  
         Appointment oldData = apptManager.findPatienInfo(ic);
 
         if (oldData != null) {
+            suggestNextAvailableSlot();
             LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("Enter new appointment time");
 
             if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
@@ -112,18 +154,18 @@ public class AppointmentUI {
             System.out.println("No appointment record found");
             return;
         }
-        String ic = ValidationHelper.inputValidatedIC("Enter patient IC number");
+        String ic = ValidationHelper.inputValidatedIC("\nEnter patient IC number");
         Appointment appt = apptManager.findPatienInfo(ic);
 
         if (appt != null) {
             System.out.println("=".repeat(35));
-            System.out.println("    Appointment Details");
+            System.out.println("     Appointment Details");
             System.out.println("=".repeat(35));
             System.out.println("Patient Name: " + appt.getPatient().getPatientName());
             System.out.println("Current appointment: " + appt.getDateTime().format(formatter));
             System.out.println("=".repeat(35));
 
-            if (getConfirmation("Are you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime() + " ?")) {
+            if (getConfirmation("Are you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime().format(formatter) + " ?")) {
                 boolean success = apptManager.cancelAppointment(appt);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }
@@ -134,7 +176,7 @@ public class AppointmentUI {
 
     
     private void rescheduleMissedApptUI(Doctor doc) {
-        apptManager.displayAllMissedAppt(doc); //
+        apptManager.displayAllMissedAppt(doc); 
         String changedIC = ValidationHelper.inputValidatedIC("\nEnter patient IC number");
 
         Appointment a = apptManager.getMissedAppt(doc, changedIC);
@@ -144,6 +186,7 @@ public class AppointmentUI {
         }
         System.out.println(Consultation.getHeader());
         System.out.println(a);
+        suggestNextAvailableSlot();
         LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("\nPlease enter new date and time to reschedule");
 
         if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
