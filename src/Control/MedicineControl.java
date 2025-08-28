@@ -2,25 +2,41 @@ package Control;
 import Entity.Medicine;
 import adt.LinkedHashMap;
 import adt.List;
+import adt.Heap;
+
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
 
 public class MedicineControl {
     private LinkedHashMap<String,Medicine> medMap;
+    private Heap<Medicine> lowStockHeap;
 
     public MedicineControl() {
         medMap = new LinkedHashMap<>();
+        lowStockHeap = new Heap<>(false);
     }
     public MedicineControl(LinkedHashMap<String,Medicine> medMap){
         this.medMap = medMap;
+        lowStockHeap = new Heap<>(false);
+        for (Object obj : medMap.getValues()) {
+            Medicine med = (Medicine) obj;
+            lowStockHeap.insert(med);
+        }
     }
 
     public void addMedicine(Medicine med) {//
         medMap.put(med.getMedID(),med);
+        lowStockHeap.insert(med);
     }
     
     public boolean updateStock(String medID, int newStock) {//
         Medicine med = medMap.get(medID);
         if (med != null) {
+            lowStockHeap.remove(med);
             med.setStock(newStock);
+            lowStockHeap.insert(med);
             return true;
         }
         return false;
@@ -54,8 +70,14 @@ public class MedicineControl {
     }
 
 
-    public boolean removeMedicine(String medID) {//
-        return medMap.remove(medID) != null;
+    public boolean removeMedicine(String medID) {
+        Medicine med = medMap.get(medID);
+        if (med != null) {
+            lowStockHeap.remove(med); 
+            medMap.remove(medID); 
+            return true;
+        }
+        return false;
     }
     
     public void displayAllMedicines() {
@@ -106,17 +128,39 @@ public class MedicineControl {
     }
     
     public void displayLowStock(int threshold) {
-        System.out.println("\n=== Low Stock Alert (below " + threshold + ") ===");
+        System.out.println("\n=== Critical Low Stock Alert (below " + threshold + ") ===");
+        
+        if (lowStockHeap.isEmpty()) {
+            System.out.println("No medicines in inventory.");
+            return;
+        }
+        
+        Heap<Medicine> tempHeap = new Heap<>(false);
         boolean found = false;
-        for (Medicine med : getAllMedicines()) {
+        int criticalCount = 0;
+
+        while (!lowStockHeap.isEmpty()) {
+            Medicine med = lowStockHeap.extractRoot();
             if (med.getStock() < threshold) {
-                System.out.println(med.getMedID() + " | " + med.getName() + " | Stock: " + med.getStock());
+                System.out.println(++criticalCount + ". " + med.getMedID() + " | " + 
+                                 med.getName() + " | Stock: " + med.getStock());
                 found = true;
+                tempHeap.insert(med);
+            } else {
+                lowStockHeap.insert(med);
+                break;
             }
         }
+
+        while (!tempHeap.isEmpty()) {
+            lowStockHeap.insert(tempHeap.extractRoot());
+        }
+
         if (!found) {
-            System.out.println("All medicines have sufficient stock.");
-        }else System.out.println("Please reorder these medicines soon!\n");
+            System.out.println(" All medicines have sufficient stock.");
+        } else {
+            System.out.println("\n " + criticalCount + " medicine(s) require immediate attention!");
+        }
     }
     
     public Iterable<Medicine> getAllMedicines() {

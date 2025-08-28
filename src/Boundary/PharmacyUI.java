@@ -8,6 +8,10 @@ import adt.Queue;
 import exception.*;
 import java.util.Scanner;
 
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
 
 public class PharmacyUI {
     private final MedRecordControl medRecControl;

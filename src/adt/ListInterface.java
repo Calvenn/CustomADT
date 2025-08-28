@@ -1,5 +1,10 @@
 package adt;
 
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
 public interface ListInterface<E> {
     boolean add(E data);
     

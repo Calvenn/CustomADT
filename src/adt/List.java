@@ -1,4 +1,10 @@
 package adt;
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
+
 public class List<E> implements ListInterface<E>{
     private E[] array;
     private int numOfEntries;
