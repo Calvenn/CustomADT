@@ -688,13 +688,16 @@ public class StaffManagementUI {
         System.out.println("\nNumber of Staff");
         System.out.println("   ^");
         
+        
         for (int i = max + 2; i > 0; i--) {
             System.out.printf("%-2d | ", i);
             for (int j = 0; j < uniqueCount; j++) {
                 if (counts[j] >= i) {
-                    System.out.print("  @  ");  // filled block
+                    System.out.print("  | |  ");  // filled block
+                } else if (counts[j] + 1 == i){
+                    System.out.print("   _   ");  // spaces
                 } else {
-                    System.out.print("     ");  // spaces
+                    System.out.print("       ");  // spaces
                 }
             }
             System.out.println();
