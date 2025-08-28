@@ -1,6 +1,3 @@
-/*
- * PharmacyReportControl.java
- */
 package Control;
 
 import Entity.MedRecord;
@@ -8,6 +5,12 @@ import Entity.Medicine;
 import adt.List;
 import adt.LinkedHashMap;
 import java.time.LocalDateTime;
+
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
 
 public class PharmacyReport {
     private final List<MedRecord> medRecList;

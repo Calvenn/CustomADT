@@ -8,6 +8,11 @@ import Entity.Doctor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
 public class MedRecordControl {
     private List<MedRecord> recList;
 
@@ -29,7 +34,7 @@ public class MedRecordControl {
                 consult
         );
         recList.add(record);
-        //consultLog.add()
+        medicine.incrementDispensed(quantityTaken);
     }
     
     public void viewAllRecords() {

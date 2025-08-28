@@ -2,6 +2,11 @@ package Entity;
 
 import java.time.LocalDateTime;
 
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
 public class MedRecord {
     private static int idNo = 0; 
     private String recordID;

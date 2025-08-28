@@ -1,11 +1,17 @@
 package Entity;
 
-public class Medicine {
+/**
+ * 
+ * @author Cheang Wei Ting
+ */
+
+public class Medicine implements Comparable<Medicine>{
     private String medID;
     private String name;
     private String desc;
     private int stock; 
     private double price; 
+    private int totalDispensed = 0;
     
     public Medicine(){
         medID = "";
@@ -21,6 +27,23 @@ public class Medicine {
         this.desc = desc;
         this.stock = stock;
         this.price = price;
+    }
+    
+    @Override
+    public int compareTo(Medicine other){
+        return Integer.compare(this.stock,other.stock);
+    }
+    
+    public int compareToBySales(Medicine other) {
+        return Integer.compare(this.totalDispensed, other.totalDispensed);
+    }
+    
+    public void incrementDispensed(int quantity) {
+        this.totalDispensed += quantity;
+    }
+    
+    public int getTotalDispensed() {
+        return totalDispensed;
     }
     
     public String getMedID(){
