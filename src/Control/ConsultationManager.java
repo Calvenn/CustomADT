@@ -110,7 +110,6 @@ public class ConsultationManager {
         List<Consultation> consultations = consultLog.get(doc.getID());
 
         if (consultations == null || consultations.isEmpty()) {
-            System.out.println("No consultation records found for Doctor " + doc.getID());
             return null; 
         }
         return consultations;
@@ -223,5 +222,30 @@ public class ConsultationManager {
             }
         }
         return null;
+    }
+    
+    //Sorting
+     public void sortByDate(List<Consultation> list, boolean ascending) {
+        if (list == null || list.isEmpty()) return;
+
+        // Bubble sort using custom ADT (1-based index)
+        for (int i = 1; i <= list.size(); i++) {
+            for (int j = 1; j <= list.size() - i; j++) {
+                Consultation c1 = list.get(j);
+                Consultation c2 = list.get(j + 1);
+
+                boolean needSwap = false;
+                if (ascending && c1.getConsultTime().isAfter(c2.getConsultTime())) {
+                    needSwap = true;
+                } else if (!ascending && c1.getConsultTime().isBefore(c2.getConsultTime())) {
+                    needSwap = true;
+                }
+
+                if (needSwap) {
+                    list.replace(j, c2);
+                    list.replace(j + 1, c1);
+                }
+            }
+        }
     }
 }

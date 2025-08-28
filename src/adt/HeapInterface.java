@@ -40,4 +40,6 @@ public interface HeapInterface<E extends Comparable<E>>{
     //@return whether data is found
     boolean contains(E data);
     
+    void clear();
+    
 }

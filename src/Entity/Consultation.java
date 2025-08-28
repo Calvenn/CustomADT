@@ -124,6 +124,19 @@ public class Consultation extends Appointment{
         );
     } 
     
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Consultation other = (Consultation) obj;
+        return this.getID().equals(other.getID());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getID().hashCode();
+    }
+    
     public static String getHeader(){
         return String.format(
             "\n" + "-".repeat(242) + "\n%-8s  %-18s  %-17s  %-8s  %-30s  %-63s  %-20s  %-20s  %-20s  %-22s\n" + "-".repeat(242),
@@ -132,54 +145,62 @@ public class Consultation extends Appointment{
     }
     
     public String generateFullReport() {
-        String report = "";
+        StringBuilder report = new StringBuilder();
 
-        report += "==================== Consultation Report ====================\n\n";
-        report += "Consultation ID : " + consultationID + "\n";
-        report += "Patient Name    : " + getPatient().getPatientName() + "\n";
-        report += "Patient IC      : " + getPatient().getPatientIC() + "\n";
-        report += "Severity Level  : " + severity + "\n";
-        report += "Diagnosis       : " + disease + "\n";
-        report += "Notes           : " + (notes == null ? "" : notes) + "\n";
-        report += "Doctor          : " + getDoctor().getName() + "\n";
-        report += "Consult Time    : " + consultTime + "\n";
-        report += "Appointment Time: " + (getDateTime() == null ? "" : getDateTime()) + "\n";
-        report += "Created At      : " + createdAt + "\n";
+        report.append("============================================================\n");
+        report.append("                     Consultation Report                  \n");
+        report.append("============================================================\n\n");
+
+        report.append(String.format("%-18s: %s\n", "Consultation ID", consultationID));
+        report.append(String.format("%-18s: %s\n", "Patient Name", getPatient().getPatientName()));
+        report.append(String.format("%-18s: %s\n", "Patient IC", getPatient().getPatientIC()));
+        report.append(String.format("%-18s: %s\n", "Severity Level", severity));
+        report.append(String.format("%-18s: %s\n", "Diagnosis", disease));
+        report.append(String.format("%-18s: %s\n", "Notes", (notes == null || notes.isEmpty() ? "-" : notes)));
+        report.append(String.format("%-18s: %s\n", "Doctor", getDoctor().getName()));
+        report.append(String.format("%-18s: %s\n", "Consult Time", consultTime));
+        report.append(String.format("%-18s: %s\n", "Appointment Time", 
+                (getDateTime() == null ? "-" : getDateTime())));
+        report.append(String.format("%-18s: %s\n", "Created At", createdAt));
 
         // --- Medical Records ---
-        report += "\n\n--- Medical Records ---\n";
-        report += String.format("%-8s %-12s %-40s\n", "MedID", "Date", "Description");
+        report.append("\n------------------------------------------------------------\n");
+        report.append("                      Medical Records                      \n");
+        report.append("------------------------------------------------------------\n");
+        report.append(String.format("%-10s %-20s %-40s\n", "MedID", "Date", "Medicine"));
 
         if (medRecords.isEmpty()) {
-            report += "No medical records found.\n";
+            report.append("No medical records found.\n");
         } else {
             for (int i = 1; i <= medRecords.size(); i++) {
                 MedRecord m = medRecords.get(i);
-                report += String.format("%-8s %-12s %-40s\n",
+                report.append(String.format("%-10s %-20s %-40s\n",
                         m.getRecordID(),
                         m.getTimestamp(),
-                        m.getMed().getName());
+                        m.getMed().getName()));
             }
         }
 
         // --- Treatment Records ---
-        report += "\n--- Treatment Records ---\n";
-        report += String.format("%-8s %-12s %-40s\n", "TrtID", "Date", "Treatment");
+        report.append("\n------------------------------------------------------------\n");
+        report.append("                     Treatment Records                     \n");
+        report.append("------------------------------------------------------------\n");
+        report.append(String.format("%-10s %-20s %-40s\n", "TrtID", "Date", "Treatment"));
 
         if (trtAppts.isEmpty()) {
-            report += "No treatment records found.\n";
+            report.append("No treatment records found.\n");
         } else {
             for (int i = 1; i <= trtAppts.size(); i++) {
                 TreatmentAppointment t = trtAppts.get(i);
-                report += String.format("%-8s %-12s %-40s\n",
+                report.append(String.format("%-10s %-20s %-40s\n",
                         t.getAppointmentId(),
                         t.getDateTime(),
-                        t.getTreatment().getName());
+                        t.getTreatment().getName()));
             }
         }
 
-        report += "\n============================================================\n";
+        report.append("============================================================\n");
 
-        return report;
+        return report.toString();
     }
 }

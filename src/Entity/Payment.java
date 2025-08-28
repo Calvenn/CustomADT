@@ -90,19 +90,30 @@ public class Payment {
         this.paymentAt = paymentAt;
     }
     
+    public static String getHeader() {
+        return String.format(
+            "\n" + "-".repeat(150) + 
+            "\n%-10s %-10s %-20s %-12s %-20s %-15s %-12s %-20s %-8s" + 
+            "\n" + "-".repeat(150),
+            "PaymentID","ReceiptID","Patient Name","ConsultID","Treatment","MedRecord","Price(RM)","Created At","Paid"
+        );
+    }
+    
     @Override
     public String toString() {
         java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        return "===== PAYMENT INFO =====\n" +
-               "Payment ID   : " + paymentId +
-               (receiptId != null ? "\nReceipt ID   : " + receiptId + "\n" : "") +
-               "\nPatient      : " + patient.getPatientName() +
-               "\nConsultation : " + consult.getID() +
-               "\nTreatment    : " + (trtAppt != null? trtAppt.getTreatment().getName() : "") +
-               "\nMedRecord    : " + (medRec != null? medRec.getMed().getMedID(): "") +
-               "\nPrice (RM)   : " + String.format("%.2f", price) + "\n" +
-               "\nCreated At   : " + createdAt.format(dtf) +
-               "========================";
+        return String.format(
+            "%-10s %-10s %-20s %-12s %-20s %-15s RM %-10.2f %-20s %-8s",
+            paymentId,
+            (receiptId != null ? receiptId : "-"),
+            patient.getPatientName(),
+            consult.getID(),
+            (trtAppt != null ? trtAppt.getTreatment().getName() : "-"),
+            (medRec != null ? medRec.getMed().getMedID() : "-"),
+            price,
+            createdAt.format(dtf),
+            (isPay ? "Yes" : "No")
+        );
     }
 }

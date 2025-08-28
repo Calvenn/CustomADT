@@ -38,20 +38,21 @@ public class AppointmentManager {
     }
     
     private void refreshHeapFromConsultations() {
-        String[] allDocID = docManager.peekAllDoctorID(); // doctor IDs
+        apptQueue.clear();
+        String[] allDocID = docManager.peekAllDoctorID(); 
         Appointment consultAppt = null;
 
-        for (int i = 0; i < allDocID.length; i++) { // loop over doctors
+        for (int i = 0; i < allDocID.length; i++) {
             List<Consultation> consultations = consultLog.get(allDocID[i]);
 
-            if (consultations == null) continue; // skip doctor if no consults
+            if (consultations == null) continue; 
 
             for (int j = 1; j <= consultations.size(); j++) {
                 consultAppt = consultations.get(j);
 
-                if (consultAppt == null) continue; // skip null entries
+                if (consultAppt == null) continue;
 
-                if (consultAppt.getDateTime() != null && !apptQueueContains(consultAppt)) {
+                if (consultAppt.getDateTime() != null && consultAppt.getDateTime().isAfter(LocalDateTime.now()) && !apptQueueContains(consultAppt)) {
                     apptQueue.insert(consultAppt);                 
                 }
             }
@@ -154,33 +155,6 @@ public class AppointmentManager {
         return false;
     }
     
-    private List<Consultation> findConsultRec(Appointment oldAppt){
-        String doctorId = oldAppt.getDoctor().getID();
-        List<Consultation> consultations = consultLog.get(doctorId);
-        return consultations;
-    }
-   
-    private int findConsultRecIndex(Appointment oldAppt){
-        int index = -1;
-        List<Consultation> consultations = findConsultRec(oldAppt);
-    
-        if(consultations == null) return -1;
-        for (int i = 1; i <= consultations.size(); i++) {
-            Consultation consult = consultations.get(i);
-            if (consult == null) {
-                System.out.println("Consultation at index " + i + " is null!");
-                continue; // Skip nulls safely
-            }
-            if (consult.getPatient().getPatientIC().equals(oldAppt.getPatient().getPatientIC()) &&
-                consult.getDoctor().getID().equals(oldAppt.getDoctor().getID()) && 
-                consult.getCreatedAt().toLocalDate().isEqual(LocalDate.now())) {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
-    
     public boolean updateAppointment(Appointment oldAppt, LocalDateTime newDateTime) {
         int index = findOldApptIndex(oldAppt);
         List<Consultation> consultations = findOldAppt(oldAppt);
@@ -217,7 +191,7 @@ public class AppointmentManager {
    
     private int findOldApptIndex(Appointment oldAppt){
         int index = -1;
-        List<Consultation> consultations = findConsultRec(oldAppt);
+        List<Consultation> consultations = findOldAppt(oldAppt);
     
         if(consultations == null) return -1;
         for (int i = 1; i <= consultations.size(); i++) {
@@ -242,9 +216,8 @@ public class AppointmentManager {
     }
     
     public void displayAllAppointmentByDoctor(String docId){
-        //refreshHeapFromConsultations();
+        refreshHeapFromConsultations();
         boolean found = false;
-        System.out.println(apptQueue.size());
         System.out.println(Consultation.getHeader());
         for (int i = 0; i < apptQueue.size(); i++) {
             Appointment appt = apptQueue.get(i);
@@ -328,11 +301,9 @@ public class AppointmentManager {
 
                     // remove safely
                     apptQueue.remove(consultAppt);
-                    System.out.println("Missed appointment moved to queue for " + docId);
                 }
             }
         }
-        System.out.println(apptQueue.size());
     }
 
     public int getNumMissedAppt(String docId) {
@@ -343,8 +314,14 @@ public class AppointmentManager {
     }
     
     public void displayAllMissedAppt(Doctor doc) {
+        Queue<Appointment> delayAppt = new Queue<>();
         if (missAppt.containsKey(doc.getID())) {
-            missAppt.display();
+            delayAppt = missAppt.get(doc.getID());
+            System.out.println(Consultation.getHeader());
+            for(int i = 0; i < delayAppt.size(); i++){
+                Appointment appt = (Consultation) delayAppt.get(i);
+                System.out.println(appt);
+            }
         }
     }
     

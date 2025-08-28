@@ -9,7 +9,6 @@ import Entity.Payment;
 import adt.List;
 import exception.ValidationHelper;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
 /**
  *
@@ -22,7 +21,7 @@ public class PaymentUI {
          this.paymentManager = paymentManager;
      }
      public void paymentMenu(){
-        displayPendingPayment();
+        displayPayment(false); //pending payment
         int choice;
         while (true){ // Repeat the step if the user input invalid choice
             System.out.println("\n" + "=".repeat(35));
@@ -37,18 +36,10 @@ public class PaymentUI {
 
             switch(choice){
                 case 1 -> payment();
-                case 2 -> displayHistoryPayment();
+                case 2 -> displayPayment(true); //payment history
                 case 0 -> {return;}
                 default -> System.out.printf("\nInvalid choice entered. Please choose again.");
             }
-        }
-     }
-     
-     public void displayPendingPayment(){
-        List<Payment> pending = paymentManager.findPendingPayment();
-        
-        for(int i = 0; i < pending.size(); i++){
-            System.out.println(pending);
         }
      }
      
@@ -74,9 +65,8 @@ public class PaymentUI {
             } 
             System.out.println("Created At          : " + payment.getCreatedAt().format(dtf));
             System.out.println("=".repeat(35));  
-            System.out.println("1. Mark as Paid");
-            System.out.println("0. Exit");
-            System.out.print("Choose option: ");
+            System.out.println("\n[1] Mark as Paid");
+            System.out.println("[0] Exit");
 
             int choice = ValidationHelper.inputValidatedChoice(0, 1, "your choice");
 
@@ -102,11 +92,16 @@ public class PaymentUI {
         }
     }
      
-     public void displayHistoryPayment(){
-        List<Payment> history = paymentManager.findPendingPayment();
-        
-        for(int i = 0; i < history.size(); i++){
-            System.out.println(history);
+     public void displayPayment(boolean isPay){
+        List<Payment> pending = paymentManager.findPendingPayment(isPay);
+        if(pending.isEmpty()){
+            System.out.println(isPay == true? "No payment record found" : "No pending payment found");
+            return;
+        } 
+        System.out.println(Payment.getHeader());
+        for(int i = 1; i <= pending.size(); i++){
+            Payment info = pending.get(i);
+            System.out.println(info);
         }
      }
 }
