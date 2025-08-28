@@ -45,7 +45,7 @@ public class VisitRegistrationUI {
         System.out.println("=".repeat(35));
         System.out.println("1. Register New Visit");
         System.out.println("2. Display Current Queue");
-        System.out.println("3. Search Functionality");
+        System.out.println("3. Search Today's Visits");
         System.out.println("4. Emergency Override");
         System.out.println("5. Display Historical Visits");
         System.out.println("6. Reports");
@@ -55,9 +55,9 @@ public class VisitRegistrationUI {
         System.out.println("=".repeat(35));
     }
 
-    public void visitsTableHeader(){
+    public void visitsTableHeader() {
         System.out.println("-".repeat(107));
-        System.out.println(String.format("| %-10s | %-14s | %-20s | %-17s | %-30s |", "Visit ID", "Severity", "Doctor", "Register Time", "Symptoms"));
+        System.out.printf("| %-10s | %-14s | %-20s | %-17s | %-30s |%n","Visit ID", "Severity", "Doctor", "Register Time", "Symptoms");
         System.out.println("-".repeat(107));
     }
 
@@ -140,6 +140,10 @@ public class VisitRegistrationUI {
     }
 
     private void searchVisitsFunctionality() {
+        System.out.println("\n" + "=".repeat(35));
+        System.out.println("       Search Today's Visits");
+        System.out.println("=".repeat(35));
+
         Visit result = promptForVisitById();
 
         if (result == null) {
