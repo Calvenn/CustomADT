@@ -118,7 +118,7 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
-            heap[i] = null;   // remove 
+            heap[i] = null; // remove 
         }
         size = 0;
     }

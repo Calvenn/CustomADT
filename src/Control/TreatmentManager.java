@@ -5,10 +5,13 @@ import adt.List;
 import Entity.Treatment; 
 import java.time.Duration; 
 
-//input data format validation should be in boundary, business logic validation in control 
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
 
 public class TreatmentManager {
-    private LinkedHashMap<String, Treatment> providedTreatments; 
+    private final LinkedHashMap<String, Treatment> providedTreatments; 
     
     public TreatmentManager() {
         providedTreatments = new LinkedHashMap<>();
@@ -47,10 +50,6 @@ public class TreatmentManager {
         return true; 
     }
     
-    public boolean checkIDFormat(String id) {
-        return id.matches("^T\\d{4}$");
-    }
-    
     public Treatment findTreatmentName(String treatmentName) {
         return providedTreatments.get(treatmentName.toLowerCase());
     }
@@ -59,13 +58,6 @@ public class TreatmentManager {
     public boolean newTreatment(String treatmentName, String description, Duration duration, double price) {
         treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
         Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, price); 
-        providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
-        return true; 
-    }
-    
-    public boolean newTreatment(String treatmentName, String description, Duration duration, double price, int frequency) {
-        treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
-        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, price, frequency); 
         providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
         return true; 
     }
@@ -143,6 +135,38 @@ public class TreatmentManager {
 
                 //swap
                 if(current.getTimeAllocation().compareTo(next.getTimeAllocation()) < 0) {
+                    treatmentList.replace(j, next); 
+                    treatmentList.replace(j+1, current); 
+                }
+            }
+        }
+        return treatmentList; 
+        
+    }
+    
+    public List<Treatment> getTreatmentRevenueReport() {
+        List<Treatment> treatmentList = new List(); 
+        
+        if(emptyTreatment()) {
+            return null;
+        }
+        
+        for(Object obj : providedTreatments.getValues()) {
+            if(obj instanceof Treatment treatment) {
+                treatmentList.add(treatment); 
+            }
+        }
+        
+        int listLength = treatmentList.size(); 
+
+        //bubble sort
+        for(int i = 1; i < listLength; i++) {
+            for(int j = 1; j < listLength - i + 1; j++) {
+                Treatment current = treatmentList.get(j); 
+                Treatment next = treatmentList.get(j+1);
+
+                //swap
+                if(current.getEarned() < next.getEarned()) {
                     treatmentList.replace(j, next); 
                     treatmentList.replace(j+1, current); 
                 }

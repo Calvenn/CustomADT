@@ -1,9 +1,7 @@
 package Control;
 import Entity.Consultation;
 import Entity.Doctor;
-import Entity.Patient;
 import adt.List;
-import adt.Queue;
 import adt.Heap;
 import adt.LinkedHashMap; 
 import Entity.TreatmentAppointment; 
@@ -18,8 +16,8 @@ import java.time.LocalTime;
  */
 
 public class TreatmentApptManager {
-    private LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
-    private LinkedHashMap<String, List<TreatmentAppointment>> history;
+    private final LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
+    private final LinkedHashMap<String, List<TreatmentAppointment>> history;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
     
@@ -32,7 +30,7 @@ public class TreatmentApptManager {
     
     //check if chosen appt time is within working hours and after now 
     public boolean validDateTime(LocalDateTime time) {
-        return (time.toLocalTime().isAfter(WORK_START) && time.toLocalTime().isBefore(WORK_END) && time.isAfter(LocalDateTime.now()));
+        return (time.isAfter(LocalDateTime.now()) && (time.toLocalTime().isAfter(WORK_START) && time.toLocalTime().isBefore(WORK_END)));
     }
     
     public boolean newTreatmentToHeap(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime) {
@@ -47,7 +45,7 @@ public class TreatmentApptManager {
     public TreatmentAppointment searchAppt(String doctorID, String trtApptID) {
         Heap<Appointment> apptHeap = incomingAppointment.get(doctorID.toUpperCase());
         if(apptHeap.isEmpty()) return null; 
-        for(int i = 1; i <= apptHeap.size(); i++) {
+        for(int i = 0; i < apptHeap.size(); i++) {
             TreatmentAppointment appt = (TreatmentAppointment) apptHeap.get(i); 
             if(appt.getAppointmentId().equalsIgnoreCase(trtApptID)) {
                 return appt; 
@@ -59,7 +57,7 @@ public class TreatmentApptManager {
     //called when new doctor
     private void addNewDoctorKey(Doctor doctor) {
         String doctorID = doctor.getID();
-        incomingAppointment.put(doctorID, new Heap<>(true));
+        incomingAppointment.put(doctorID, new Heap<>(false));
         history.put(doctorID, new List<>());
     }
     
@@ -69,14 +67,36 @@ public class TreatmentApptManager {
         return incomingAppointment.containsKey(doctorID) && history.containsKey(doctorID);
     }
     
+    public boolean startEndTimeConflict(LocalDateTime start, LocalDateTime end, LocalDateTime time) {
+        return (!time.isBefore(start) && time.isBefore(end));
+    }
+    
     public List<String> checkDoctorAvailability(LocalDateTime time) {
         List<String> availableDoctors = new List<>(); 
+        
+        //for each doctor in available doctors 
         for(Object doctor : incomingAppointment.getKeys()) {
+            //will get their incoming appointment heap 
             Heap<Appointment> appt = incomingAppointment.get((String)doctor); 
-            for(int i = 1; i <= appt.size(); i++) {
-                if(time.isEqual(appt.get(i).getDateTime())) break; 
+            boolean available = true; 
+            
+            //loop through each appt in appointment heap 
+            for(int i = 0; i < appt.size(); i++) {
+                //need check whether each appointments have time clashed with passed in time 
+                //if time is within range of booked time & duration 
+                TreatmentAppointment trtAppt = (TreatmentAppointment) appt.get(i);
+                LocalDateTime start = trtAppt.getDateTime();
+                LocalDateTime end = start.plusMinutes(trtAppt.getTreatment().getDuration().toMinutes());
+                
+                //to check if time is = start/end and within start-end range 
+                //time is not before start, so not at start and not earlier than start 
+                //time is before end, so can be at end but cannot anytime before end 
+                if(startEndTimeConflict(start, end, time)) {
+                    available = false; 
+                    break;
+                } 
             }
-            availableDoctors.add((String) doctor); 
+            if(available == true) availableDoctors.add((String) doctor); 
         }
 
         return availableDoctors; 
@@ -112,6 +132,7 @@ public class TreatmentApptManager {
         }
         incomingAppointment.get(doctorID).extractRoot();
         history.get(doctorID).add(next);
+        next.getTreatment().doneTreatment();
         return true; 
     }
     
@@ -125,10 +146,12 @@ public class TreatmentApptManager {
         }
         
         history.get(doctorID).add(appt);
+        appt.getTreatment().doneTreatment();
         return true; 
     }
     
     public List<TreatmentAppointment> getHistoryList(String doctorID) {
         return history.get(doctorID); 
     }
+    
 }

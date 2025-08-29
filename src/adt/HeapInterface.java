@@ -50,4 +50,8 @@ public interface HeapInterface<E extends Comparable<E>>{
     //Remove the contents of heap
     void clear();
     
+    //@param data to extract
+    //@return the data that i want to extract
+    E extractSpecific(E item);
+    
 }

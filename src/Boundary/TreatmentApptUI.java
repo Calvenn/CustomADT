@@ -26,7 +26,7 @@ public class TreatmentApptUI {
     private final DoctorManager doctorManager; 
     private final TreatmentUI treatmentUI; 
     private final Scanner scanner; 
-    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
     
     public TreatmentApptUI(TreatmentApptManager treatmentApptManager, DoctorManager doctorManager, TreatmentUI treatmentUI) {
         this.treatmentApptManager = treatmentApptManager; 
@@ -44,35 +44,36 @@ public class TreatmentApptUI {
     }
     
     public void treatmentApptMenu(String userID) {
+        //check if is doctor 
+        if(userID.toLowerCase().startsWith("d")) {
+            //check doctor department
+            if (!doctorManager.findDoctor(userID.toUpperCase()).getDepartment().equalsIgnoreCase("treatment")) {
+                //if consult doctor
+                printTitle("Treatment Appointment Menu", 35);
+                System.out.println("Consult doctors are not allowed to access treatment appointment system.");
+                System.out.println("Enter to continue...");
+                scanner.nextLine();
+                return;
+            } else {
+                //if treatment doctor
+                showNextUI(userID);
+            }
+        }
         while(true) {
             String input; 
-            printTitle("Treatment Appointment Menu", 35);
             
-            //check if is doctor 
-            if(userID.toLowerCase().startsWith("d")) {
-                //check doctor department
-                if (!doctorManager.findDoctor(userID.toUpperCase()).getDepartment().equalsIgnoreCase("treatment")) {
-                    //if consult doctor
-                    System.out.println("Consult doctors are not allowed to access treatment appointment system.");
-                    System.out.println("Enter to continue...");
-                    scanner.nextLine();
-                } else {
-                    //if treatment doctor
-                    showNextUI(userID);
-                }
-            }
+            printTitle("Treatment Appointment Menu", 35);
             System.out.println("1. Show All Incoming Appointments"); 
             System.out.println("2. Show Treatment Appointment History");
             System.out.println("3. Complete A Treatment");
             System.out.println("4. Cancel A Treatment");
-            System.out.println("5. Generate Reports");
-            System.out.println("6. Back"); 
+            System.out.println("5. Back"); 
             
             while (true) {
                 System.out.print("Choose > "); 
                 input = scanner.nextLine(); 
                 try {
-                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 6);
+                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 5);
                     break; 
                 } catch(InvalidInputException e) {
                     ValidationUtility.printErrorWithSolution(e);
@@ -84,8 +85,7 @@ public class TreatmentApptUI {
                 case 2 -> showHistoryUI(userID);    //accessible to admin, doctor (only self) 
                 case 3 -> completeAppointmentUI(userID);    //only accessible to treatment doctor
                 case 4 -> cancelAppointmentUI(userID);    //only accessible to treatment doctor
-                case 5 -> generateReportUI();   //accessible to admin, doctor (is overall report, not specific report) 
-                case 6 -> {
+                case 5 -> {
                     System.out.println("Returning to main menu..."); 
                     return; 
                 }
@@ -110,7 +110,7 @@ public class TreatmentApptUI {
     }
     
     public void showIncomingUI(String userID) {
-        printTitle("Incoming Treatment Appointments", 35);
+        printTitle("Incoming Treatment Appointments", 40);
         String doctorID = getValidID(userID); 
         if(doctorID.isEmpty()) return; 
         Heap<Appointment> incoming = treatmentApptManager.getIncomingAppt(doctorID);
@@ -118,7 +118,6 @@ public class TreatmentApptUI {
         if(incoming == null) {
             System.out.println("\nNo record found!"); 
         } else {
-            printTitle("Incoming Appointments for " + doctorID + " found!", 35);
             incoming.display();
         }
         
@@ -183,6 +182,7 @@ public class TreatmentApptUI {
             System.out.println("No record found!"); 
             System.out.println("Enter to return..."); 
             scanner.nextLine(); 
+            return; 
         }
         System.out.println(appt); 
         System.out.println("Enter to return..."); 
@@ -197,17 +197,19 @@ public class TreatmentApptUI {
         String timeString; 
         LocalDateTime apptTime; 
         while (true) {
-            System.out.println("Enter x to cancel.");
-            System.out.println("Appointment Time can only be in 5 minutes intervals.");
-            System.out.print("Appointment Time (yyyy-MM-dd HH:mm): "); 
+            System.out.println("Instructions:");
+            System.out.println("  - Enter 'x' to cancel");
+            System.out.println("  - Time must be in 5-minute intervals");
+            System.out.println("----------------------------------------");
+            System.out.print("Appointment Time (yyyy-MM-dd HH:mm): ");
             timeString = scanner.nextLine().trim();
 
             try {
                 if(checkCancel(timeString)) return null;
                 TryCatchThrowFromFile.validateDateTime(timeString);
-                apptTime = LocalDateTime.parse(timeString, dateFormat);
+                apptTime = LocalDateTime.parse(timeString, DATE_FORMAT);
                 
-                if(treatmentApptManager.validDateTime(apptTime)) {
+                if(!treatmentApptManager.validDateTime(apptTime)) {
                     throw new InvalidInputException("Appointment Time is not within business hours (8:00-17:00)\nOr not a future date time."); 
                 }
                 if(apptTime.getMinute() % 5 != 0) {
@@ -249,26 +251,42 @@ public class TreatmentApptUI {
         return appt;
     }
     
-    public void addNewAppointmentUI(Consultation consultRec) {
-        printTitle("Add New Appointment", 35); 
+    public boolean addNewAppointmentUI(Consultation consultRec) {
         List<String> availableDoctors;
+        List<LocalDateTime> bookedTime = new List<>();
         while(true) {
+            printTitle("Add New Treatment Appointment", 35); 
+
             //getting appt time input 
-            LocalDateTime apptTime; 
+            LocalDateTime apptTime;
             while(true) {
                 apptTime = inputApptTime();
                 if(apptTime == null) {
                     System.out.println("\nAdd treatment appointment cancelled.");
                     System.out.println("Enter to continue...");
                     scanner.nextLine();
-                    return; 
+                    return false;  
                 }
                 System.out.println(); 
+                
+                boolean hasConflict = false;
+                if(!bookedTime.isEmpty()) {
+                    for(int i = 1; i <= bookedTime.size(); i+=2) {
+                        if(treatmentApptManager.startEndTimeConflict(bookedTime.get(i), bookedTime.get(i+1), apptTime)) {
+                            System.out.println("Time has conflict with previous appointment at " + bookedTime.get(i).format(DATE_FORMAT));
+                            System.out.println("Please enter another time.\n"); 
+                            hasConflict = true; 
+                            break; 
+                        }
+                    }
+                }
+                if(hasConflict) continue; 
 
                 availableDoctors = treatmentApptManager.checkDoctorAvailability(apptTime); 
                 if(availableDoctors.isEmpty()) {
-                    System.out.println("No doctors available at " + apptTime.format(dateFormat)); 
+                    System.out.println("No doctors available at " + apptTime.format(DATE_FORMAT)); 
                     System.out.println("Please enter another time.");
+                    continue;
                 }
                 break;
             }
@@ -305,7 +323,7 @@ public class TreatmentApptUI {
             if(treatment == null) break; 
             
             printTitle("Confirm Appointment Details", 56); 
-            System.out.printf("| %-20s: %-30s |\n", "Appointment Time", apptTime.format(dateFormat));
+            System.out.printf("| %-20s: %-30s |\n", "Appointment Time", apptTime.format(DATE_FORMAT));
             System.out.printf("| %-20s: %-30s |\n", "Doctor", String.format("%s - Dr. %s", doctor.getID(), doctor.getName()));
             System.out.printf("| %-20s: %-30s |\n", "Consult", String.format("%s - %s", consult.getID(), consult.getPatient().getPatientName()));
             System.out.printf("| %-20s: %-30s |\n", "Treatment", treatment.getName());
@@ -313,8 +331,9 @@ public class TreatmentApptUI {
             
             while(true) {
                 System.out.print("Confirm Appointment? (y/n): ");
-                input = scanner.nextLine(); 
+                input = scanner.nextLine().toLowerCase(); 
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
                     break; 
                 } catch (InvalidInputException e) {
@@ -324,13 +343,35 @@ public class TreatmentApptUI {
             if(input.charAt(0) == 'n') break; 
             treatmentApptManager.newTreatmentToHeap(doctor, consult, treatment, apptTime);  
             System.out.println("Add treatment appointment success!");
+            
+            //for cases where a consult requires multiple treatments 
+            while(true) {
+                System.out.print("Add another appointment for the same consult? (y/n): ");
+                input = scanner.nextLine().toLowerCase(); 
+                try {
+                    TryCatchThrowFromFile.validateNotNull(input);
+                    TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
+                    break; 
+                } catch (InvalidInputException e) {
+                    ValidationUtility.printErrorWithSolution(e); 
+                }
+            }
+            //if yes, will return to top to key in another treatment appointment
+            if(input.charAt(0) == 'y') {
+                bookedTime.add(apptTime);
+                bookedTime.add(apptTime.plusMinutes(treatment.getDuration().toMinutes()));
+                continue;
+            } 
+
+            System.out.println("\nAdd treatment appointment completed!");
             System.out.println("Enter to continue...");
             scanner.nextLine();
-            return; 
+            return true; 
         }
         System.out.println("\nAdd treatment appointment cancelled.");
         System.out.println("Enter to continue...");
         scanner.nextLine();
+        return false; 
     }
     
     public void completeAppointmentUI(String userID) {
@@ -342,6 +383,7 @@ public class TreatmentApptUI {
             System.out.println("Admin denied access to complete treatment appointment."); 
             System.out.println("Enter to return..."); 
             scanner.nextLine(); 
+            return;
         }
         
         TreatmentAppointment next = treatmentApptManager.nextAppt(userID);
@@ -350,6 +392,7 @@ public class TreatmentApptUI {
             System.out.println("No appointment to complete."); 
             System.out.println("Enter to return..."); 
             scanner.nextLine(); 
+            return;
         }
         
         System.out.println(next); 
@@ -359,6 +402,7 @@ public class TreatmentApptUI {
             System.out.print("Complete this treatment? (y/n): "); 
             input = scanner.nextLine(); 
             try {
+                TryCatchThrowFromFile.validateNotNull(input);
                 TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
                 if(input.length() != 1) {
                     throw new InvalidInputException("Please enter y or n only.");
@@ -368,16 +412,18 @@ public class TreatmentApptUI {
                 ValidationUtility.printErrorWithSolution(e); 
             }
         }
+        
         if(input.charAt(0) == 'n') {
             System.out.println("\nComplete treatment appointment cancelled.");
             System.out.println("Enter to continue...");
-            PaymentManager.paymentRec.add(new Payment(next.getPatient(), next.getConsultation(), next.getTreatment().getPrice(), false, next, null));
             scanner.nextLine();
             return; 
         }
         if(treatmentApptManager.completeAppt(userID)) {
             System.out.println("\nTreatment Appointemnt completed!");
-            System.out.println("You can now view it from treatment appointemnt history.");
+            System.out.println("You can now view it from treatment appointment history.");
+            PaymentManager.paymentRec.add(new Payment(next.getPatient(), next.getConsultation(), next.getTreatment().getPrice(), false, next, null));
+            System.out.println("Please ask the patient to pay at the counter.");
             System.out.println("Enter to continue...");
             scanner.nextLine();
             return; 
@@ -399,17 +445,21 @@ public class TreatmentApptUI {
             System.out.println("Admin denied access to complete treatment appointment."); 
             System.out.println("Enter to return..."); 
             scanner.nextLine(); 
+            return;
         }
         
         while(true) {
             TreatmentAppointment toCancel = inputTrtApptID(userID); 
+            if(toCancel == null) break;
+            
             System.out.println(toCancel);
 
             String input; 
             while(true) {
                 System.out.print("Confirm cancel appointment? (y/n): ");
-                input = scanner.nextLine(); 
+                input = scanner.nextLine().toLowerCase(); 
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
                     break; 
                 } catch (InvalidInputException e) {
@@ -427,51 +477,6 @@ public class TreatmentApptUI {
         System.out.println("Cancelled cancelling treatment appointment.");
         System.out.println("Enter to continue...");
         scanner.nextLine();
-    }
-    
-    //reports 
-    public void generateReportUI() {
-        printTitle("Treatment Apointment Reports", 35); 
-        String input; 
-        while(true) {
-            System.out.println("Select report to generate: "); 
-            System.out.println("1. "); 
-            System.out.println("2. "); 
-            System.out.println("3. Back"); 
-            
-            while (true) {
-                System.out.print("Choose > "); 
-                input = scanner.nextLine(); 
-                try {
-                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 3);
-                    break; 
-                } catch(InvalidInputException e) {
-                    ValidationUtility.printErrorWithSolution(e);
-                }
-            }
-            
-//            switch(Integer.parseInt(input)) {
-//                case 1 -> 
-//                case 2 -> 
-//                case 3 -> {
-//                    System.out.println("Returning to treatment menu..."); 
-//                    return; 
-//                }
-//            }
-            
-            printTitle("End of Report", 100); 
-            while(true) {
-                System.out.print("Generate another report? (y/n): ");
-                input = scanner.nextLine(); 
-                try {
-                    TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
-                    break; 
-                } catch (InvalidInputException e) {
-                    ValidationUtility.printErrorWithSolution(e); 
-                }
-            }
-            if(input.charAt(0) == 'n') return; 
-        }
     }
     
 }
