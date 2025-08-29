@@ -13,12 +13,9 @@ import java.time.LocalDate;
 public class VisitHistoryManager {
     // Store visits grouped by date (each date can have multiple visits)
     private final LinkedHashMap<LocalDate, List<Visit>> historicalVisits;
-    // Cache all dates in sorted order
-    private Object[] allDates;
 
     public VisitHistoryManager() {
         this.historicalVisits = new LinkedHashMap<>();
-        this.allDates = new Object[0];
     }
 
     public void addHistoricalVisit(Visit visit) {
@@ -34,35 +31,31 @@ public class VisitHistoryManager {
         }
         // Add the visit to the list for that date
         visitsOnDate.add(visit);
-        
-        // Update and sort the dates
-        updateSortedDates();
-    }
-    
-    // Update the allDates array and sort it
-    private void updateSortedDates() {
-        allDates = historicalVisits.getKeys();
-        
-        // Sort the dates using Insertion Sort
-        for (int i = 1; i < allDates.length; i++) {
-            LocalDate key = (LocalDate) allDates[i];
-            int j = i - 1;
-
-            // Shift elements that are later than key
-            // Move dates that come after our current date to the right
-            while (j >= 0 && ((LocalDate) allDates[j]).isAfter(key)) {
-                allDates[j + 1] = allDates[j];
-                j--;
-            }
-            allDates[j + 1] = key;
-        }
     }
 
     // Retrieve all visits for a specific patient by their IC
     public List<Visit> getVisitsByPatient(String patientIC) {
         List<Visit> patientVisits = new List<>();
         
-        for (Object obj : allDates) {
+        // Get all dates from the HashMap
+        Object[] dates = historicalVisits.getKeys();
+        
+        // Sort the dates using Insertion Sort
+        for (int i = 1; i < dates.length; i++) {
+            LocalDate key = (LocalDate) dates[i];
+            int j = i - 1;
+
+            // Shift elements that are later than key
+            // Move dates that come after our current date to the right
+            while (j >= 0 && ((LocalDate) dates[j]).isAfter(key)) {
+                dates[j + 1] = dates[j];
+                j--;
+            }
+            dates[j + 1] = key;
+        }
+        
+        // Now iterate through sorted dates
+        for (Object obj : dates) {
             LocalDate date = (LocalDate) obj;
             List<Visit> visitsOnDate = historicalVisits.get(date);
             // Check each visit on this date
@@ -78,14 +71,15 @@ public class VisitHistoryManager {
     }
 
     // Retrieve all visits in a specific month and year
-    // Enter 0 for month or year if want to include all months/years
-    public List<Visit> getVisitsByMonthYear(int month, int year) {
+    public List<Visit> getVisitsByMonthYear(int month, int year, boolean ascending) {
         List<Visit> result = new List<>();
-        
-        for (Object obj : allDates) {
+        Object[] dates = historicalVisits.getKeys();
+
+        // Collect all visits for the month & year
+        for (Object obj : dates) {
             LocalDate date = (LocalDate) obj;
             boolean monthMatches = (date.getMonthValue() == month);
-            boolean yearMatches =  (date.getYear() == year);
+            boolean yearMatches = (date.getYear() == year);
             if (monthMatches && yearMatches) {
                 List<Visit> visitsOnDate = historicalVisits.get(date);
                 for (int i = 1; i <= visitsOnDate.size(); i++) {
@@ -93,22 +87,57 @@ public class VisitHistoryManager {
                 }
             }
         }
+
+        // Bubble Sort by registrationTime
+        for (int i = 1; i <= result.size(); i++) {
+            for (int j = 1; j <= result.size() - i; j++) {
+                Visit v1 = result.get(j);
+                Visit v2 = result.get(j + 1);
+
+                boolean shouldSwap = false;
+                
+                if (ascending) {
+                    // For ascending order (oldest first)
+                    if (v1.getRegistrationTime().isAfter(v2.getRegistrationTime())) {
+                        shouldSwap = true;
+                    }
+                } else {
+                    // For descending order (latest first)
+                    if (v1.getRegistrationTime().isBefore(v2.getRegistrationTime())) {
+                        shouldSwap = true;
+                    }
+                }
+
+                if (shouldSwap) {
+                    // Swap visits
+                    result.replace(j, v2);
+                    result.replace(j + 1, v1);
+                }
+            }
+        }
+
         return result;
     }
 
     // Count how many visits happened in each month of a specific year
     // Returns an array where index 0 = January, index 1 = February
     public int[] getMonthlyVisitCounts(int year) {
+        // Create an array with 12 slots (Jan to Dec)
         int[] monthCounts = new int[12];
+        Object[] dates = historicalVisits.getKeys();
         
-        // allDates is already sorted
-        for (Object obj : allDates) {
+        // Go through every date we have
+        for (Object obj : dates) {
             LocalDate date = (LocalDate) obj;
 
-            // Only count visits from the year we want
+            // Check if the date is in the same year
             if (date.getYear() == year) {
+                // Get all visits for that date
                 List<Visit> visitsOnDate = historicalVisits.get(date);
-                monthCounts[date.getMonthValue() - 1] += visitsOnDate.size();
+                // Find which month (1-12) → subtract 1 to fit array index (0-11)
+                int monthIndex = date.getMonthValue() - 1;
+
+                monthCounts[monthIndex] = monthCounts[monthIndex] + visitsOnDate.size();
             }
         }
         return monthCounts;
@@ -118,9 +147,9 @@ public class VisitHistoryManager {
     // Enter 0 for month or year if want to include all months/years
     public int[] getSeverityCounts(int month, int year) {
         int[] severityCounts = new int[3];
-        
-        // allDates is already sorted
-        for (Object obj : allDates) {
+        Object[] dates = historicalVisits.getKeys();
+
+        for (Object obj : dates) {
             LocalDate date = (LocalDate) obj;
             // Check if this date matches the month and year we want
             boolean monthMatches = (date.getMonthValue() == month);

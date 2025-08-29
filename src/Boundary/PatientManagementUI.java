@@ -121,14 +121,57 @@ public class PatientManagementUI {
         }
     }
 
+    // Search by Student ID
+    private Patient handleSearchByStudentID() {
+        while (true) {
+            System.out.print("Enter Student ID to search (or 0 to exit): ");
+            String studentID = scanner.nextLine().trim();
+
+            if (studentID.equals("0")) return null;
+
+            try {
+                Patient patient = TryCatchThrowFromFile.findObjectOrThrow(
+                        patientManager.getAllPatients(),
+                        Patient::getStudentID,
+                        studentID,
+                        "Patient",
+                        "Student ID"
+                );
+                System.out.println("\nPatient found:\n" + patient);
+                return patient;
+            } catch (InvalidInputException e) {
+                ValidationUtility.printErrorWithSolution(e);
+            }
+        }
+    }
+
     private void handleSearchAndDisplayHistory() {
         System.out.println("\n" + "=".repeat(30));
         System.out.println("      Search Patient History");
         System.out.println("=".repeat(30));
-        Patient patient = handleSearchPatient(); 
-        if (patient != null) {  
+
+        // Ask user which field to search by
+        System.out.println("Search patient by:");
+        System.out.println("1. IC Number");
+        System.out.println("2. Student ID");
+        System.out.println("0. Cancel");
+        int choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
+
+        Patient patient = null;
+        switch (choice) {
+            case 0 -> {
+                System.out.println("Search cancelled.");
+                return;
+            }
+            case 1 -> patient = handleSearchPatient(); // existing IC search
+            case 2 -> patient = handleSearchByStudentID(); // new Student ID search
+        }
+
+        if (patient != null) {
             VisitsHistoryUI historyUI = new VisitsHistoryUI(visitHistoryManager);
             historyUI.displayPatientHistory(patient);
+        } else {
+            System.out.println("No patient selected.");
         }
     }
 
@@ -196,13 +239,35 @@ public class PatientManagementUI {
             return;
         }
 
-        Patient[] patients = patientManager.getAllPatients();
-        int totalPatients = patients.length;
+        System.out.println("View patients group by:");
+        System.out.println("1. Male");
+        System.out.println("2. Female");
+        System.out.println("3. All");
+        System.out.println("0. Exit");
+        int choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
+
+        if (choice == 0) return; // exit
+
+        Patient[] displayList = new Patient[0];
+
+        switch (choice) {
+            case 1 -> displayList = patientManager.getPatientsByGender('M');
+            case 2 -> displayList = patientManager.getPatientsByGender('F');
+            case 3 -> displayList = patientManager.getAllPatients();
+        }
+
+        // Ask for sorting
+        System.out.println("\nSort by age?");
+        System.out.println("1. Oldest first");
+        System.out.println("2. Youngest first");
+        System.out.println("0. No sorting");
+        int sortChoice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
+
+        if (sortChoice == 1) patientManager.sortPatientsByAge(displayList, true);
+        else if (sortChoice == 2) patientManager.sortPatientsByAge(displayList, false);
 
         patientTableHeader();
-
-        for (int i = 0; i < totalPatients; i++) {
-            Patient patient = patients[i];
+        for (Patient patient : displayList) {
             System.out.printf("| %-15s | %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
                     patient.getPatientIC(),
                     patient.getStudentID(),
@@ -248,42 +313,49 @@ public class PatientManagementUI {
 
     // Helper method to display chart + table
     private void printChartAndTable(String title, String[] labels, int[] counts) {
+        // Calculate the total count
         int total = 0;
-        for (int c : counts) total += c;
-        
-        // Compute percentages
-        double[] percentages = new double[counts.length];
         for (int i = 0; i < counts.length; i++) {
-            percentages[i] = (total > 0) ? (counts[i] * 100.0 / total) : 0;
+            total += counts[i];
         }
 
+        // Print the header for the chart
         System.out.println("\n" + "=".repeat(40));
         System.out.println("       " + title + " CHART");
         System.out.println("=".repeat(40));
 
-        int maxBarLength = 30;
+        int maxBarLength = 28; // maximum number of stars
         int maxCount = 0;
-        for (int c : counts) if (c > maxCount) maxCount = c;
-
-        for (int i = 0; i < labels.length; i++) {
-            int barLength = (maxCount == 0) ? 0 : (int)((counts[i] * maxBarLength * 1.0) / maxCount);
-            System.out.printf("%-7s | %s%n", labels[i], "*".repeat(barLength));
+        for (int i = 0; i < counts.length; i++) {
+            if (counts[i] > maxCount) {
+                maxCount = counts[i];
+            }
         }
 
-        System.out.println("-".repeat(40));
+        // Print the bar chart
+        for (int i = 0; i < labels.length; i++) {
+            int barLength = 0;
+            if (maxCount > 0) {
+                barLength = (counts[i] * maxBarLength) / maxCount;
+            }
+            System.out.printf("%-8s | %s%n", labels[i], "*".repeat(barLength));
+        }
 
-        // Table
+        // Print separator and table header
+        System.out.println("-".repeat(40));
         System.out.println("       " + title + " TABLE");
         System.out.println("-".repeat(40));
-        System.out.printf("%-8s %-8s %-10s%n", "Gender", "Count", "Percentage");
-        System.out.println("-".repeat(40));
 
+        // Print table with counts and percentages
+        System.out.printf("%-10s %-10s %-10s%n", "Label", "Count", "Percentage");
+        System.out.println("-".repeat(40));
         for (int i = 0; i < labels.length; i++) {
-            System.out.printf("%-10s %-8d %-9.2f%%%n", labels[i], counts[i], percentages[i]);
+            double percent = (total > 0) ? (counts[i] * 100.0 / total) : 0;
+            System.out.printf("%-10s %-10d %-9.2f%%%n", labels[i], counts[i], percent);
         }
 
         System.out.println("-".repeat(40));
-        System.out.println("Total Patients: " + total);
+        System.out.println("Total: " + total);
     }
 
     private void displayGenderDistribution() {
@@ -302,7 +374,7 @@ public class PatientManagementUI {
 
     private void handleClearAllPatients() {
         System.out.println("\n" + "=".repeat(35));
-        System.out.println("      CLEAR ALL PATIENTS");
+        System.out.println("      CLEAR PATIENTS");
         System.out.println("=".repeat(35));
 
         if (patientManager.isEmpty()) {
@@ -311,17 +383,57 @@ public class PatientManagementUI {
         }
 
         System.out.println("Current total patients: " + patientManager.getTotalPatients());
+        System.out.println("\nChoose an option:");
+        System.out.println("1. Clear ALL patients");
+        System.out.println("2. Clear patients aged 31 and above");
+        System.out.println("0. Cancel");
+        int choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
 
-        // Use validation helper for Y/N confirmation
-        char confirmation = ValidationHelper.inputValidateYesOrNo(
-            "\nAre you sure you want to clear ALL patients? This cannot be undone!"
-        );
+        switch (choice) {
+            case 0 -> {
+                System.out.println("\nClear operation cancelled.");
+                return;
+            }
+            case 1 -> {
+                char confirmAll = ValidationHelper.inputValidateYesOrNo("\nAre you sure you want to clear ALL patients? This cannot be undone!");
+                if (confirmAll == 'Y') {
+                    patientManager.clearAllPatients();
+                    System.out.println("\nAll patients have been cleared from the system.");
+                } else {
+                    System.out.println("\nClear operation cancelled.");
+                }
+            }
+            case 2 -> {
+                Patient[] above30 = patientManager.getPatientsAbove30();
+                
+                if (above30.length == 0) {
+                    System.out.println("\nNo patients aged 31 and above.");
+                    break;
+                }
+                
+                System.out.println("\nPatients aged 31 and above:");
+                patientTableHeader();
+                for (Patient p : above30) {
+                    System.out.printf("| %-15s | %-15s | %-20s | %-15s | %-5d | %-8s | %-40s |\n",
+                            p.getPatientIC(),
+                            p.getStudentID(),
+                            p.getPatientName(),
+                            p.getPatientPhoneNo(),
+                            p.getPatientAge(),
+                            p.getPatientGender(),
+                            p.getPatientAddress());
+                    System.out.println("-".repeat(140));
+                }
 
-        if (confirmation == 'Y') {
-            patientManager.clearAllPatients();
-            System.out.println("\nAll patients have been cleared from the system.");
-        } else {
-            System.out.println("\nClear operation cancelled.");
+                char confirm30 = ValidationHelper.inputValidateYesOrNo(
+                        "\nAre you sure you want to clear all patients with age 31 and above?");
+                if (confirm30 == 'Y') {
+                    patientManager.removePatientsAbove30();
+                    System.out.println("\nPatients with age 31 and above have been removed.");
+                } else {
+                    System.out.println("\nClear operation cancelled.");
+                }
+            }
         }
     }
 }

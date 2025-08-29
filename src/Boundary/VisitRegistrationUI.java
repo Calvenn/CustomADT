@@ -190,25 +190,34 @@ public class VisitRegistrationUI {
         Visit next = queueManager.getNextPatient();
         Visit[] waiting = queueManager.getWaitingPatients();
         
-        int width = 58;  
-        String line = "-".repeat(width);
-        String title = "LIVE QUEUE STATUS";
-        System.out.println("\n" + line);
-        System.out.printf("| %-"+(width-4)+"s |%n", title);  // auto pad
-        System.out.println(line);
+        System.out.println("\n" + "-".repeat(58));
+        System.out.println("| LIVE QUEUE STATUS" + " ".repeat(37) + " |");
+        System.out.println("-".repeat(58));
 
-        System.out.printf("| %-"+(width-4)+"s |%n", "Total patients in queue: " + queueManager.getQueueSize());
-        System.out.println(line);
+        System.out.printf("| %-54s |\n", "Total patients in queue: " + queueManager.getQueueSize());
+        System.out.println("-".repeat(58));
 
-        System.out.printf("| %-16s | %-16s | %-16s |%n", "Processing", "Next Patient", "Waiting");
-        System.out.println(line);
+        System.out.printf("| %-16s | %-16s | %-16s |\n", "Processing", "Next Patient", "Waiting");
+        System.out.println("-".repeat(58));
 
         int maxRows = Math.max(1, Math.max(1, waiting.length));
         for (int i = 0; i < maxRows; i++) {
-            String col1 = (i == 0 && processing != null) ? processing.getVisitId() : "";
-            String col2 = (i == 0 && next != null) ? next.getVisitId() : "";
-            String col3 = (i < waiting.length) ? waiting[i].getVisitId() : "";
-            System.out.printf("| %-16s | %-16s | %-16s |%n", col1, col2, col3);
+            String col1 = "";
+            String col2 = "";
+            String col3 = "";
+            // First column
+            if (i == 0 && processing != null) {
+                col1 = processing.getVisitId();
+            }
+            // Second column
+            if (i == 0 && next != null) {
+                col2 = next.getVisitId();
+            }
+            // Third column
+            if (i < waiting.length) {
+                col3 = waiting[i].getVisitId();
+            }
+            System.out.printf("| %-16s | %-16s | %-16s |\n", col1, col2, col3);
         }
 
         System.out.println("-".repeat(58));

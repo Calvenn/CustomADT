@@ -40,6 +40,14 @@ public class PatientManager {
         return patientMap.get(patientIC);
     }
 
+    public Patient findPatientByStudentID(String studentID) {
+        if (studentID == null || studentID.isEmpty()) {
+            return null;
+        }
+        
+        return patientMap.get(studentID);
+    }
+
     public void displayPatientDetails(Patient patient) {
         patientMap.display();
     }
@@ -90,4 +98,95 @@ public class PatientManager {
     public void clearAllPatients() {
         patientMap.clear();
     }
+
+    // Returns arrays of patients filtered by gender
+    public Patient[] getPatientsByGender(char gender) {
+        Object[] allPatients = patientMap.getValues();
+        
+        // count matching patients
+        int count = 0;
+        for (Object obj : allPatients) {
+            Patient p = (Patient) obj;
+            if (Character.toUpperCase(p.getPatientGender()) == Character.toUpperCase(gender)) {
+                count++;
+            }
+        }
+        
+        // fill the array
+        Patient[] result = new Patient[count];
+        int index = 0;
+        for (Object obj : allPatients) {
+            Patient p = (Patient) obj;
+            if (Character.toUpperCase(p.getPatientGender()) == Character.toUpperCase(gender)) {
+                result[index++] = p;
+            }
+        }
+        
+        return result;
+    }
+
+    public void sortPatientsByAge(Patient[] patients, boolean oldestFirst) {
+        int n = patients.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                Patient p1 = patients[j];
+                Patient p2 = patients[j + 1];
+
+                boolean shouldSwap = false;
+
+                if (oldestFirst) {
+                    // Descending: oldest first
+                    if (p1.getPatientAge() < p2.getPatientAge()) {
+                        shouldSwap = true;
+                    }
+                } else {
+                    // Ascending: youngest first
+                    if (p1.getPatientAge() > p2.getPatientAge()) {
+                        shouldSwap = true;
+                    }
+                }
+
+                if (shouldSwap) {
+                    // Swap
+                    patients[j] = p2;
+                    patients[j + 1] = p1;
+                }
+            }
+        }
+    }
+
+    // Returns an array of patients aged 31 and above
+    public Patient[] getPatientsAbove30() {
+        Object[] allPatients = patientMap.getValues();
+        
+        // Count how many are 31+
+        int count = 0;
+        for (int i = 0; i < allPatients.length; i++) {
+            Patient p = (Patient) allPatients[i];
+            if (p.getPatientAge() > 30) {
+                count++;
+            }
+        }
+        
+        // Fill the array
+        Patient[] result = new Patient[count];
+        int index = 0;
+        for (int i = 0; i < allPatients.length; i++) {
+            Patient p = (Patient) allPatients[i];
+            if (p.getPatientAge() > 30) {
+                result[index++] = p;
+            }
+        }
+        
+        return result;
+    }
+
+    // Removes all patients aged 31+
+    public void removePatientsAbove30() {
+        Patient[] toRemove = getPatientsAbove30();
+        for (Patient p : toRemove) {
+            patientMap.remove(p.getPatientIC());
+        }
+    }
+
 }

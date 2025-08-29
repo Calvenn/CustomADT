@@ -30,19 +30,27 @@ public class VisitsHistoryUI {
         int month = ValidationHelper.inputValidatedChoice(1, 12, "month (1-12)");
         int year = ValidationHelper.inputValidatedChoice(2020, LocalDate.now().getYear(), "year");
 
-        List<Visit> filteredVisits = historyManager.getVisitsByMonthYear(month, year);
+        // Ask user sorting order
+        System.out.println("\nChoose sorting order:");
+        System.out.println("1. Oldest date first");
+        System.out.println("2. Latest date first");
+        int choice = ValidationHelper.inputValidatedChoice(1, 2, "choice");
+        boolean ascending = (choice == 1);
+
+        // Now get visits with bubble sort applied
+        List<Visit> filteredVisits = historyManager.getVisitsByMonthYear(month, year, ascending);
+
         System.out.println("\nTotal visits in selected period: " + filteredVisits.size());
-        System.out.println(("-".repeat(107)));
-        int width = 105; 
-        String title = "VISIT HISTORY FOR " + month + "/" + year;
-        System.out.printf("| %-"+(width-2)+"s |%n", title);
+        System.out.println("-".repeat(107));
+        System.out.println("| VISIT HISTORY FOR " + month + "/" + year + " ".repeat(76) + " |");
+
         if (filteredVisits.size() == 0) {
             System.out.println("No visits found for the selected period.");
-            System.out.println(("-".repeat(101)));
+            System.out.println("-".repeat(101));
             return;
         }
-        
-        // Display all visits
+
+        // Display visits in chosen order
         visitsTableHeader();
         for (int i = 1; i <= filteredVisits.size(); i++) {
             System.out.println(filteredVisits.get(i));
@@ -52,9 +60,7 @@ public class VisitsHistoryUI {
     public void displayPatientHistory(Patient patient) {
         if (patient == null) return; 
         System.out.println(("-".repeat(107)));
-        int width = 105; 
-        String title = "VISIT HISTORY FOR PATIENT " + patient.getPatientIC();
-        System.out.printf("| %-"+(width-2)+"s |%n", title);
+        System.out.println("| VISIT HISTORY FOR PATIENT " + patient.getPatientIC() + " ".repeat(63) + " |");
         List<Visit> patientVisits = historyManager.getVisitsByPatient(patient.getPatientIC());
         if (patientVisits.size() == 0) {
             System.out.println("No visit records found for this patient.");
@@ -66,39 +72,62 @@ public class VisitsHistoryUI {
         }
     }
 
-    // Helper method: bar chart + table
+    // bar chart + table
     private void printBarChartWithTable(String title, String[] labels, int[] counts, boolean showPercentage) {
+        // Calculate the total count
         int total = 0;
-        for (int c : counts) total += c;
+        for (int i = 0; i < counts.length; i++) {
+            total = total + counts[i];
+        }
 
+        // Print the header for chart
         System.out.println("\n" + "=".repeat(46));
         System.out.println("       " + title + " CHART");
         System.out.println("=".repeat(46));
 
-        int maxBarLength = 25; // max number of stars
+        int maxBarLength = 25; // maximum number of stars
         int maxCount = 0;
-        for (int c : counts) if (c > maxCount) maxCount = c;
-
-        for (int i = 0; i < labels.length; i++) {
-            int barLength = (maxCount == 0) ? 0 : (int)((counts[i] * maxBarLength * 1.0) / maxCount);
-            System.out.printf("%-15s | %s%n", labels[i], "*".repeat(barLength));
+        for (int i = 0; i < counts.length; i++) {
+            if (counts[i] > maxCount) {
+                maxCount = counts[i];
+            }
         }
-        System.out.println("-".repeat(46));
 
+        // Print the bar chart
+        for (int i = 0; i < labels.length; i++) {
+            // Calculate how many stars to print
+            int barLength = 0;
+            if (maxCount > 0) {
+                barLength = (int)((counts[i] * maxBarLength) / maxCount);
+            }
+            
+            // Print label and stars
+            System.out.printf("%-15s | %s\n", labels[i], "*".repeat(barLength));
+        }
+        
+        // Print separator and table header
+        System.out.println("-".repeat(46));
         System.out.println("       " + title + " TABLE");
         System.out.println("-".repeat(46));
-        if (showPercentage) {
-            System.out.printf("%-15s %-10s %-10s%n", "Label", "Count", "Percentage");
+        
+        // Print table with or without percentage
+        if (showPercentage == true) {
+            System.out.printf("%-15s %-10s %-10s\n", "Label", "Count", "Percentage");
             System.out.println("-".repeat(46));
+            
             for (int i = 0; i < labels.length; i++) {
-                double percent = (total > 0) ? counts[i] * 100.0 / total : 0;
-                System.out.printf("%-15s %-10d %-9.2f%%%n", labels[i], counts[i], percent);
+                double percent = 0.0;
+                if (total > 0) {
+                    percent = (counts[i] * 100.0) / total;
+                }
+                System.out.printf("%-15s %-10d %.2f%%\n", labels[i], counts[i], percent);
             }
         } else {
-            System.out.printf("%-15s %-10s%n", "Label", "Count");
+            System.out.printf("%-15s %-10s\n", "Label", "Count");
             System.out.println("-".repeat(46));
+            
             for (int i = 0; i < labels.length; i++) {
-                System.out.printf("%-15s %-10d%n", labels[i], counts[i]);
+                System.out.printf("%-15s %-10d\n", labels[i], counts[i]);
             }
         }
 
@@ -109,7 +138,10 @@ public class VisitsHistoryUI {
     public void displayYearlyReport() {
         int year = ValidationHelper.inputValidatedChoice(2025, LocalDate.now().getYear(), "year");
         int[] monthCounts = historyManager.getMonthlyVisitCounts(year);
-        String[] monthNames = {"January","February","March","April","May","June", "July","August","September","October","November","December"};
+        
+        String[] monthNames = {"January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December"};
+        
         printBarChartWithTable("YEAR " + year + " VISITS PER MONTH", monthNames, monthCounts, true);
     }
 
@@ -122,5 +154,4 @@ public class VisitsHistoryUI {
 
         printBarChartWithTable("SEVERITY REPORT " + month + "/" + year, labels, severityCounts, true);
     }
-
 }
