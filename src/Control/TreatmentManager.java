@@ -50,10 +50,6 @@ public class TreatmentManager {
         return true; 
     }
     
-    public boolean checkIDFormat(String id) {
-        return id.matches("^T\\d{4}$");
-    }
-    
     public Treatment findTreatmentName(String treatmentName) {
         return providedTreatments.get(treatmentName.toLowerCase());
     }
