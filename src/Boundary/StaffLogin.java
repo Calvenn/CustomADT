@@ -228,7 +228,7 @@ public class StaffLogin {
             System.out.println("0. Exit");   
             System.out.println("===============================");
             
-            choice = ValidationHelper.inputValidatedChoice(0, 2, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 3, "your choice");
 
             switch(choice){
                 case 1 -> consultUI.consultMainMenuRead(); // Consultation System*/

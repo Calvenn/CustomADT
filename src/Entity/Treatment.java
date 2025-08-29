@@ -1,6 +1,11 @@
 package Entity; 
 import java.time.Duration; 
 
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
+
 public class Treatment implements Comparable<Treatment> {
     private final String treatmentId; 
     private String name; 
@@ -79,6 +84,10 @@ public class Treatment implements Comparable<Treatment> {
     
     public Duration getTimeAllocation() {
         return duration.multipliedBy(frequency);
+    }
+    
+    public double getEarned() {
+        return frequency * price; 
     }
     
     @Override
