@@ -16,8 +16,8 @@ import java.time.LocalTime;
  */
 
 public class TreatmentApptManager {
-    private LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
-    private LinkedHashMap<String, List<TreatmentAppointment>> history;
+    private final LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
+    private final LinkedHashMap<String, List<TreatmentAppointment>> history;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
     private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
     

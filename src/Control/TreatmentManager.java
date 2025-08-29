@@ -11,7 +11,7 @@ import java.time.Duration;
  */
 
 public class TreatmentManager {
-    private LinkedHashMap<String, Treatment> providedTreatments; 
+    private final LinkedHashMap<String, Treatment> providedTreatments; 
     
     public TreatmentManager() {
         providedTreatments = new LinkedHashMap<>();

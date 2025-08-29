@@ -14,7 +14,7 @@ public class TreatmentAppointment extends Appointment{
     private final Treatment treatment; 
     private final LocalDateTime createdAt; 
     
-    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
     private static int idNo = 0; 
     
     public TreatmentAppointment(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime) {
@@ -70,8 +70,8 @@ public class TreatmentAppointment extends Appointment{
            super.getDoctor().getID(),super.getDoctor().getName(), 
            this.consult.getID(), super.getPatient().getPatientName(), 
            this.treatment.getName(), 
-           super.getDateTime().format(dateFormat), 
-           this.createdAt.format(dateFormat)
+           super.getDateTime().format(DATE_FORMAT), 
+           this.createdAt.format(DATE_FORMAT)
         ); 
     }
     
