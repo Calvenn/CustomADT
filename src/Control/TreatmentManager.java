@@ -5,7 +5,10 @@ import adt.List;
 import Entity.Treatment; 
 import java.time.Duration; 
 
-//input data format validation should be in boundary, business logic validation in control 
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
 
 public class TreatmentManager {
     private LinkedHashMap<String, Treatment> providedTreatments; 

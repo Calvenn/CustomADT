@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter; 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

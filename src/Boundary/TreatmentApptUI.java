@@ -26,7 +26,7 @@ public class TreatmentApptUI {
     private final DoctorManager doctorManager; 
     private final TreatmentUI treatmentUI; 
     private final Scanner scanner; 
-    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
     
     public TreatmentApptUI(TreatmentApptManager treatmentApptManager, DoctorManager doctorManager, TreatmentUI treatmentUI) {
         this.treatmentApptManager = treatmentApptManager; 
@@ -207,7 +207,7 @@ public class TreatmentApptUI {
             try {
                 if(checkCancel(timeString)) return null;
                 TryCatchThrowFromFile.validateDateTime(timeString);
-                apptTime = LocalDateTime.parse(timeString, dateFormat);
+                apptTime = LocalDateTime.parse(timeString, DATE_FORMAT);
                 
                 if(!treatmentApptManager.validDateTime(apptTime)) {
                     throw new InvalidInputException("Appointment Time is not within business hours (8:00-17:00)\nOr not a future date time."); 
@@ -273,7 +273,7 @@ public class TreatmentApptUI {
                 if(!bookedTime.isEmpty()) {
                     for(int i = 1; i <= bookedTime.size(); i+=2) {
                         if(treatmentApptManager.startEndTimeConflict(bookedTime.get(i), bookedTime.get(i+1), apptTime)) {
-                            System.out.println("Time has conflict with previous appointment at " + bookedTime.get(i).format(dateFormat));
+                            System.out.println("Time has conflict with previous appointment at " + bookedTime.get(i).format(DATE_FORMAT));
                             System.out.println("Please enter another time.\n"); 
                             hasConflict = true; 
                             break; 
@@ -284,7 +284,7 @@ public class TreatmentApptUI {
 
                 availableDoctors = treatmentApptManager.checkDoctorAvailability(apptTime); 
                 if(availableDoctors.isEmpty()) {
-                    System.out.println("No doctors available at " + apptTime.format(dateFormat)); 
+                    System.out.println("No doctors available at " + apptTime.format(DATE_FORMAT)); 
                     System.out.println("Please enter another time.");
                     continue;
                 }
@@ -323,7 +323,7 @@ public class TreatmentApptUI {
             if(treatment == null) break; 
             
             printTitle("Confirm Appointment Details", 56); 
-            System.out.printf("| %-20s: %-30s |\n", "Appointment Time", apptTime.format(dateFormat));
+            System.out.printf("| %-20s: %-30s |\n", "Appointment Time", apptTime.format(DATE_FORMAT));
             System.out.printf("| %-20s: %-30s |\n", "Doctor", String.format("%s - Dr. %s", doctor.getID(), doctor.getName()));
             System.out.printf("| %-20s: %-30s |\n", "Consult", String.format("%s - %s", consult.getID(), consult.getPatient().getPatientName()));
             System.out.printf("| %-20s: %-30s |\n", "Treatment", treatment.getName());

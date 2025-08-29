@@ -1,6 +1,11 @@
 package Entity; 
 import java.time.Duration; 
 
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
+
 public class Treatment implements Comparable<Treatment> {
     private final String treatmentId; 
     private String name; 

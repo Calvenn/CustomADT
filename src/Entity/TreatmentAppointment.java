@@ -2,6 +2,11 @@ package Entity;
 import java.time.LocalDateTime; 
 import java.time.format.DateTimeFormatter;
 
+/**
+ *
+ * @author MeganYeohTzeXuan
+ */
+
 public class TreatmentAppointment extends Appointment{
     
     private final String appointmentId; 

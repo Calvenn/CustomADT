@@ -1,9 +1,7 @@
 package Control;
 import Entity.Consultation;
 import Entity.Doctor;
-import Entity.Patient;
 import adt.List;
-import adt.Queue;
 import adt.Heap;
 import adt.LinkedHashMap; 
 import Entity.TreatmentAppointment; 
