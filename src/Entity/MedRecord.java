@@ -18,7 +18,8 @@ public class MedRecord {
     private boolean toSave;
     private Consultation consult;
 
-    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, LocalDateTime timestamp, boolean toSave, Consultation consult) {
+    public MedRecord(Patient patient, Doctor doc, Medicine med, int quantityTaken, 
+            LocalDateTime timestamp, boolean toSave, Consultation consult) {
         this.recordID = "MR" + String.format("%04d", generateId(toSave)); 
         this.patient = patient;
         this.doc = doc;

@@ -165,11 +165,11 @@ public class MedicineControl {
     
     public Iterable<Medicine> getAllMedicines() {
         Object[] meds = medMap.getValues();
-        java.util.List<Medicine> medList = new java.util.ArrayList<>();
+        List<Medicine> medList = new List<>();
         for (Object obj : meds) {
             medList.add((Medicine) obj);
         }
-        return medList;
+        return (Iterable<Medicine>) medList;
     }
     
     public List<String> suggestedMeds(String symptoms) {
