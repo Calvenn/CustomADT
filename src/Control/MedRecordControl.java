@@ -23,7 +23,8 @@ public class MedRecordControl {
         this.recList = recList;
     }
     
-    public void addRecord(Patient patient, Doctor doctor, Medicine medicine, int quantityTaken, boolean toSave, Consultation consult) {
+    public void addRecord(Patient patient, Doctor doctor, Medicine medicine,
+            int quantityTaken, boolean toSave, Consultation consult) {
         MedRecord record = new MedRecord(
                 patient,
                 doctor,
@@ -34,7 +35,6 @@ public class MedRecordControl {
                 consult
         );
         recList.add(record);
-        medicine.incrementDispensed(quantityTaken);
     }
     
     public void viewAllRecords() {
@@ -52,7 +52,8 @@ public class MedRecordControl {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getPatient().getPatientIC().equalsIgnoreCase(patient)||record.getPatient().getPatientName().equalsIgnoreCase(patient)) {
+            if (record.getPatient().getPatientIC().equalsIgnoreCase(patient)
+                    ||record.getPatient().getPatientName().equalsIgnoreCase(patient)) {
                 displayRecord(record);
                 found = true;
             }
@@ -66,7 +67,8 @@ public class MedRecordControl {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getDoctor().getID().equalsIgnoreCase(doctor)||record.getDoctor().getName().equalsIgnoreCase(doctor)) {
+            if (record.getDoctor().getID().equalsIgnoreCase(doctor)
+                    ||record.getDoctor().getName().equalsIgnoreCase(doctor)) {
                 displayRecord(record);
                 found = true;
             }
@@ -80,7 +82,8 @@ public class MedRecordControl {
         boolean found = false;
         for (int i = 1; i <= recList.size(); i++) {
             MedRecord record = recList.get(i);
-            if (record.getMed().getMedID().equalsIgnoreCase(med)||record.getMed().getName().equalsIgnoreCase(med)) {
+            if (record.getMed().getMedID().equalsIgnoreCase(med)
+                    ||record.getMed().getName().equalsIgnoreCase(med)) {
                 displayRecord(record);
                 found = true;
             }

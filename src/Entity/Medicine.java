@@ -11,7 +11,6 @@ public class Medicine implements Comparable<Medicine>{
     private String desc;
     private int stock; 
     private double price; 
-    private int totalDispensed = 0;
     
     public Medicine(){
         medID = "";
@@ -32,18 +31,6 @@ public class Medicine implements Comparable<Medicine>{
     @Override
     public int compareTo(Medicine other){
         return Integer.compare(this.stock,other.stock);
-    }
-    
-    public int compareToBySales(Medicine other) {
-        return Integer.compare(this.totalDispensed, other.totalDispensed);
-    }
-    
-    public void incrementDispensed(int quantity) {
-        this.totalDispensed += quantity;
-    }
-    
-    public int getTotalDispensed() {
-        return totalDispensed;
     }
     
     public String getMedID(){
