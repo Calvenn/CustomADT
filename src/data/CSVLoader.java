@@ -256,7 +256,7 @@ public class CSVLoader {
                     // Collected
                     boolean collected = Boolean.parseBoolean(values[5].trim());
                     
-                    Consultation consult = consultManager.getConsultRec(values[6], doctor.getID());
+                    Consultation consult = consultManager.getConsultRecByDoctor(values[6], doctor.getID());
                     
                     if(consult == null){
                         System.err.println("Consult Record not found: " + values[6]);
@@ -325,7 +325,7 @@ public class CSVLoader {
 
                 Doctor doctor = docManager.findDoctor(values[0].trim());
                 
-                Consultation consult = consultManager.getConsultRec(values[1].trim(), docManager);
+                Consultation consult = consultManager.getConsultRec(values[1].trim());
                 
                 Treatment treatment = trtManager.findTreatmentName(values[2].trim());
 

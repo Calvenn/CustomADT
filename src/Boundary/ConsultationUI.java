@@ -6,18 +6,18 @@ import Control.ConsultationReport;
 import Control.DoctorManager;   
 import Control.MedicineControl;
 import Control.PaymentManager;
-import Control.TreatmentManager;
 
 import Entity.Doctor;
 import Entity.Appointment;
 import Entity.Consultation;
+import Entity.MedRecord;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.Payment;
 import Entity.Severity;
 import Entity.Staff;
 import Entity.Visit;
-import Entity.Treatment;
+import Entity.TreatmentAppointment;
 import adt.LinkedHashMap;
 import adt.List;
 
@@ -37,18 +37,16 @@ public class ConsultationUI {
     private final ConsultationManager consultManager;
     private final TreatmentApptUI treatmentApptUI;
     private final DoctorManager docManager;
-    private final TreatmentManager trtManager;
     private final MedicineControl medControl;
     private static Doctor currentDoc = null;
     private final ConsultationReport consultReport;
     private final Scanner scanner;
 
-    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, TreatmentManager trtManager, MedicineControl medControl, ConsultationReport consultReport, TreatmentApptUI treatmentApptUI) {
+    public ConsultationUI(DoctorManager docManager, AppointmentManager apptManager, ConsultationManager consultManager, MedicineControl medControl, ConsultationReport consultReport, TreatmentApptUI treatmentApptUI) {
         this.docManager = docManager;
         this.apptManager = apptManager;
         this.apptUI = new AppointmentUI(apptManager); 
         this.consultManager = consultManager;
-        this.trtManager = trtManager;
         this.medControl = medControl;
         this.consultReport = consultReport;
         this.treatmentApptUI = treatmentApptUI;
@@ -68,7 +66,7 @@ public class ConsultationUI {
         currentDoc = doc.get(select);
         
         consultationApptSummary();
-        apptManager.checkMissedAppt(currentDoc);
+        apptManager.refreshMissApptFlag(currentDoc);
         System.out.println("\n" + "=".repeat(35));
         System.out.println("1. Consultation History By " + currentDoc.getName());
         System.out.println("2. Appointment Record");
@@ -100,7 +98,7 @@ public class ConsultationUI {
         
         while (true) {
             consultationApptSummary();
-            apptManager.checkMissedAppt(currentDoc);
+            apptManager.refreshMissApptFlag(currentDoc);
             
             System.out.println("\n" + "=".repeat(35));
             System.out.println("        CONSULTATION MENU");
@@ -174,7 +172,7 @@ public class ConsultationUI {
         Object currentPatient = null;
         Severity severity = null;
         LocalDateTime startTime = null, createdAt = null;
-        Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to call next patient?)");
+        Character choice = ValidationHelper.inputValidateYesOrNo("Do you want to call next patient? ");
         
         if(choice == 'y' || choice == 'Y'){          
             currentPatient = consultManager.dispatchNextPatient();
@@ -201,7 +199,7 @@ public class ConsultationUI {
         } else if (currentPatient instanceof Consultation appt){
             id = appt.getID();
             System.out.println("=".repeat(35));
-            System.out.println("Type   : Appointment");
+            System.out.println("Type     : Appointment");
             System.out.println("ID       : " + id);
             System.out.println("Patient  : " + appt.getPatient().getPatientName());
             System.out.println("Doctor   : " + appt.getDoctor().getName());
@@ -209,6 +207,12 @@ public class ConsultationUI {
             System.out.println("Symptoms : " + appt.getDisease());
             System.out.println("=".repeat(35));
             patient = appt.getPatient();
+            
+            Character confirm = ValidationHelper.inputValidateYesOrNo("Has arrive? ");
+            if(confirm == 'n' || confirm == 'N') {
+                currentPatient = null;
+                return;
+            }
         }      
         
         boolean isLifeThreatening = false;
@@ -401,7 +405,7 @@ public class ConsultationUI {
 
             for (int i = 1; i <= consultations.size(); i++) {
                 Consultation c = consultations.get(i);
-                System.out.println(c.generateFullReport());
+                System.out.println(generateFullReport(c));
             }
         }
     }
@@ -431,6 +435,67 @@ public class ConsultationUI {
 
         // Print footer
         System.out.println("============================================================\n");       
+    }
+    
+    public String generateFullReport(Consultation c) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        StringBuilder report = new StringBuilder();
+
+        report.append("============================================================\n");
+        report.append("                     Consultation Report                  \n");
+        report.append("============================================================\n\n");
+
+        report.append(String.format("%-18s: %s\n", "Consultation ID", c.getID()));
+        report.append(String.format("%-18s: %s\n", "Patient Name", c.getPatient().getPatientName()));
+        report.append(String.format("%-18s: %s\n", "Patient IC", c.getPatient().getPatientIC()));
+        report.append(String.format("%-18s: %s\n", "Severity Level", c.getSeverity()));
+        report.append(String.format("%-18s: %s\n", "Diagnosis", c.getDisease()));
+        report.append(String.format("%-18s: %s\n", "Notes", (c.getNotes() == null ? "-" : c.getNotes())));
+        report.append(String.format("%-18s: %s\n", "Doctor", c.getDoctor().getName()));
+        report.append(String.format("%-18s: %s\n", "Consult Time", c.getConsultTime().format(formatter)));
+        report.append(String.format("%-18s: %s\n", "Appointment Time", 
+                (c.getDateTime() == null ? "-" : c.getDateTime().format(formatter))));
+        report.append(String.format("%-18s: %s\n", "Created At", c.getCreatedAt().format(formatter)));
+
+        // --- Medical Records ---
+        report.append("\n------------------------------------------------------------\n");
+        report.append("                      Medical Records                      \n");
+        report.append("------------------------------------------------------------\n");
+        report.append(String.format("%-10s %-20s %-40s\n", "MedID", "Date", "Medicine"));
+
+        if (c.medRecords.isEmpty()) {
+            report.append("No medical records found.\n");
+        } else {
+            for (int i = 1; i <= c.medRecords.size(); i++) {
+                MedRecord m = c.medRecords.get(i);
+                report.append(String.format("%-10s %-20s %-40s\n",
+                        m.getRecordID(),
+                        m.getTimestamp().format(formatter),
+                        m.getMed().getName()));
+            }
+        }
+
+        // --- Treatment Records ---
+        report.append("\n------------------------------------------------------------\n");
+        report.append("                     Treatment Records                     \n");
+        report.append("------------------------------------------------------------\n");
+        report.append(String.format("%-10s %-20s %-40s\n", "TrtID", "Date", "Treatment"));
+
+        if (c.trtAppts.isEmpty()) {
+            report.append("No treatment records found.\n");
+        } else {
+            for (int i = 1; i <= c.trtAppts.size(); i++) {
+                TreatmentAppointment t = c.trtAppts.get(i);
+                report.append(String.format("%-10s %-20s %-40s\n",
+                        t.getAppointmentId(),
+                        t.getDateTime().format(formatter),
+                        t.getTreatment().getName()));
+            }
+        }
+
+        report.append("============================================================\n");
+
+        return report.toString();
     }
     
     public void displayOutcomeReport() {

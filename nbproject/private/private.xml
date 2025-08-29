@@ -8,12 +8,22 @@
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/VisitsHistoryUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/solution.txt</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/data/patients.csv</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Visit.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Symptoms.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Medicine.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Doctor.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/data/staff.csv</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/QueueManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/MedicineControl.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/VisitHistoryManager.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/exception/InvalidInputException.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/PaymentManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/adt/HeapInterface.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/StaffManagementUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/ConsultationUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Treatment.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/TreatmentAppointment.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Severity.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/AppointmentUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/DoctorManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Patient.java</file>
@@ -22,7 +32,6 @@
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/data/CSVLoader.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/ConsultationReport.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/TreatmentUI.java</file>
-            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/data/treatmentAppt.csv</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/VisitRegistrationUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/PatientManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/exception/ValidationHelper.java</file>
@@ -30,9 +39,11 @@
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/TreatmentApptManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/TreatmentManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/PaymentUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/MedRecordControl.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Entity/Appointment.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/TreatmentApptUI.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Boundary/PatientManagementUI.java</file>
+            <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/data/medicine.csv</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/AppointmentManager.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/exception/TryCatchThrowFromFile.java</file>
             <file>file:/C:/Coding/NetBeansProjects/Assgn/Clinic_Management_System/src/Control/ConsultationManager.java</file>

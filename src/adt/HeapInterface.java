@@ -5,8 +5,11 @@
 package adt;
 
 /**
+ * References
+ * 1.https://www.programiz.com/dsa/heap-data-structure
+ * 2.https://www.enjoyalgorithms.com/blog/introduction-to-heap-data-structure
  * @param <E> a type that implements Comparable
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public interface HeapInterface<E extends Comparable<E>>{
     
@@ -36,10 +39,15 @@ public interface HeapInterface<E extends Comparable<E>>{
     //@return whether data sucessfully delete
     boolean remove(E data);
     
+    //@param index of the element
+    //@return the element of that index
+    E get(int index);
+    
     //@param data to be find
     //@return whether data is found
     boolean contains(E data);
     
+    //Remove the contents of heap
     void clear();
     
 }

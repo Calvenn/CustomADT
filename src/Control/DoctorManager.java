@@ -48,7 +48,7 @@ public class DoctorManager {
         return allDocIDs;
     }
     
-    public Doctor[] viewAllDoctor() {
+    private Doctor[] viewAllDoctor() {
         Object[] obj = doctorLookup.getValues();
         Doctor[] doctor = new Doctor[obj.length];
         for (int i = 0; i < obj.length; i++) {

@@ -9,6 +9,10 @@ import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 import java.util.Objects;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class ValidationUtility {
     
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+?6?01[0-9]-*[0-9]{7,8})$");

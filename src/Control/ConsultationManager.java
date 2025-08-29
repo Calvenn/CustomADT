@@ -48,34 +48,74 @@ public class ConsultationManager {
     }
 
     public Object dispatchNextPatient() {
-        int severity = -1;
-        Appointment nextAppt = appointmentHeap.peekRoot();
-        Visit nextWalkIn = queue.peekRoot();  
-        
-        if (nextAppt instanceof Consultation) severity = ((Consultation) nextAppt).getSeverity();
-        
-        while (nextAppt != null && (!nextAppt.getDoctor().getID().equals(currentDoc.getID()) || nextAppt.getDateTime().isBefore(LocalDateTime.now()))) {
-            appointmentHeap.extractRoot(); // skip unrelated doctor
-            nextAppt = appointmentHeap.peekRoot();
+        appointmentHeap.display();
+        queue.display();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Appointment bestAppt = findNextValidAppointment(now);
+        Visit bestWalkIn = findNextValidWalkIn(); // skip walk-ins that have future appointments
+
+        // --- Handle null cases ---
+        if (bestAppt == null && bestWalkIn == null) return null;
+        if (bestAppt == null) return queue.extractSpecific(bestWalkIn);
+        if (bestWalkIn == null) {
+            // Only return appointment if it's in the on-time window
+            LocalDateTime apptStart = bestAppt.getDateTime().minusMinutes(5);
+            LocalDateTime apptEnd   = bestAppt.getDateTime().plusMinutes(15);
+            if (!now.isBefore(apptStart) && !now.isAfter(apptEnd)) {
+                return appointmentHeap.extractSpecific(bestAppt);
+            } 
         }
 
-        while (nextWalkIn != null && !nextWalkIn.getDoctor().getID().equals(currentDoc.getID())) {
-            queue.extractRoot(); // skip unrelated doctor
-            nextWalkIn = queue.peekRoot();
+        // --- Determine if appointment is on time ---
+        LocalDateTime apptStart = bestAppt.getDateTime().minusMinutes(5);
+        LocalDateTime apptEnd   = bestAppt.getDateTime().plusMinutes(15);
+        boolean apptInWindow = !now.isBefore(apptStart) && !now.isAfter(apptEnd);
+
+        // --- Appointment not yet due, serve walk-in first ---
+        if (!apptInWindow) {
+            return queue.extractSpecific(bestWalkIn);
         }
 
-        if (nextAppt == null && nextWalkIn == null) return null;
-        if (nextAppt == null) return queue.extractRoot();
-        if (nextWalkIn == null) return appointmentHeap.extractRoot();
-
-        boolean isToday = nextAppt.getDateTime().toLocalDate().equals(LocalDate.now());
-        
-        if (isToday && nextWalkIn.getSeverityLevel().getSeverity() > severity) {
-            return queue.extractRoot();
+        // --- Appointment in window, decide by severity ---
+        int apptSeverity = (bestAppt instanceof Consultation) ? ((Consultation) bestAppt).getSeverity() : -1;
+        boolean isToday = bestAppt.getDateTime().toLocalDate().equals(LocalDate.now());
+        if (isToday && bestWalkIn.getSeverityLevel().getSeverity() > apptSeverity) {
+            return queue.extractSpecific(bestWalkIn);
         } else {
-            return appointmentHeap.extractRoot();  // Extract appointment otherwise           
+            return appointmentHeap.extractSpecific(bestAppt);
         }
-    }   
+    }
+
+    
+    private Appointment findNextValidAppointment(LocalDateTime now) {
+        for (int i = 0; i < appointmentHeap.size(); i++) {
+            Appointment appt = appointmentHeap.get(i);
+            if (appt.getDoctor().getID().equals(currentDoc.getID()) &&
+                !appt.getDateTime().isBefore(now)) {
+                return appt; // first valid appointment
+            }
+        }
+        return null;
+    }
+
+    //SKIP APPT DATA
+    private Visit findNextValidWalkIn() {
+        for (int i = 0; i < queue.size(); i++) {
+            Visit v = queue.get(i);
+
+            // Only consider walk-ins for this doctor
+            if (!v.getDoctor().getID().equals(currentDoc.getID())) continue;
+
+            // Skip walk-ins that are actually appointments (ID starts with "A")
+            if (v.getVisitId().startsWith("A")) continue;
+
+            // Valid walk-in found
+            return v;
+        }
+        return null; // no valid walk-in
+    }
         
     public Consultation consultationRecord(String id, Patient patient, int severity, String diagnosis, String notes, LocalDateTime startTime, LocalDateTime createdAt) {
         // Get existing consultation list for doctor
@@ -88,7 +128,7 @@ public class ConsultationManager {
             return newConsult;
         } else {
             newConsult = new Consultation(id, severity, patient, diagnosis, notes, currentDoc, startTime, null, createdAt);
-            apptManager.bookAppointment(newConsult, null);
+            apptManager.bookAppointment(newConsult, null, false);
             return newConsult;
         }
     }
@@ -115,16 +155,20 @@ public class ConsultationManager {
     
     public List<Consultation> getRecordsAll() {
         List<Consultation> allConsultations = new List<>();
-        Doctor[] doctors = doctorManager.viewAllDoctor();
-        for (int i = 0; i < doctors.length; i++) {
-            if(doctors[i].getDepartment().equalsIgnoreCase("CONSULT")){
-                List<Consultation> consults = consultLog.get(doctors[i].getID());
-                for(int j = 1; j <= consults.size(); j++){
-                    if (consults != null) {
-                        Consultation c = consults.get(j);
-                        allConsultations.add(c); 
+
+        // get only doctors from CONSULT dept
+        List<Doctor> consultDoctors = doctorManager.getDoctorsByDept("CONSULT");
+
+        if (consultDoctors != null) {
+            for (int i = 1; i <= consultDoctors.size(); i++) {
+                Doctor doctor = consultDoctors.get(i);
+                List<Consultation> consults = consultLog.get(doctor.getID());
+
+                if (consults != null) {
+                    for (int j = 1; j <= consults.size(); j++) { 
+                        allConsultations.add(consults.get(j));
                     }
-                } 
+                }
             }
         }
         return allConsultations;
@@ -134,9 +178,7 @@ public class ConsultationManager {
         List<Consultation> resultList = new List<>();
         List<Consultation> consultations = getRecordsAll();
 
-        if (consultations == null || consultations.size() == 0) {
-            return resultList; // return empty list
-        }
+        if (consultations.isEmpty()) return resultList;
 
         for (int i = 0; i < consultations.size(); i++) {
             Consultation c = consultations.get(i);
@@ -179,12 +221,11 @@ public class ConsultationManager {
         return resultList;
     }
     
-    public Consultation getConsultRec(String id, String docId) {
+    //get consult rec for specific doctor
+    public Consultation getConsultRecByDoctor(String id, String docId) {
         Consultation found = null;
         List<Consultation> consultations = consultLog.get(docId);
-        if (consultations == null || consultations.isEmpty()) {
-            return null;
-        }
+        if (consultations.isEmpty()) return null;
 
         for (int i = 1; i <= consultations.size(); i++) {
             Consultation c = consultations.get(i);
@@ -192,27 +233,12 @@ public class ConsultationManager {
                 found = c;
             }
         }
-
         return found;
     }
     
-    private List<Consultation> extractConsultRec(String id, DoctorManager docManager) {
-        List<Consultation> allConsultations = new List<>();
-        Doctor[] doctors = docManager.viewAllDoctor();
-
-        for (int i = 0; i < doctors.length; i++) {
-            List<Consultation> doctorConsults = consultLog.get(doctors[i].getID());
-            if (doctorConsults != null) {
-                for (int j = 1; j <= doctorConsults.size(); j++) { // your ADT is 1-based
-                    allConsultations.add(doctorConsults.get(j));
-                }
-            }
-        }
-        return allConsultations;
-    }
-    
-    public Consultation getConsultRec(String id, DoctorManager docManager) {
-        List<Consultation> consultations = extractConsultRec(id, docManager);
+    //based 
+    public Consultation getConsultRec(String id) {
+        List<Consultation> consultations = getRecordsAll();
         for (int i = 1; i <= consultations.size(); i++) {
             Consultation c = consultations.get(i);
             if (c != null && c.getID().equals(id)) {
@@ -222,11 +248,11 @@ public class ConsultationManager {
         return null;
     }
     
-    //Sorting
+    //Sort by consult start time
      public void sortByDate(List<Consultation> list, boolean ascending) {
-        if (list == null || list.isEmpty()) return;
+        if (list.isEmpty()) return;
 
-        // Bubble sort using custom ADT (1-based index)
+        // Bubble sort using ADT 
         for (int i = 1; i <= list.size(); i++) {
             for (int j = 1; j <= list.size() - i; j++) {
                 Consultation c1 = list.get(j);

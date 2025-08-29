@@ -61,10 +61,13 @@ public class ClinicApplication {
         docManager = new DoctorManager(doctorLookup, sharedDoc);
         staffManager = new StaffManager(staffLookup);
         historyManager = new VisitHistoryManager();
-        queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, historyManager);
+        
         apptManager = new AppointmentManager(missAppt, consultLog, apptQueue,docManager);
         consultManager = new ConsultationManager(sharedVisitQueue,apptManager.getAppointmentHeap(),
         consultLog, trtApptHistory, medRecList,docManager,apptManager);
+        
+        queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, historyManager, consultManager);
+        
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
         treatmentApptManager = new TreatmentApptManager(trtApptHistory);
@@ -75,7 +78,7 @@ public class ClinicApplication {
         patientUI = new PatientManagementUI(queueManager, patientManager, historyManager);
         treatmentUI = new TreatmentUI(trtManager);
         treatmentApptUI = new TreatmentApptUI(treatmentApptManager, docManager, treatmentUI);
-        consultUI = new ConsultationUI(docManager, apptManager, consultManager, trtManager, medControl, consultReport, treatmentApptUI);
+        consultUI = new ConsultationUI(docManager, apptManager, consultManager, medControl, consultReport, treatmentApptUI);
         pharReport = new PharmacyReport(medRecList,medMap);
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
@@ -94,6 +97,5 @@ public class ClinicApplication {
         CSVLoader.loadMedicineFromCSV("src/data/medicine.csv", medControl);
         CSVLoader.loadMedRecordFromCSV("src/data/medicineRec.csv", patientManager, docManager, medControl, medRecList, consultManager);
         staffLogin.login();
-
     }
 }

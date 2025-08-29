@@ -12,7 +12,7 @@ import adt.Heap;
 
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  */
 public class ConsultationReport {
     private final LinkedHashMap<String, List<Consultation>> consultLog;

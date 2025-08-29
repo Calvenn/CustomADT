@@ -6,7 +6,7 @@ package adt;
 import java.util.Arrays;
 /**
  *
- * @author calve
+ * @author CalvenPhnuahKahHong
  * @param <E> any comparable type
  */
 public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
@@ -14,7 +14,7 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     private E[] heap;
     private int size;
     private boolean isMaxHeap = true; //Default is max heap
-    //to use min heap init like this -> ADTHeap<Integer> maxHeap = new ADTHeap<>(false);
+    //To create a min heap: ADTHeap<Integer> maxHeap = new ADTHeap<>(false);
     
     public Heap(boolean isMaxHeap){
         this.heap = (E[]) new Comparable[DEFAULT_SIZE];
@@ -24,9 +24,9 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     
     @Override
     public void insert(E data){
-        ensureSize();
-        heap[size] = data;
-        heapUp(size);
+        ensureSize(); // make sure the array size if always enough
+        heap[size] = data; 
+        heapUp(size); // rearange the order of root area
         size++;
     }
     
@@ -36,9 +36,9 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
         E root = heap[0]; //assign the first element as a TMP
         heap[0] = heap[size - 1]; //the last element is assign to first
         heap[size -1] = null; //last element become null
-        size--;
-        heapDown(0);
-        return root;
+        size--; // remove the root 
+        heapDown(0); // rearrange the order of lower layer
+        return root; // return the removed root
     }
     
     @Override
@@ -48,18 +48,18 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
 
     @Override
     public boolean isEmpty() {
-        return size == 0;
+        return size == 0; // true if heap[size] is 0
     }
 
     @Override
     public int size() {
-        return size;
+        return size; // size of heap
     }
 
     @Override
     public void display() {
         for (int i = 0; i < size; i++) {
-            System.out.println(heap[i]);
+            System.out.println(heap[i]); //display element in heap
         }
     }
     
@@ -67,9 +67,9 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     public boolean update(E oldData, E newData) {
         for (int i = 0; i < size; i++) {
             if (heap[i].equals(oldData)) {
-                heap[i] = newData;
-                heapUp(i);
-                heapDown(i);
+                heap[i] = newData; // replace the oldData to newData
+                heapUp(i); // update and rearrange the order of root area
+                heapDown(i); // update and rearrange the order of element
                 return true;
             }
         }
@@ -92,9 +92,17 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
         heap[size-1] = null; //assign the last element to null
         size--;
         
-        heapDown(index);
-        heapUp(index);
+        heapDown(index); // update and rearrange the order of root area
+        heapUp(index); // update and rearrange the order of element
         return true;
+    }
+    
+    @Override
+    public E get(int index) {
+        if (index >= 0 && index < size) {
+            return heap[index];
+        }
+        return null;
     }
     
     @Override
@@ -110,25 +118,51 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
-            heap[i] = null;   // remove references (helps GC)
+            heap[i] = null;   // remove 
         }
         size = 0;
     }
 
+    @Override
+    public E extractSpecific(E item) {
+        int index = -1;
+
+        for (int i = 0; i < size; i++) { //find index of the element
+            if (get(i).equals(item)) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1)  return null;
+
+        E removed = get(index); //specified item to be extract
+
+        int lastIndex = size - 1;
+        swap(index, lastIndex); //swap with last element
+
+        remove(get(lastIndex)); //remove item to be extract
+
+        if (index < size) { //restore original heap
+            heapUp(index);
+            heapDown(index);
+        }
+        return removed;
+    }
     
     /****************helper function**************/
     private void ensureSize(){
         if(size == heap.length){
-            heap = Arrays.copyOf(heap, heap.length * 2);
+            heap = Arrays.copyOf(heap, heap.length * 2); // double the size of array
         }
     }
     
-    // to insert data to heap and rearrange
+    // to insert data to heap and rearrange (upper layer of heap - root area)
     private void heapUp(int index) {
         int child = index;
         while (child > 0) {
             int parent = (child - 1) / 2; //apply formula of floor(i/2)
-            if (shouldSwap(heap[child], heap[parent])) {
+            if (shouldSwap(heap[child], heap[parent])) { // check whether parents is greater than child
                 swap(child, parent);
                 child = parent;
             } else {
@@ -137,19 +171,19 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
         }
     }
 
-    // to rearrange data 
+    // to rearrange data (lower layer of heap)
     private void heapDown(int index) {
         int parent = index;
         while (true) {
-            int left  = 2 * parent + 1; // to locate the number of position
-            int right = 2 * parent + 2;
+            int left  = 2 * parent + 1; // to locate the number of position (left element)
+            int right = 2 * parent + 2; // to locate the number of position (right element)
             int selected = parent;
 
-            if (left < size && shouldSwap(heap[left], heap[selected])) {
-                selected = left;
+            if (left < size && shouldSwap(heap[left], heap[selected])) { 
+                selected = left; //swap location if left child element is greater/smaller than parents
             }
-            if (right < size && shouldSwap(heap[right], heap[selected])) {
-                selected = right;
+            if (right < size && shouldSwap(heap[right], heap[selected])) { 
+                selected = right; //swap location if right child element is greater/smaller than parents
             }
             if (selected != parent) {
                 swap(parent, selected);
@@ -162,20 +196,15 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     
     private boolean shouldSwap(E a, E b) {
         if (a == null || b == null)return false;
-        return isMaxHeap ? a.compareTo(b) > 0 : a.compareTo(b) < 0;
+        return isMaxHeap ? a.compareTo(b) > 0 : a.compareTo(b) < 0; 
+        //Max Heap: swap if child > parent
+        //Min Heap: swap if child < parent
     }
 
     // Swap two elements 
     private void swap(int i, int j) {
-        E tmp    = heap[i];
-        heap[i]  = heap[j];
-        heap[j]  = tmp;
-    }
-    
-    public E get(int index) {
-        if (index >= 0 && index < size) {
-            return heap[index];
-        }
-        return null;
+        E tmp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = tmp;
     }
 }

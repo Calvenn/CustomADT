@@ -1,5 +1,9 @@
 package Entity;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class Patient{
     private String patientIC;
     private String studentID;
