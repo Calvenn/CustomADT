@@ -4,14 +4,13 @@
  */
 package Entity;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 /**
  *
  * @author CalvenPhnuahKahHong
  */
 public abstract class Appointment implements Comparable<Appointment>{
-    private Patient patient;
-    private Doctor doctor;
+    private final Patient patient;
+    private final Doctor doctor;
     private LocalDateTime dateTime;
     
     public Appointment(Patient patient, Doctor doctor, LocalDateTime time){
@@ -32,22 +31,13 @@ public abstract class Appointment implements Comparable<Appointment>{
         return dateTime;
     }
     
-    public void setTime(LocalDateTime time){
+    public void setDateTime(LocalDateTime time){
         this.dateTime = time;
     }
     
     @Override
     public int compareTo(Appointment other){
         return this.dateTime.compareTo(other.dateTime);
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Appointment other = (Appointment) obj;
-        return this.getPatient().getPatientIC().equals(other.getPatient().getPatientIC())
-            && this.getDoctor().getID().equals(other.getDoctor().getID());
     }
     
     public abstract String getAppointmentType();

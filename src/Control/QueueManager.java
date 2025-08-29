@@ -11,6 +11,12 @@ import adt.LinkedHashMap;
 import adt.List;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ *
+ * @author NgPuiYin
+ */
 
 public class QueueManager {
     private Heap<Visit> visitQueue;
@@ -19,6 +25,7 @@ public class QueueManager {
     private int queueNumber;
     private DoctorManager docManager;
     private VisitHistoryManager historyManager;
+    private ConsultationManager consultManager;
     
     // Enhanced tracking features using custom ADTs
     private LinkedHashMap<Severity, Integer> severityCount;
@@ -28,7 +35,7 @@ public class QueueManager {
     private Visit nextPatient;
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, Heap<Appointment> apptQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager) {
+    public QueueManager(Heap<Visit> sharedQueue, Heap<Appointment> apptQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager, ConsultationManager consultManager) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         this.queueNumber = 1000;
@@ -37,7 +44,7 @@ public class QueueManager {
         this.severityCount = new LinkedHashMap<>();
         this.consultLog = consultLog;
         this.apptQueue = apptQueue;
-
+        this.consultManager = consultManager;
         this.historyManager = historyManager;
         
         // Initialize severity counters
@@ -51,13 +58,11 @@ public class QueueManager {
 
         for (int i = 1; i <= doc.size(); i++) { 
             List<Consultation> consultations = consultLog.get(doc.get(i).getID());
-                if (consultations == null) continue;
+            if (consultations == null) continue;
 
-                for (int j = 1; j <= consultations.size(); j++) {
-                    Consultation consultAppt = consultations.get(j);
+            for (int j = 1; j <= consultations.size(); j++) {
+                Consultation consultAppt = consultations.get(j);
                     if (consultAppt == null || consultAppt.getDateTime() == null) continue;
-
-                    LocalDate apptDate = consultAppt.getDateTime().toLocalDate();
 
                     boolean apptExists = false;
                     for (int k = 1; k <= apptQueue.size(); k++) {
@@ -75,24 +80,22 @@ public class QueueManager {
                         apptQueue.insert(consultAppt);
                     }
 
-                    if (apptDate.equals(LocalDate.now())) {
-                        boolean visitExists = false;
-                        for (int k = 0; k < visitQueue.size(); k++) {
-                            Visit v = visitQueue.get(k);
-                            if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
-                                visitExists = true;
-                                break;
-                            }
+                    boolean visitExists = false;
+                    for (int k = 0; k < visitQueue.size(); k++) {
+                        Visit v = visitQueue.get(k);
+                        if (v != null && v.getPatient().equals(consultAppt.getPatient())) {
+                            visitExists = true;
+                            break;
                         }
 
-                        if (!visitExists) {
-                            createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
-                        }
+                    if (!visitExists) {
+                        createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
                     }
-                }
+                }     
+            }       
         }
     }
-
+    
     public boolean isEmpty() {
         return visitQueue.isEmpty();
     }
@@ -203,21 +206,51 @@ public class QueueManager {
     }
 
     public Visit processNextPatient() {
-        if (currentlyProcessing == null && !visitQueue.isEmpty()) {
-            // Set the first patient as currently processing (don't remove from queue)
-            currentlyProcessing = visitQueue.get(0);
-            
-            // Set next patient if queue has more than one patient
-            if (visitQueue.size() > 1) {
-                nextPatient = visitQueue.get(1);
+        // Always delegate selection logic to dispatchNextPatient
+        Object next = consultManager.dispatchNextPatient();
+        Visit selectedVisit = null;
+
+        // If dispatch picked a Visit directly
+        if (next instanceof Visit) {
+            selectedVisit = (Visit) next;
+        }
+        // If dispatch picked an Appointment (Consultation), wrap into Visit
+        else if (next instanceof Consultation) {
+            Consultation appt = (Consultation) next;
+
+            // Try to find existing Visit in queue
+            for (int i = 0; i < visitQueue.size(); i++) {
+                Visit v = visitQueue.get(i);
+                if (v.getPatient().equals(appt.getPatient())) {
+                    selectedVisit = v;
+                    break;
+                }
+            }
+
+            // If not found, create new Visit
+            if (selectedVisit == null) {
+                selectedVisit = createVisit(
+                    appt.getPatient(),
+                    appt.getDisease(),
+                    false,
+                    true
+                );
+            }
+        }
+
+        // Now sync with "currentlyProcessing" and "nextPatient"
+        if (selectedVisit != null) {
+            currentlyProcessing = selectedVisit;
+            if (visitQueue.size() > 0) {
+                nextPatient = visitQueue.get(0); // peek next in queue
             } else {
                 nextPatient = null;
             }
-            
-            return currentlyProcessing;
         }
-        return null;
+
+        return currentlyProcessing;
     }
+
 
     private void updateNextPatient() {
         if (currentlyProcessing == null) {

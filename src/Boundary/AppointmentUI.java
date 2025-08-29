@@ -78,11 +78,11 @@ public class AppointmentUI {
             suggestNextAvailableSlot();
             LocalDateTime time = ValidationHelper.inputValidatedDateTime("Enter appointment date and time");
 
-            if (apptManager.bookAppointment(consultAppt, time)) {
+            if (apptManager.bookAppointment(consultAppt, time, true)) {
                 System.out.println("\nAppointment booked successfully!");
                 break;
             } else {
-                System.out.println("Time slot already taken. Please try a different time.");
+                System.out.println("Time slot already taken or not working hour. Please try a different time.");
             }
         }
     }
@@ -173,11 +173,23 @@ public class AppointmentUI {
             System.out.println("IC Number " + ic + " not found. Please try again");
         }
     }
+    
+    private void displayAllMissedAppt(Doctor doc){
+        List<Appointment> missed = apptManager.getAllMissedAppt(doc);
 
+        if (missed.isEmpty()) {
+            System.out.println("No missed appointments found for this doctor.");
+        } else {
+            System.out.println(Consultation.getHeader());
+            for (int i = 1; i <= missed.size(); i++) {
+                System.out.println(missed.get(i)); 
+            }
+        }
+    }
     
     private void rescheduleMissedApptUI(Doctor doc) {
-        apptManager.displayAllMissedAppt(doc); 
-        String changedIC = ValidationHelper.inputValidatedIC("\nEnter patient IC number");
+        displayAllMissedAppt(doc); 
+        String changedIC = ValidationHelper.inputValidatedIC("\nEnter patient IC number to reschedule");
 
         Appointment a = apptManager.getMissedAppt(doc, changedIC);
         if (a == null) {
@@ -190,9 +202,10 @@ public class AppointmentUI {
         LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("\nPlease enter new date and time to reschedule");
 
         if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
-            boolean success = apptManager.bookAppointment(a, newTime);
+            boolean success = apptManager.bookAppointment(a, newTime, false);
             if (success) {
                 System.out.println("Appointment Updated");
+                apptManager.checkMissedAppt(doc.getID());
                 if (!apptManager.removeMissedAppt(doc, a.getPatient().getPatientIC())) {
                     System.out.println("Removed Unsuccessful. Please try again");
                 }

@@ -3,6 +3,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class Visit implements Comparable<Visit> {
     private String visitId;
     private Patient patient;

@@ -1,5 +1,9 @@
 package exception;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class TryCatchThrowFromFile {
 
     // Validate not null or empty (String or Object)
@@ -68,7 +72,7 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Invalid IC number format.");
         }
     }
-    
+
     //Validate student ID
     public static void validateStudentID(String studentID) throws InvalidInputException {
         validateNotNull(studentID);
@@ -112,5 +116,6 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Price must be more than zero.");
         }
     }
+
 
 }

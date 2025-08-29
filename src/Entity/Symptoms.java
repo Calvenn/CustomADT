@@ -1,5 +1,9 @@
 package Entity;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class Symptoms {
     
     public static Severity assessSeverity(String symptoms, boolean isLifeThreatening) {

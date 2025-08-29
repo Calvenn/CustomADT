@@ -1,5 +1,9 @@
 package Entity;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public enum Severity{
     EMERGENCY(3),
     URGENT(2),

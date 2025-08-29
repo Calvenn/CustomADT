@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
  */
 public class Consultation extends Appointment{
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-    private List<MedRecord> medRecords = new List<>();
-    private List<TreatmentAppointment> trtAppts = new List<>();
+    public List<MedRecord> medRecords = new List<>();
+    public List<TreatmentAppointment> trtAppts = new List<>();
     //for report purpose
     public static int numOfFollowUp = 0;
     public static int numOfPharmacy = 0;
@@ -140,65 +140,5 @@ public class Consultation extends Appointment{
             "\n" + "-".repeat(242) + "\n%-8s  %-18s  %-17s  %-8s  %-30s  %-63s  %-20s  %-20s  %-20s  %-22s\n" + "-".repeat(242),
             "ConsultID","Patient Name","Patient IC","Severity","Diagnosis","Notes","Doctor","Consult Time","Appt Time","Created At"            
         );
-    }
-    
-    public String generateFullReport() {
-        StringBuilder report = new StringBuilder();
-
-        report.append("============================================================\n");
-        report.append("                     Consultation Report                  \n");
-        report.append("============================================================\n\n");
-
-        report.append(String.format("%-18s: %s\n", "Consultation ID", consultationID));
-        report.append(String.format("%-18s: %s\n", "Patient Name", getPatient().getPatientName()));
-        report.append(String.format("%-18s: %s\n", "Patient IC", getPatient().getPatientIC()));
-        report.append(String.format("%-18s: %s\n", "Severity Level", severity));
-        report.append(String.format("%-18s: %s\n", "Diagnosis", disease));
-        report.append(String.format("%-18s: %s\n", "Notes", (notes == null || notes.isEmpty() ? "-" : notes)));
-        report.append(String.format("%-18s: %s\n", "Doctor", getDoctor().getName()));
-        report.append(String.format("%-18s: %s\n", "Consult Time", consultTime.format(formatter)));
-        report.append(String.format("%-18s: %s\n", "Appointment Time", 
-                (getDateTime() == null ? "-" : getDateTime().format(formatter))));
-        report.append(String.format("%-18s: %s\n", "Created At", createdAt));
-
-        // --- Medical Records ---
-        report.append("\n------------------------------------------------------------\n");
-        report.append("                      Medical Records                      \n");
-        report.append("------------------------------------------------------------\n");
-        report.append(String.format("%-10s %-20s %-40s\n", "MedID", "Date", "Medicine"));
-
-        if (medRecords.isEmpty()) {
-            report.append("No medical records found.\n");
-        } else {
-            for (int i = 1; i <= medRecords.size(); i++) {
-                MedRecord m = medRecords.get(i);
-                report.append(String.format("%-10s %-20s %-40s\n",
-                        m.getRecordID(),
-                        m.getTimestamp().format(formatter),
-                        m.getMed().getName()));
-            }
-        }
-
-        // --- Treatment Records ---
-        report.append("\n------------------------------------------------------------\n");
-        report.append("                     Treatment Records                     \n");
-        report.append("------------------------------------------------------------\n");
-        report.append(String.format("%-10s %-20s %-40s\n", "TrtID", "Date", "Treatment"));
-
-        if (trtAppts.isEmpty()) {
-            report.append("No treatment records found.\n");
-        } else {
-            for (int i = 1; i <= trtAppts.size(); i++) {
-                TreatmentAppointment t = trtAppts.get(i);
-                report.append(String.format("%-10s %-20s %-40s\n",
-                        t.getAppointmentId(),
-                        t.getDateTime().format(formatter),
-                        t.getTreatment().getName()));
-            }
-        }
-
-        report.append("============================================================\n");
-
-        return report.toString();
     }
 }
