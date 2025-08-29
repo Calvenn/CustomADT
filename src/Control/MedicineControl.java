@@ -163,15 +163,6 @@ public class MedicineControl {
         }
     }
     
-    public Iterable<Medicine> getAllMedicines() {
-        Object[] meds = medMap.getValues();
-        List<Medicine> medList = new List<>();
-        for (Object obj : meds) {
-            medList.add((Medicine) obj);
-        }
-        return (Iterable<Medicine>) medList;
-    }
-    
     public List<String> suggestedMeds(String symptoms) {
         String[][] medicines = {
             {"Panadol", "fever", "headache", "pain"},
