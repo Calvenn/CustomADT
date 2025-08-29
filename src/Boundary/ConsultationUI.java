@@ -249,7 +249,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 2 -> {
-                        treatmentApptUI.addNewAppointmentUI(consultInfo);                       
+                        if(!treatmentApptUI.addNewAppointmentUI(consultInfo)) continue;                    
                         return;
                     }
                     case 3 -> {

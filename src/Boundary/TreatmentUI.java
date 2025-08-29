@@ -8,8 +8,12 @@ import java.util.Scanner;
 import java.time.Duration; 
 import exception.TryCatchThrowFromFile;
 import exception.ValidationUtility;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter; 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,8 +22,9 @@ import java.time.format.DateTimeFormatter;
 
 public class TreatmentUI {
     private final TreatmentManager treatmentManager; 
-    private Scanner scanner;
-    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+    private final Scanner scanner;
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
+    private final int CHART_WIDTH = 35;
     
     public TreatmentUI(TreatmentManager treatmentManager) {
         this.treatmentManager = treatmentManager; 
@@ -98,6 +103,7 @@ public class TreatmentUI {
                 System.out.print("Search another treatment? (y/n): "); 
                 input = scanner.nextLine(); 
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
                     break;
                 } catch (InvalidInputException e) {
@@ -235,6 +241,7 @@ public class TreatmentUI {
                     System.out.print("Try again? (y/n): "); 
                     input = scanner.nextLine(); 
                     try {
+                        TryCatchThrowFromFile.validateNotNull(input);
                         TryCatchThrowFromFile.validateYesOrNo(input.charAt(0));
                         break;
                     } catch (InvalidInputException e) {
@@ -338,6 +345,7 @@ public class TreatmentUI {
                 another = scanner.next().charAt(0);
                 scanner.nextLine();
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(another);
                     break; 
                 } catch(InvalidInputException e) {
@@ -362,6 +370,7 @@ public class TreatmentUI {
             System.out.print("Confirm modification? (y/n): "); 
             input = scanner.next().charAt(0);
             try {
+                TryCatchThrowFromFile.validateNotNull(input);
                 TryCatchThrowFromFile.validateYesOrNo(input);
                 break; 
             } catch(InvalidInputException e) {
@@ -385,6 +394,7 @@ public class TreatmentUI {
                 System.out.print("Confirm delete? (y/n): "); 
                 input = scanner.nextLine().charAt(0); 
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(input);
                     break; 
                 } catch(InvalidInputException e) {
@@ -405,6 +415,7 @@ public class TreatmentUI {
                 System.out.print("Delete another record? (y/n): "); 
                 input = scanner.nextLine().charAt(0); 
                 try {
+                    TryCatchThrowFromFile.validateNotNull(input);
                     TryCatchThrowFromFile.validateYesOrNo(input);
                     break; 
                 } catch(InvalidInputException e) {
@@ -422,19 +433,20 @@ public class TreatmentUI {
     }
     
     public void generateReportUI() {
-        printTitle("Treatment Reports", 35); 
         String input; 
         while(true) {
+            printTitle("Treatment Reports", 35); 
             System.out.println("Select report to generate: "); 
-            System.out.println("1. Treatment frequency report"); 
-            System.out.println("2. Time allocation report"); 
-            System.out.println("3. Back"); 
+            System.out.println("1. Treatment Frequency Report"); 
+            System.out.println("2. Time Allocation Report"); 
+            System.out.println("3. Treatment Revenue Analysis Report"); 
+            System.out.println("4. Back"); 
             
             while (true) {
                 System.out.print("Choose > "); 
                 input = scanner.nextLine(); 
                 try {
-                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 3);
+                    TryCatchThrowFromFile.validateIntegerRange(input, 1, 4);
                     break; 
                 } catch(InvalidInputException e) {
                     ValidationUtility.printErrorWithSolution(e);
@@ -444,7 +456,8 @@ public class TreatmentUI {
             switch(Integer.parseInt(input)) {
                 case 1 -> treatmentFrequencyReportUI();
                 case 2 -> timeAllocationReportUI(); 
-                case 3 -> {
+                case 3 -> revenueAnalysisReportUI(); 
+                case 4 -> {
                     System.out.println("Returning to treatment menu..."); 
                     return; 
                 }
@@ -487,6 +500,31 @@ public class TreatmentUI {
         System.out.println("-".repeat(100)); 
         
         System.out.println("Total Treatments: " + treatmentManager.totalTreatments() + "\n"); 
+        
+        System.out.println("=".repeat(100)); 
+
+        treatmentHeap = treatmentManager.getFrequencyReport();
+        int maximum = treatmentHeap.peekRoot().getFrequency();
+        
+        System.out.printf("%-30s ", "Treatment");
+        printBar(CHART_WIDTH, false);
+        System.out.printf("  %10s\n", "Frequency");
+        
+        for(int i = 0; i < heapSize; i++) {
+            Treatment trt = treatmentHeap.extractRoot();
+            int frequency = trt.getFrequency();
+            
+            //get bar length by finding the percentage it should take up on chart width (so wont overflow if many data) 
+            //so first find the ratio of frequency to the biggest frequency of the data 
+            //then need see this ratio will take up how many of this chart 
+            int barLength = (int) Math.round((double) frequency / maximum * CHART_WIDTH);
+
+            System.out.printf("%-30s ", trt.getName());
+            printBar(barLength, true); 
+            printBar((CHART_WIDTH - barLength), false);
+            System.out.printf("%5d\n", frequency);
+        }
+
     }
     
     private void timeAllocationReportUI() {
@@ -507,7 +545,7 @@ public class TreatmentUI {
         Duration totalTime = Duration.ZERO; 
         
         for(int i = 1; i <= listSize; i++) {
-            Treatment treatment = treatmentList.remove(1);
+            Treatment treatment = treatmentList.get(i);
             System.out.printf("%-13s | %-30s | %-10d | %-10s | %-15s \n", treatment.getTreatmentId(), treatment.getName(), treatment.getFrequency(), treatment.getDuration().toMinutes() + " minutes", treatment.getTimeAllocation().toMinutes() + " minutes");
             totalTime = totalTime.plus(treatment.getTimeAllocation());
         }
@@ -515,12 +553,97 @@ public class TreatmentUI {
         System.out.println("-".repeat(100)); 
         System.out.println("Total Treatments: " + treatmentManager.totalTreatments()); 
         System.out.println("Total Time Allocated on Treatment: " + totalTime.toMinutes() + " minutes\n");
+        
+        System.out.println("=".repeat(100)); 
+
+        int maximum = (int) treatmentList.get(1).getTimeAllocation().toMinutes();
+        
+        System.out.printf("%-30s ", "Treatment");
+        printBar(CHART_WIDTH, false);
+        System.out.printf("  %10s\n", "Duration (min)");
+        for(int i = 1; i <= listSize; i++) {
+            Treatment trt = treatmentList.get(i);
+            int duration = (int) trt.getTimeAllocation().toMinutes();
+            
+            //get bar length by finding the percentage it should take up on chart width (so wont overflow if many data) 
+            //so first find the ratio of frequency to the biggest frequency of the data 
+            //then need see this ratio will take up how many of this chart 
+            int barLength = (int) Math.round((double) duration / maximum * CHART_WIDTH);
+
+            System.out.printf("%-30s ", trt.getName());
+            printBar(barLength, true); 
+            printBar((CHART_WIDTH - barLength), false);
+            System.out.printf("%5d\n", duration);
+        }
+
+    }
+    
+    private void revenueAnalysisReportUI() {
+        generateReportHeader("Treatment Revenue Analysis Report");
+        List<Treatment> treatmentList = treatmentManager.getTreatmentRevenueReport();
+        
+        if(treatmentList == null) {
+            System.out.println("No data is found."); 
+            return; 
+        }
+        
+        int listSize = treatmentList.size(); 
+        
+        System.out.println("_".repeat(100)); 
+        System.out.printf("%-13s | %-30s | %-10s | %-10s | %-15s \n", "Treatment ID", "Treatment Name", "Frequency", "Price", "Total Revenue");
+        System.out.println("-".repeat(100)); 
+        
+        double totalEarned = 0; 
+        
+        for(int i = 1; i <= listSize; i++) {
+            Treatment treatment = treatmentList.get(1);
+            System.out.printf("%-13s | %-30s | %-10d | %-10s | %-15s \n", treatment.getTreatmentId(), treatment.getName(), treatment.getFrequency(), String.format("RM %.02f", treatment.getPrice()), String.format("RM %.02f", treatment.getEarned()));
+            totalEarned += treatment.getEarned();
+        }
+        
+        System.out.println("-".repeat(100)); 
+        System.out.println("Total Treatments: " + treatmentManager.totalTreatments()); 
+        System.out.println("Total Revenue from Treatment: " + String.format("RM %.02f", totalEarned) + "\n");
+        
+        System.out.println("=".repeat(100)); 
+
+        double maximum = (double) treatmentList.get(1).getEarned();
+        
+        System.out.printf("%-30s ", "Treatment");
+        printBar(CHART_WIDTH, false);
+        System.out.printf("  %10s\n", "Revenue (RM)");
+        for(int i = 1; i <= listSize; i++) {
+            Treatment trt = treatmentList.get(i);
+            double revenue = trt.getEarned();
+            
+            //get bar length by finding the percentage it should take up on chart width (so wont overflow if many data) 
+            //so first find the ratio of frequency to the biggest frequency of the data 
+            //then need see this ratio will take up how many of this chart 
+            int barLength = (int) Math.round(revenue / maximum * CHART_WIDTH);
+
+            System.out.printf("%-30s ", trt.getName());
+            printBar(barLength, true); 
+            printBar((CHART_WIDTH - barLength), false);
+            System.out.printf("%10.02f\n", revenue);
+        }
     }
     
     private void generateReportHeader(String header) {
         System.out.println("-".repeat(100)); 
         printTitle(header, 100); 
-        System.out.println("Generated at: " + LocalDateTime.now().format(dateFormat)); 
+        System.out.println("Generated at: " + LocalDateTime.now().format(DATE_FORMAT)); 
     }
     
+    private void printBar(int repeat, boolean black) {
+        try {
+            byte[] bar = black ? "▬".getBytes("UTF-8") : "　".getBytes("UTF-8");
+            for (int i = 0; i < repeat; i++) {
+                System.out.write(bar);
+            }
+        } catch (UnsupportedEncodingException ex) {
+            System.out.print("=".repeat(repeat));
+        } catch (IOException ex) {
+            System.out.print("=".repeat(repeat));
+        }
+    }
 }

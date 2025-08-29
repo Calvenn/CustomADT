@@ -63,13 +63,6 @@ public class TreatmentManager {
         return true; 
     }
     
-    public boolean newTreatment(String treatmentName, String description, Duration duration, double price, int frequency) {
-        treatmentName = treatmentName.substring(0, 1).toUpperCase() + treatmentName.substring(1); 
-        Treatment newTreatment = new Treatment(treatmentName.trim(), description, duration, price, frequency); 
-        providedTreatments.put(treatmentName.toLowerCase(), newTreatment); 
-        return true; 
-    }
-    
     public String[] getTreatmentNames() {
         return (String[]) providedTreatments.getKeys();
     }
@@ -143,6 +136,38 @@ public class TreatmentManager {
 
                 //swap
                 if(current.getTimeAllocation().compareTo(next.getTimeAllocation()) < 0) {
+                    treatmentList.replace(j, next); 
+                    treatmentList.replace(j+1, current); 
+                }
+            }
+        }
+        return treatmentList; 
+        
+    }
+    
+    public List<Treatment> getTreatmentRevenueReport() {
+        List<Treatment> treatmentList = new List(); 
+        
+        if(emptyTreatment()) {
+            return null;
+        }
+        
+        for(Object obj : providedTreatments.getValues()) {
+            if(obj instanceof Treatment treatment) {
+                treatmentList.add(treatment); 
+            }
+        }
+        
+        int listLength = treatmentList.size(); 
+
+        //bubble sort
+        for(int i = 1; i < listLength; i++) {
+            for(int j = 1; j < listLength - i + 1; j++) {
+                Treatment current = treatmentList.get(j); 
+                Treatment next = treatmentList.get(j+1);
+
+                //swap
+                if(current.getEarned() < next.getEarned()) {
                     treatmentList.replace(j, next); 
                     treatmentList.replace(j+1, current); 
                 }

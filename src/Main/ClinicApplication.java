@@ -9,6 +9,8 @@ import Control.*;
 import Entity.*;
 import adt.*;
 import data.CSVLoader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**f
  *
@@ -80,7 +82,8 @@ public class ClinicApplication {
         pharUI = new PharmacyUI(medRecControl, medControl, medCollectQueue, pharReport);
         staffUI = new StaffManagementUI(staffManager, docManager);
         payUI = new PaymentUI(paymentManager);
-        staffLogin = new StaffLogin(queueManager, staffManager, consultUI, treatmentUI, treatmentApptUI, pharUI, patientUI, staffUI, payUI); 
+        staffLogin = new StaffLogin(queueManager, staffManager, consultUI, treatmentUI, treatmentApptUI, pharUI, patientUI, staffUI, payUI);
+
     }
     
     public void run(){

@@ -81,6 +81,10 @@ public class Treatment implements Comparable<Treatment> {
         return duration.multipliedBy(frequency);
     }
     
+    public double getEarned() {
+        return frequency * price; 
+    }
+    
     @Override
     public int compareTo(Treatment other) {
         return Integer.compare(this.frequency, other.frequency); 
