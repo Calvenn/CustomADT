@@ -12,6 +12,10 @@ import exception.TryCatchThrowFromFile;
 import exception.ValidationHelper;
 import exception.ValidationUtility;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class PatientManagementUI {
     private QueueManager queueManager;
     private PatientManager patientManager;

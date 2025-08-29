@@ -2,6 +2,10 @@ package Control;
 import Entity.Patient;
 import adt.LinkedHashMap;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 /*  1. store patient in an array
     2. search for patient by ic number
     3. register new patient */

@@ -1,5 +1,9 @@
 package exception;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class TryCatchThrowFromFile {
 
     // Validate not null or empty (String or Object)

@@ -8,6 +8,10 @@ import Entity.Severity;
 import exception.TryCatchThrowFromFile;
 import exception.ValidationHelper;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class VisitRegistrationUI {
     private QueueManager queueManager;
     private PatientManager patientManager;

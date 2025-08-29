@@ -5,6 +5,10 @@ import adt.LinkedHashMap;
 import adt.List;
 import java.time.LocalDate;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 /*  manage patient visit history
     It keeps track of all visits and organizes them by date
     each date has a list of visits that happened on that day

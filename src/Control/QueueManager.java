@@ -12,6 +12,10 @@ import adt.List;
 
 import java.time.LocalDate;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class QueueManager {
     private Heap<Visit> visitQueue;
     private Heap<Appointment> apptQueue;

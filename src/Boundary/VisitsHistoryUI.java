@@ -8,6 +8,10 @@ import exception.ValidationHelper;
 
 import java.time.LocalDate;
 
+/**
+ *
+ * @author NgPuiYin
+ */
 public class VisitsHistoryUI {
     private final VisitHistoryManager historyManager;
 
