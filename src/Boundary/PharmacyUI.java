@@ -39,7 +39,6 @@ public class PharmacyUI {
             System.out.println("3. Pharmacy Report");
             System.out.println("0. Back");
             System.out.println("=========================");
-            System.out.print("Enter choice: ");
 
             choice = ValidationHelper.inputValidatedChoice(0,3, "your choice");
 
