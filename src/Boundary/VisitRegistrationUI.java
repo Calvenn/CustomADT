@@ -2,6 +2,7 @@ package Boundary;
 import Control.PatientManager;
 import Control.QueueManager;
 import Control.VisitHistoryManager;
+import Entity.Doctor;
 import Entity.Visit;
 import Entity.Severity;
 
@@ -80,7 +81,8 @@ public class VisitRegistrationUI {
         System.out.println("\nPatient found: \n" + patient);
         boolean isLifeThreatening = askLifeThreatening();
         String symptoms = ValidationHelper.inputValidatedString("\nPlease describe the symptoms: ");
-        Visit visit = queueManager.createVisit(patient, symptoms, isLifeThreatening, false);
+        Doctor doctor = queueManager.findMinWorkloadDoc();
+        Visit visit = queueManager.createVisit(doctor,patient, symptoms, isLifeThreatening, false);
         System.out.println("\nVisit Registration Successful!");
         visitsTableHeader();
         System.out.println(visit);

@@ -65,7 +65,7 @@ public class QueueManager {
                     if (consultAppt == null || consultAppt.getDateTime() == null) continue;
 
                     boolean apptExists = false;
-                    for (int k = 1; k <= apptQueue.size(); k++) {
+                    for (int k = 0; k < apptQueue.size(); k++) {
                         Appointment existing = apptQueue.get(k);
                         if (existing instanceof Consultation) {
                             Consultation existingC = (Consultation) existing;
@@ -87,11 +87,13 @@ public class QueueManager {
                             visitExists = true;
                             break;
                         }
-
-                    if (!visitExists) {
-                        createVisit(consultAppt.getPatient(), consultAppt.getDisease(), false, true);
                     }
-                }     
+
+                    if (!visitExists && LocalDateTime.now().isBefore(consultAppt.getDateTime().plusMinutes(15)) && 
+                            consultAppt.getDateTime().toLocalDate().equals(LocalDate.now())) {
+                        createVisit(consultAppt.getDoctor(), consultAppt.getPatient(), consultAppt.getDisease(), false, true);
+                    }
+                     
             }       
         }
     }
@@ -100,11 +102,10 @@ public class QueueManager {
         return visitQueue.isEmpty();
     }
 
-    public Visit createVisit(Patient patient, String symptoms, boolean isLifeThreatening, boolean isAppt) {
+    public Visit createVisit(Doctor doctor, Patient patient, String symptoms, boolean isLifeThreatening, boolean isAppt) {
         String visitId = generateId(isAppt);
         Severity severityLevel = Entity.Symptoms.assessSeverity(symptoms, isLifeThreatening);
 
-        Doctor doctor = docManager.getMinWorkDoctorByDept("CONSULT");
         Visit visit = new Visit(visitId, patient, symptoms, severityLevel, doctor);
         docManager.updateDoctorInc(doctor);
         visitQueue.insert(visit);
@@ -112,6 +113,10 @@ public class QueueManager {
         updateNextPatient();
 
         return visit;
+    }
+    
+    public Doctor findMinWorkloadDoc(){
+        return docManager.getMinWorkDoctorByDept("CONSULT");
     }
 
     public int getQueueSize() {
@@ -230,6 +235,7 @@ public class QueueManager {
             // If not found, create new Visit
             if (selectedVisit == null) {
                 selectedVisit = createVisit(
+                    appt.getDoctor(),
                     appt.getPatient(),
                     appt.getDisease(),
                     false,
