@@ -43,11 +43,11 @@ public class PaymentManager {
         Payment payment = null;
         for(int i = 1; i <= paymentRec.size(); i++){
             payment = paymentRec.get(i);
-            if(!payment.getPatient().getPatientIC().equals(ic)){
-                continue;
+            if(payment.getPatient().getPatientIC().equals(ic)){
+               return payment;
             }
         }
-        return payment;
+        return null;
     }
     
     public boolean isTrtAppt(Payment payment){
