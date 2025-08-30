@@ -21,10 +21,8 @@ import java.time.LocalDateTime;
 public class QueueManager {
     private Heap<Visit> visitQueue;
     private Heap<Appointment> apptQueue;
-    
     private int queueNumber;
     private DoctorManager docManager;
-    private VisitHistoryManager historyManager;
     
     // Enhanced tracking features using custom ADTs
     private LinkedHashMap<Severity, Integer> severityCount;

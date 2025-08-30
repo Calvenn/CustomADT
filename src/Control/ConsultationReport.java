@@ -9,80 +9,69 @@ import adt.LinkedHashMap;
 import adt.List;
 import adt.Heap;
 
-
 /**
  *
  * @author CalvenPhnuahKahHong
  */
 public class ConsultationReport {
     private final LinkedHashMap<String, List<Consultation>> consultLog;
-    private final AppointmentManager apptManager;
     
-    public ConsultationReport(LinkedHashMap<String, List<Consultation>> consultLog, AppointmentManager apptManager){
+    public ConsultationReport(LinkedHashMap<String, List<Consultation>> consultLog){
         this.consultLog = consultLog;
-        this.apptManager = apptManager;
     }
 
     public int[] generateOutcomeCounts() {
         int followUp = Consultation.numOfFollowUp;
         int pharmacy = Consultation.numOfPharmacy;
         int treatment = Consultation.numOfTreatment;
-        int totalOutcome = followUp + pharmacy + treatment;
+        int totalOutcome = followUp + pharmacy + treatment; //counut all
 
-        if (totalOutcome == 0) {
-            return null; 
-        }
+        if (totalOutcome == 0) return null;
 
-        return new int[]{ followUp, pharmacy, treatment, totalOutcome };
+        return new int[]{followUp, pharmacy, treatment, totalOutcome};
     }
 
     public LinkedHashMap<String, Integer> generateDiagnosisTrends() {
         LinkedHashMap<String, Integer> diagnosisCount = new LinkedHashMap<>();
         Consultation c = null;
 
-        if (consultLog == null || consultLog.isEmpty()) {
-            return null; // Boundary handles "no records"
-            
-        }
-
-        Object[] lists = consultLog.getValues(); // Each is a List<Consultation>
+        if (consultLog.isEmpty()) return null; 
+   
+        Object[] lists = consultLog.getValues(); //get consult list rec
 
         for (Object obj : lists) {
             List<Consultation> consultationList = (List<Consultation>) obj;
 
             for (int i = 1; i <= consultationList.size(); i++) {
                 c = consultationList.get(i);
-                if (c == null || c.getDisease() == null || c.getDisease().trim().isEmpty()) continue;
+                if (c == null || c.getDisease() == null || c.getDisease().trim().isEmpty()) continue; //continue if no rec
 
-                String diagnosis = c.getDisease().trim().toLowerCase();
+                String diagnosis = c.getDisease().trim().toLowerCase(); //assign diagnosis
 
                 if (diagnosisCount.containsKey(diagnosis)) {
-                    diagnosisCount.put(diagnosis, diagnosisCount.get(diagnosis) + 1);
+                    diagnosisCount.put(diagnosis, diagnosisCount.get(diagnosis) + 1); // count num of diagnosis occur
                 } else {
-                    diagnosisCount.put(diagnosis, 1);
+                    diagnosisCount.put(diagnosis, 1); //other wise 1
                 }
             }
         }
-
         return diagnosisCount.isEmpty() ? null : diagnosisCount;
     }
     
     public LinkedHashMap<String, Object[]> generateTimeToConsultReport() {
         LinkedHashMap<String, Object[]> report = new LinkedHashMap<>();
 
-        if (consultLog == null || consultLog.isEmpty()) {
-            return report;
-        }
-
+        if (consultLog.isEmpty()) return report;
+        
         // Stats for appointment
         long totalAppt = 0, apptCount = 0;
-        Heap<Long> apptMaxHeap = new Heap<>(true);  // max-heap
-        Heap<Long> apptMinHeap = new Heap<>(false); // min-heap
+        Heap<Long> apptMaxHeap = new Heap<>(true);  //max-heap(store longest wait)
+        Heap<Long> apptMinHeap = new Heap<>(false); //min-heap(store shortest wait)
 
         // Stats for walk-in
         long totalWalk = 0, walkCount = 0;
-        Heap<Long> walkMaxHeap = new Heap<>(true);
-        Heap<Long> walkMinHeap = new Heap<>(false);
+        Heap<Long> walkMaxHeap = new Heap<>(true); //max-heap(store longest wait)
+        Heap<Long> walkMinHeap = new Heap<>(false); //min-heap(store shortest wait)
 
         Object[] lists = consultLog.getValues();
         for (Object obj : lists) {
@@ -92,16 +81,15 @@ public class ConsultationReport {
                 Consultation c = consultations.get(i);
                 if (c == null) continue;
 
-                long wait = java.time.Duration.between(
-                        c.getConsultTime(), c.getCreatedAt()
-                ).toMinutes();
+                //convert to minutes
+                long wait = java.time.Duration.between(c.getConsultTime(), c.getCreatedAt()).toMinutes();
 
-                if (c.getDateTime() != null) { // Appointment
+                if (c.getDateTime() != null) { //appt
                     totalAppt += wait;
                     apptCount++;
                     apptMaxHeap.insert(wait);
                     apptMinHeap.insert(wait);
-                } else { // Walk-in
+                } else { //walk in
                     totalWalk += wait;
                     walkCount++;
                     walkMaxHeap.insert(wait);
@@ -110,32 +98,30 @@ public class ConsultationReport {
             }
         }
 
-        long avgAppt = (apptCount == 0 ? 0 : totalAppt / apptCount);
-        long avgWalk = (walkCount == 0 ? 0 : totalWalk / walkCount);
-        long avgOverall = ((apptCount + walkCount) == 0 ? 0 :
-                (totalAppt + totalWalk) / (apptCount + walkCount));
+        long avgAppt = (apptCount == 0 ? 0 : totalAppt / apptCount); //count avg wait time for appt
+        long avgWalk = (walkCount == 0 ? 0 : totalWalk / walkCount); //count walk in wait time for appt
+        long avgOverall = ((apptCount + walkCount) == 0 ? 0 : (totalAppt + totalWalk) / (apptCount + walkCount)); //count overall wait time
 
-        // Put into LinkedHashMap: category → {avg, max, min}
+        //put into LinkedHashMap: category → {avg, max, min}
         report.put("Appointments", new Object[]{
                 avgAppt,
-                (apptCount == 0 ? "-" : apptMaxHeap.peekRoot() + " mins"),
-                (apptCount == 0 ? "-" : apptMinHeap.peekRoot() + " mins")
+                (apptCount == 0 ? "-" : apptMaxHeap.peekRoot() + " mins"), //show longest wait
+                (apptCount == 0 ? "-" : apptMinHeap.peekRoot() + " mins") //show shortest wait
         });
         report.put("Walk-ins", new Object[]{
                 avgWalk,
-                (walkCount == 0 ? "-" : walkMaxHeap.peekRoot() + " mins"),
-                (walkCount == 0 ? "-" : walkMinHeap.peekRoot() + " mins")
+                (walkCount == 0 ? "-" : walkMaxHeap.peekRoot() + " mins"), //show longest wait
+                (walkCount == 0 ? "-" : walkMinHeap.peekRoot() + " mins") //show shortest wait
         });
         report.put("Overall", new Object[]{
                 avgOverall,
                 (apptCount + walkCount == 0 ? "-" :
-                        Math.max(apptMaxHeap.isEmpty() ? Long.MIN_VALUE : apptMaxHeap.peekRoot(),
-                                walkMaxHeap.isEmpty() ? Long.MIN_VALUE : walkMaxHeap.peekRoot()) + " mins"),
+                        Math.max(apptMaxHeap.isEmpty() ? Long.MIN_VALUE : apptMaxHeap.peekRoot(), 
+                                walkMaxHeap.isEmpty() ? Long.MIN_VALUE : walkMaxHeap.peekRoot()) + " mins"), //f
                 (apptCount + walkCount == 0 ? "-" :
                         Math.min(apptMinHeap.isEmpty() ? Long.MAX_VALUE : apptMinHeap.peekRoot(),
                                 walkMinHeap.isEmpty() ? Long.MAX_VALUE : walkMinHeap.peekRoot()) + " mins")
         });
-
         return report;
     }
     

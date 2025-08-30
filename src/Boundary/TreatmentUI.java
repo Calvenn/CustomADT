@@ -594,7 +594,7 @@ public class TreatmentUI {
         double totalEarned = 0; 
         
         for(int i = 1; i <= listSize; i++) {
-            Treatment treatment = treatmentList.get(1);
+            Treatment treatment = treatmentList.get(i);
             System.out.printf("%-13s | %-30s | %-10d | %-10s | %-15s \n", treatment.getTreatmentId(), treatment.getName(), treatment.getFrequency(), String.format("RM %.02f", treatment.getPrice()), String.format("RM %.02f", treatment.getEarned()));
             totalEarned += treatment.getEarned();
         }
