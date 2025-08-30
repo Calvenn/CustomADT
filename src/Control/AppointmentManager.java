@@ -47,15 +47,15 @@ public class AppointmentManager {
             Doctor doctor = consultDoctors.get(i);
             List<Consultation> consultations = consultLog.get(doctor.getID());
 
-            if (consultations == null) continue;
+            if (consultations.isEmpty()) continue;
 
             for (int j = 1; j <= consultations.size(); j++) {
                 Appointment consultAppt = consultations.get(j);
 
                 if (consultAppt == null) continue;
 
-                if (consultAppt.getDateTime() != null && !LocalDateTime.now().isAfter(consultAppt.getDateTime().plusMinutes(15)) && !apptQueueContains(consultAppt)) 
-                {
+                if (consultAppt.getDateTime() != null && !LocalDateTime.now().isAfter(consultAppt.getDateTime().plusMinutes(15)) && 
+                        !apptQueueContains(consultAppt)) {
                     apptQueue.insert(consultAppt);
                 }
             }
@@ -157,8 +157,8 @@ public class AppointmentManager {
         return false;
     }
     
-    //update appt
-    public boolean updateAppointment(Appointment oldAppt, LocalDateTime newDateTime) {
+    //updat OR cancel    appt
+    public boolean updateOrCancelAppt(Appointment oldAppt, LocalDateTime newDateTime) {
         int index = findOldApptIndex(oldAppt, false); //it is old booking appt so find the record that with appt dateTime
         List<Consultation> consultations = findOldAppt(oldAppt);
         String oldID = consultations.get(index).getID();
@@ -171,21 +171,6 @@ public class AppointmentManager {
             }
         return false;
     }    
-    
-    //cancel appt
-    public boolean cancelAppointment(Appointment appt){
-        int index = findOldApptIndex(appt, false); //it is old booking appt so find the record that with appt dateTime
-        List<Consultation> consultations = findOldAppt(appt);
-        String oldID = consultations.get(index).getID();
-            if(appt instanceof Consultation oldConsult && index != -1){
-                Consultation newAppt = new Consultation(oldID,oldConsult.getSeverity(), oldConsult.getPatient(), oldConsult.getDisease(), oldConsult.getNotes(), oldConsult.getDoctor(), oldConsult.getConsultTime(), null, oldConsult.getCreatedAt()); 
-                consultations.replace(index, newAppt); // set date time as null, so system won't assign this record as a appt
-                apptQueue.remove(appt);
-                refreshHeapFromConsultations();
-                return true;
-            }
-        return false;
-    }
     
     //find the appt data
     private List<Consultation> findOldAppt(Appointment oldAppt){

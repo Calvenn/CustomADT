@@ -7,7 +7,6 @@ package Boundary;
 import Entity.Appointment;
 import Entity.Doctor;
 import Control.AppointmentManager;
-import Control.DoctorManager;
 import Entity.Consultation;
 import adt.List;
 
@@ -141,7 +140,7 @@ public class AppointmentUI {
             LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("Enter new appointment time");
 
             if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
-                boolean success = apptManager.updateAppointment(oldData, newTime);
+                boolean success = apptManager.updateOrCancelAppt(oldData, newTime);
                 System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");
             }
         } else {
@@ -166,7 +165,7 @@ public class AppointmentUI {
             System.out.println("=".repeat(35));
 
             if (getConfirmation("Are you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime().format(formatter) + " ?")) {
-                boolean success = apptManager.cancelAppointment(appt);
+                boolean success = apptManager.updateOrCancelAppt(appt, null);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }
         } else {
