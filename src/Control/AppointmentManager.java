@@ -8,6 +8,7 @@ import Entity.Doctor;
 import adt.LinkedHashMap;
 import adt.List;
 import adt.Queue;
+import exception.ValidationUtility;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,10 +23,6 @@ public class AppointmentManager {
     private final LinkedHashMap<String, List<Consultation>> consultLog;
     private final DoctorManager docManager;
     public boolean missedFlag;
-    
-    private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
-    private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00 
-
     
     public AppointmentManager(LinkedHashMap<String, Queue<Appointment>> missAppt, LinkedHashMap<String, List<Consultation>> consultLog, Heap<Appointment> apptQueue, DoctorManager docManager) {
         this.apptQueue = apptQueue;
@@ -73,12 +70,6 @@ public class AppointmentManager {
         return false;
     }
 
-    //check whether the dateTime entry is within working hour
-    public boolean isWithinWorkingHours(LocalDateTime time) {
-        LocalTime appointmentTime = time.toLocalTime();
-        return !appointmentTime.isBefore(WORK_START) && !appointmentTime.isAfter(WORK_END);
-    }
-
     //find a available slot for doctor to book appt
     public LocalDateTime findNextAvailableSlot() {
         LocalDateTime now = LocalDateTime.now();
@@ -91,9 +82,9 @@ public class AppointmentManager {
         };
 
         for (LocalDate date : baseDates) {
-            LocalDateTime currentSlot = LocalDateTime.of(date, WORK_START);
+            LocalDateTime currentSlot = LocalDateTime.of(date, ValidationUtility.WORK_START);
 
-            while (!currentSlot.toLocalTime().isAfter(WORK_END)) {
+            while (!currentSlot.toLocalTime().isAfter(ValidationUtility.WORK_END)) {
                 boolean conflict = false;
 
                 // Check for time conflict with existing appointments
@@ -129,11 +120,7 @@ public class AppointmentManager {
         if (consultAppt instanceof Consultation) {
             Consultation newConsult = (Consultation) consultAppt;
             
-            if(dateTime != null){
-                if (!isWithinWorkingHours(dateTime)) {
-                    return false;
-                }
-            
+            if(dateTime != null){        
                 for (int i = 0; i < apptQueue.size(); i++) {
                     Appointment appt = apptQueue.get(i);
                     if (appt.getDateTime().equals(dateTime)) {
@@ -157,7 +144,7 @@ public class AppointmentManager {
         return false;
     }
     
-    //updat OR cancel    appt
+    //updat OR cancel appt
     public boolean updateOrCancelAppt(Appointment oldAppt, LocalDateTime newDateTime) {
         int index = findOldApptIndex(oldAppt, false); //it is old booking appt so find the record that with appt dateTime
         List<Consultation> consultations = findOldAppt(oldAppt);

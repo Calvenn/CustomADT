@@ -56,6 +56,20 @@ public class TryCatchThrowFromFile {
             throw new InvalidInputException("Invalid date-time format.");
         }
     }
+    
+    public static void validateIsWorkingHour(String dateTimeStr) throws InvalidInputException {
+        validateNotNull(dateTimeStr);
+        if (!ValidationUtility.isWithinWorkingHours(dateTimeStr)) {
+            throw new InvalidInputException("Selected time is outside of working hours.");
+        }
+    }
+    
+    public static void validateIsPastDate(String dateTimeStr) throws InvalidInputException {
+        validateNotNull(dateTimeStr);
+        if (!ValidationUtility.isPastDate(dateTimeStr)) {
+            throw new InvalidInputException("Selected time cannot be in the past.");
+        }
+    }
 
     // Validate phone
     public static void validatePhone(String phone) throws InvalidInputException {

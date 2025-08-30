@@ -34,24 +34,20 @@ public class ValidationHelper {
         while (true) {
             System.out.print(prompt + " (yyyy-MM-dd HH:mm): ");
             String input = scanner.nextLine().trim();
-            
+
             try {
                 TryCatchThrowFromFile.validateDateTime(input);
                 LocalDateTime dt = LocalDateTime.parse(input, formatter);
 
-                if (dt.isBefore(LocalDateTime.now())) {
-                    System.out.println("Cannot enter a past date/time. Try again.\n");
-                    continue;
-                }
-
-                return dt; // valid & not in past
-
+                TryCatchThrowFromFile.validateIsWorkingHour(input);
+                TryCatchThrowFromFile.validateIsPastDate(input);
+                return dt;
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e);
-            } 
+            }
         }
     }
-    
+
     public static String validateICOnce(String ic) {
         try {
             TryCatchThrowFromFile.validateIC(ic);
