@@ -383,6 +383,7 @@ public class TreatmentUI {
         while(true) {
             printTitle("Delete Treatment", 35);
             Treatment treatment = searchForTreatment(); 
+            System.out.println();
             if(treatment == null) {
                 return; 
             }
