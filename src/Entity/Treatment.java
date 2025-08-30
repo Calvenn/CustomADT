@@ -99,13 +99,18 @@ public class Treatment implements Comparable<Treatment> {
     @Override
     public String toString() {
         return String.format("""
-                             Treatment ID: %s
-                             Treatment Name: %s
-                             Description: %s 
-                             Duration: %s minutes
-                             Price: RM %,.02f
-                             Frequency: %d
-                             """, 
-                treatmentId, name, description, duration.toMinutes(), price, frequency); 
+            %-16s: %s
+            %-16s: %s
+            %-16s: %s
+            %-16s: %s
+            %-16s: %s
+            %-16s: %s
+            """, 
+                "Treatment ID", treatmentId, 
+                "Treatment Name", name, 
+                "Description", description, 
+                "Duration", duration.toMinutes() + " minutes", 
+                "Price", String.format("RM %,.02f", price), 
+                "Frequency", frequency); 
     }
 }

@@ -59,19 +59,19 @@ public class TreatmentAppointment extends Appointment{
     @Override
     public String toString() {
         return String.format("""
-            Appointment ID: %s
-            Doctor: %s -- %s
-            Consultation: %s -- %s
-            Treatment: %s
-            Treatment Time: %s
-            Created At: %s
+            %-16s: %s
+            %-16s: %s - %s
+            %-16s: %s - %s
+            %-16s: %s
+            %-16s: %s
+            %-16s: %s
             """, 
-           this.appointmentId, 
-           super.getDoctor().getID(),super.getDoctor().getName(), 
-           this.consult.getID(), super.getPatient().getPatientName(), 
-           this.treatment.getName(), 
-           super.getDateTime().format(DATE_FORMAT), 
-           this.createdAt.format(DATE_FORMAT)
+           "Appointment ID", this.appointmentId, 
+           "Doctor", super.getDoctor().getID(),super.getDoctor().getName(), 
+           "Consultation", this.consult.getID(), super.getPatient().getPatientName(), 
+           "Treatment", this.treatment.getName(), 
+           "Time", super.getDateTime().format(DATE_FORMAT), 
+           "Created At", this.createdAt.format(DATE_FORMAT)
         ); 
     }
     

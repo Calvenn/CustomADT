@@ -115,8 +115,9 @@ public class TreatmentApptUI {
         if(doctorID.isEmpty()) return; 
         Heap<Appointment> incoming = treatmentApptManager.getIncomingAppt(doctorID);
         
+        System.out.println();
         if(incoming == null) {
-            System.out.println("\nNo record found!"); 
+            System.out.println("No record found!"); 
         } else {
             incoming.display();
         }
@@ -160,10 +161,10 @@ public class TreatmentApptUI {
         if(doctorID.isEmpty()) return; 
         List<TreatmentAppointment> history = treatmentApptManager.getHistoryList(doctorID);
         
+        System.out.println();
         if(history == null) {
-            System.out.println("\nNo record found!"); 
+            System.out.println("No record found!"); 
         } else {
-            printTitle("History for " + doctorID + " found!", 35);
             for(int i = 1; i <= history.size(); i++) {
                 System.out.println(history.get(i));
             }
@@ -176,7 +177,7 @@ public class TreatmentApptUI {
     public void showNextUI(String userID) {
         System.out.println();
         printTitle("Next Treatment Appointment", 35);
-        
+
         TreatmentAppointment appt = treatmentApptManager.nextAppt(userID.toUpperCase());
         if(appt == null) {
             System.out.println("No record found!"); 
@@ -442,7 +443,7 @@ public class TreatmentApptUI {
         //check if user is admin or doctor 
         //if admin, deny access
         if(userID.toLowerCase().startsWith("a")) {
-            System.out.println("Admin denied access to complete treatment appointment."); 
+            System.out.println("Admin denied access to cancel treatment appointment."); 
             System.out.println("Enter to return..."); 
             scanner.nextLine(); 
             return;
