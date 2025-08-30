@@ -27,7 +27,7 @@ public class VisitRegistrationUI {
         int choice;
         do {
             displayVisitsMenu();
-            choice = ValidationHelper.inputValidatedChoice(0, 8, "your choice");
+            choice = ValidationHelper.inputValidatedChoice(0, 7, "your choice");
 
             switch (choice) {
                 case 1 -> handleVisitRegistration();
@@ -37,7 +37,6 @@ public class VisitRegistrationUI {
                 case 5 -> visitsHistoryUI.displayHistoricalVisits();
                 case 6 -> handleSummaryReports();
                 case 7 -> displayLiveQueueStatus();
-                case 8 -> handleProcessNextPatient();
             }
 
         } while (choice != 0);
@@ -54,7 +53,6 @@ public class VisitRegistrationUI {
         System.out.println("5. Display Historical Visits");
         System.out.println("6. Reports");
         System.out.println("7. Live Queue Status");
-        System.out.println("8. Process Next Patient");
         System.out.println("0. Exit");
         System.out.println("=".repeat(35));
     }
@@ -130,13 +128,22 @@ public class VisitRegistrationUI {
 
     private Visit promptForVisitById() {
         while (true) {
-            int numberPart = ValidationHelper.inputValidatedPositiveInt("Enter Visit Number (e.g., 1000) or 0 to cancel: ");
-            if (numberPart == 0) {
-                return null; // User chose to cancel
-            }   
-            String visitId = "V" + numberPart;
+            String input = ValidationHelper.inputValidatedString("Enter Visit/Appointment ID (e.g., V1000, A1000, or just 1000) or 0 to cancel: ").trim();
+            if (input.equals("0")) {
+                return null;
+            }
+            String visitId;
+            if (input.matches("^[VA]\\d+$")) {
+                visitId = input.toUpperCase();
+            } else if (input.matches("^\\d+$")) {
+                // Default to V if only number is entered
+                visitId = "V" + input;
+            } else {
+                System.out.println("Invalid format. Please try again.");
+                continue;
+            }
             try {
-                return TryCatchThrowFromFile.findObjectOrThrow(queueManager.getAllVisits(), Visit::getVisitId, visitId, "Visit", "ID"); 
+                return TryCatchThrowFromFile.findObjectOrThrow(queueManager.getAllVisits(), Visit::getVisitId, visitId, "Visit", "ID");
             } catch (Exception e) {
                 System.out.println("No visit found with ID " + visitId + ". Please try again.");
             }
@@ -190,62 +197,29 @@ public class VisitRegistrationUI {
     }
 
     private void displayLiveQueueStatus() {
-        Visit processing = queueManager.getCurrentlyProcessing();
         Visit next = queueManager.getNextPatient();
         Visit[] waiting = queueManager.getWaitingPatients();
         
-        System.out.println("\n" + "-".repeat(58));
-        System.out.println("| LIVE QUEUE STATUS" + " ".repeat(37) + " |");
-        System.out.println("-".repeat(58));
+        System.out.println("\n" + "-".repeat(57));
+        System.out.println("| LIVE QUEUE STATUS" + " ".repeat(37) + "|");
+        System.out.println("-".repeat(57));
 
-        System.out.printf("| %-54s |\n", "Total patients in queue: " + queueManager.getQueueSize());
-        System.out.println("-".repeat(58));
+        System.out.printf("| %-53s |\n", "Total patients in queue: " + queueManager.getQueueSize());
+        System.out.println("-".repeat(57));
 
-        System.out.printf("| %-16s | %-16s | %-16s |\n", "Processing", "Next Patient", "Waiting");
-        System.out.println("-".repeat(58));
+        System.out.printf("| %-25s | %-25s |\n", "Next Patient", "Waiting");
+        System.out.println("-".repeat(57));
 
-        int maxRows = Math.max(1, Math.max(1, waiting.length));
+        int maxRows = Math.max(1, waiting.length);
         for (int i = 0; i < maxRows; i++) {
             String col1 = "";
             String col2 = "";
-            String col3 = "";
-            // First column
-            if (i == 0 && processing != null) {
-                col1 = processing.getVisitId();
-            }
-            // Second column
-            if (i == 0 && next != null) {
-                col2 = next.getVisitId();
-            }
-            // Third column
-            if (i < waiting.length) {
-                col3 = waiting[i].getVisitId();
-            }
-            System.out.printf("| %-16s | %-16s | %-16s |\n", col1, col2, col3);
+            if (i == 0 && next != null) col1 = next.getVisitId();
+            if (i < waiting.length) col2 = waiting[i].getVisitId();
+            System.out.printf("| %-25s | %-25s |\n", col1, col2);
         }
+        System.out.println("-".repeat(57));
 
-        System.out.println("-".repeat(58));
-    }
-
-    private void handleProcessNextPatient() {
-        System.out.println("\n" + "=".repeat(35));
-        System.out.println("      Process Next Patient");
-        System.out.println("=".repeat(35));
-        Visit nextVisit = queueManager.peekRootVisit();
-        if (nextVisit == null) {
-            System.out.println("No patients in queue.");
-            return;
-        }
-        System.out.println("Next patient in queue: " + nextVisit.getVisitId());
-        char confirm = ValidationHelper.inputValidateYesOrNo("Process this patient?");
-        if (confirm == 'Y') {
-            Visit processedVisit = queueManager.processNextPatient();
-            System.out.println("Visit " + processedVisit.getVisitId() + " is now being processed.");
-        } else {
-            System.out.println("Processing cancelled.");
-        }
-
-        displayLiveQueueStatus();
     }
 
    private void handleSummaryReports() {

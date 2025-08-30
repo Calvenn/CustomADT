@@ -66,7 +66,7 @@ public class ClinicApplication {
         consultManager = new ConsultationManager(sharedVisitQueue,apptManager.getAppointmentHeap(),
         consultLog, trtApptHistory, medRecList,docManager,apptManager);
         
-        queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, historyManager, consultManager);
+        queueManager = new QueueManager(sharedVisitQueue, apptQueue, docManager, consultLog, consultManager);
         
         consultReport = new ConsultationReport(consultLog, apptManager);
         trtManager = new TreatmentManager(providedTreatments);
