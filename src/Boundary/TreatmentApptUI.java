@@ -249,6 +249,7 @@ public class TreatmentApptUI {
             }
             
         }
+        System.out.println();
         return appt;
     }
     
@@ -451,8 +452,8 @@ public class TreatmentApptUI {
         
         while(true) {
             TreatmentAppointment toCancel = inputTrtApptID(userID); 
-            if(toCancel == null) break;
             
+            if(toCancel == null) break;
             System.out.println(toCancel);
 
             String input; 
