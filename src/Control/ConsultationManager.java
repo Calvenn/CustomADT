@@ -48,14 +48,12 @@ public class ConsultationManager {
     }
 
     public Object dispatchNextPatient() {
-        appointmentHeap.display();
-        queue.display();
-
         LocalDateTime now = LocalDateTime.now();
 
         Appointment bestAppt = findNextValidAppointment(now);
         Visit bestWalkIn = findNextValidWalkIn(); // skip walk-ins that have future appointments
-
+        
+        System.out.println(bestWalkIn);
         // --- Handle null cases ---
         if (bestAppt == null && bestWalkIn == null) return null;
         if (bestAppt == null) return queue.extractSpecific(bestWalkIn);
@@ -71,7 +69,7 @@ public class ConsultationManager {
         // --- Determine if appointment is on time ---
         LocalDateTime apptStart = bestAppt.getDateTime().minusMinutes(5);
         LocalDateTime apptEnd   = bestAppt.getDateTime().plusMinutes(15);
-        boolean apptInWindow = !now.isBefore(apptStart) && !now.isAfter(apptEnd);
+        boolean apptInWindow = now.isAfter(apptStart) && now.isBefore(apptEnd);
 
         // --- Appointment not yet due, serve walk-in first ---
         if (!apptInWindow) {
@@ -93,7 +91,7 @@ public class ConsultationManager {
         for (int i = 0; i < appointmentHeap.size(); i++) {
             Appointment appt = appointmentHeap.get(i);
             if (appt.getDoctor().getID().equals(currentDoc.getID()) &&
-                !appt.getDateTime().isBefore(now)) {
+                !appt.getDateTime().plusMinutes(15).isBefore(now)) {
                 return appt; // first valid appointment
             }
         }
@@ -109,7 +107,10 @@ public class ConsultationManager {
             if (!v.getDoctor().getID().equals(currentDoc.getID())) continue;
 
             // Skip walk-ins that are actually appointments (ID starts with "A")
-            if (v.getVisitId().startsWith("A")) continue;
+            if (v.getVisitId().startsWith("A")) {
+                queue.remove(v);
+                continue;
+            }
 
             // Valid walk-in found
             return v;
