@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
@@ -18,6 +19,8 @@ public class ValidationUtility {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+?6?01[0-9]-*[0-9]{7,8})$");
     private static final Pattern IC_PATTERN = Pattern.compile("^\\d{6}-\\d{2}-\\d{4}$");
     private static final Pattern STUDENT_ID_PATTERN = Pattern.compile("\\d{2}[A-Z]{3}\\d{5}");
+    public static final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
+    public static final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00 
     
     // Check if value is null or empty
     public static boolean isNullOrEmpty(Object value) {
@@ -113,7 +116,37 @@ public class ValidationUtility {
         return upperValue == 'Y' || upperValue == 'N';
     }
 
+    public static boolean isWithinWorkingHours(String dateTimeStr) {
+        if (isNullOrEmpty(dateTimeStr)) return false;
 
+        String pattern = "yyyy-MM-dd HH:mm";
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr.trim(), formatter);
+
+            LocalTime appointmentTime = dateTime.toLocalTime();
+
+            return !appointmentTime.isBefore(WORK_START) && !appointmentTime.isAfter(WORK_END);
+
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    public static boolean isPastDate(String dateTimeStr) {
+        if (isNullOrEmpty(dateTimeStr)) return false;
+
+        String pattern = "yyyy-MM-dd HH:mm";
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr.trim(), formatter);
+            return !dateTime.isBefore(LocalDateTime.now());
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
     
     // Simplified: Automatically detect error type and show relevant solution
     public static void showSolutionFromFile(String errorMessage) {
@@ -139,7 +172,7 @@ public class ValidationUtility {
             msg.contains("invalid integer format")) {
             return "INTEGER ERROR";
         }
-        if (msg.contains("invalid date format")) {
+        if (msg.contains("invalid date-time format")) {
             return "DATE TIME ERROR";
         }
         if (msg.contains("invalid phone number format")) {
@@ -158,6 +191,12 @@ public class ValidationUtility {
         if (msg.contains("invalid student id format") ||
             msg.contains("student id cannot be null or empty")) {
             return "STUDENT ID ERROR";
+        }
+        if (msg.contains("selected time is outside of working hours")) {
+            return "NOT WORKING HOUR";
+        }
+        if (msg.contains("selected time cannot be in the past")) {
+            return "PAST TIME";
         }
         return "GENERAL ERROR";
     }

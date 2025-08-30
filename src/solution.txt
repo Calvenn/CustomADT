@@ -37,6 +37,18 @@ Format: dd-MM-yyyy HH:mm
 
 ================================================================================
 
+NOT WORKING HOUR:
+Please enter a valid date and time in working hour.
+Working Hours: 08:00 AM - 17:00 PM
+
+================================================================================
+
+PAST TIME:
+Please enter a future date and time.
+Allowed Working Hours: 08:00 AM - 05:00 PM
+
+================================================================================
+
 GENDER ERROR:
 Please enter F or M only.
 Choosing one of the two options.

@@ -75,7 +75,7 @@ public class AppointmentUI {
     void bookAppointmentUI(Consultation consultAppt) {
         while (true) {
             suggestNextAvailableSlot();
-            LocalDateTime time = ValidationHelper.inputValidatedDateTime("Enter appointment date and time");
+            LocalDateTime time = ValidationHelper.inputValidatedDateTime("\nEnter appointment date and time");
 
             if (apptManager.bookAppointment(consultAppt, time, true)) {
                 System.out.println("\nAppointment booked successfully!");
@@ -125,9 +125,17 @@ public class AppointmentUI {
             System.out.println(oldData);
         }
     }
+    
+    private void displayApptDetails(Appointment appt){
+        System.out.println("=".repeat(35));
+        System.out.println("     Appointment Details");
+        System.out.println("=".repeat(35));
+        System.out.println("Patient Name: " + appt.getPatient().getPatientName());
+        System.out.println("Current appointment: " + appt.getDateTime().format(formatter));
+        System.out.println("=".repeat(35));
+    }
 
-
-    protected void updateAppointmentUI() {
+    private void updateAppointmentUI() {
         if(apptManager.getAppointmentHeap().isEmpty()) {
             System.out.println("No appointment record found");
             return;
@@ -136,10 +144,11 @@ public class AppointmentUI {
         Appointment oldData = apptManager.findPatienInfo(ic);
 
         if (oldData != null) {
+            displayApptDetails(oldData);
             suggestNextAvailableSlot();
-            LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("Enter new appointment time");
+            LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("\nEnter new appointment time");
 
-            if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
+            if (getConfirmation("\nAre you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
                 boolean success = apptManager.updateOrCancelAppt(oldData, newTime);
                 System.out.println(success ? "Appointment updated." : "Not found or update failed. Please try again");
             }
@@ -157,14 +166,8 @@ public class AppointmentUI {
         Appointment appt = apptManager.findPatienInfo(ic);
 
         if (appt != null) {
-            System.out.println("=".repeat(35));
-            System.out.println("     Appointment Details");
-            System.out.println("=".repeat(35));
-            System.out.println("Patient Name: " + appt.getPatient().getPatientName());
-            System.out.println("Current appointment: " + appt.getDateTime().format(formatter));
-            System.out.println("=".repeat(35));
-
-            if (getConfirmation("Are you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime().format(formatter) + " ?")) {
+            displayApptDetails(appt);
+            if (getConfirmation("\nAre you sure you want to cancel patient " + appt.getPatient().getPatientName() + " at " + appt.getDateTime().format(formatter) + " ?")) {
                 boolean success = apptManager.updateOrCancelAppt(appt, null);
                 System.out.println(success ? "Appointment cancelled." : "Not found. Please try again");
             }
@@ -200,7 +203,7 @@ public class AppointmentUI {
         suggestNextAvailableSlot();
         LocalDateTime newTime = ValidationHelper.inputValidatedDateTime("\nPlease enter new date and time to reschedule");
 
-        if (getConfirmation("Are you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
+        if (getConfirmation("\nAre you sure you want to change appointment to " + newTime.format(formatter) + " ?")) {
             boolean success = apptManager.bookAppointment(a, newTime, false);
             if (success) {
                 System.out.println("Appointment Updated");
