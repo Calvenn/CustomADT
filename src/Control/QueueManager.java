@@ -25,7 +25,6 @@ public class QueueManager {
     private int queueNumber;
     private DoctorManager docManager;
     private VisitHistoryManager historyManager;
-    private ConsultationManager consultManager;
     
     // Enhanced tracking features using custom ADTs
     private LinkedHashMap<Severity, Integer> severityCount;
@@ -35,7 +34,7 @@ public class QueueManager {
     private Visit nextPatient;
 
     // Updated constructor to include PatientManager
-    public QueueManager(Heap<Visit> sharedQueue, Heap<Appointment> apptQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog, VisitHistoryManager historyManager, ConsultationManager consultManager) {
+    public QueueManager(Heap<Visit> sharedQueue, Heap<Appointment> apptQueue, DoctorManager docManager, LinkedHashMap<String, List<Consultation>> consultLog) {
         this.visitQueue = sharedQueue;
         this.docManager = docManager;
         this.queueNumber = 1000;
@@ -44,8 +43,6 @@ public class QueueManager {
         this.severityCount = new LinkedHashMap<>();
         this.consultLog = consultLog;
         this.apptQueue = apptQueue;
-        this.consultManager = consultManager;
-        this.historyManager = historyManager;
         
         // Initialize severity counters
         for (Severity severity : Severity.values()) {
@@ -210,54 +207,6 @@ public class QueueManager {
         return false;
     }
 
-    public Visit processNextPatient() {
-        // Always delegate selection logic to dispatchNextPatient
-        Object next = consultManager.dispatchNextPatient();
-        Visit selectedVisit = null;
-
-        // If dispatch picked a Visit directly
-        if (next instanceof Visit) {
-            selectedVisit = (Visit) next;
-        }
-        // If dispatch picked an Appointment (Consultation), wrap into Visit
-        else if (next instanceof Consultation) {
-            Consultation appt = (Consultation) next;
-
-            // Try to find existing Visit in queue
-            for (int i = 0; i < visitQueue.size(); i++) {
-                Visit v = visitQueue.get(i);
-                if (v.getPatient().equals(appt.getPatient())) {
-                    selectedVisit = v;
-                    break;
-                }
-            }
-
-            // If not found, create new Visit
-            if (selectedVisit == null) {
-                selectedVisit = createVisit(
-                    appt.getDoctor(),
-                    appt.getPatient(),
-                    appt.getDisease(),
-                    false,
-                    true
-                );
-            }
-        }
-
-        // Now sync with "currentlyProcessing" and "nextPatient"
-        if (selectedVisit != null) {
-            currentlyProcessing = selectedVisit;
-            if (visitQueue.size() > 0) {
-                nextPatient = visitQueue.get(0); // peek next in queue
-            } else {
-                nextPatient = null;
-            }
-        }
-
-        return currentlyProcessing;
-    }
-
-
     private void updateNextPatient() {
         if (currentlyProcessing == null) {
             // No one processing, next patient is top of heap
@@ -307,22 +256,6 @@ public class QueueManager {
         }
         
         return waiting;
-    }
-
-    public void completeCurrentPatient() {
-        if (currentlyProcessing != null) {
-            // move patient to history
-            historyManager.addHistoricalVisit(currentlyProcessing);
-
-            // The visit has been extracted by ConsultationManager, so we just clear our tracking
-            currentlyProcessing = null;
-            
-            // Update next patient to be the new top of heap
-            updateNextPatient();
-            
-            // Refresh queue composition after the visit has been removed
-            refreshQueueComposition();
-        }
     }
 
     public Visit[] getAllVisits() {
