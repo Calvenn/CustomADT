@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package adt;
-import java.util.Arrays;
 /**
  *
  * @author CalvenPhnuahKahHong
@@ -151,13 +150,20 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
     }
     
     /****************helper function**************/
-    private void ensureSize(){
-        if(size == heap.length){
-            heap = Arrays.copyOf(heap, heap.length * 2); // double the size of array
+    private void ensureSize() {
+        if (size == heap.length) {
+            //create a new array with double the size
+            E[] newHeap = (E[]) new Comparable[heap.length * 2];
+
+            for (int i = 0; i < heap.length; i++) {
+                newHeap[i] = heap[i]; // copy elements manually
+            }
+            heap = newHeap; //reassign element
         }
     }
+
     
-    // to insert data to heap and rearrange (upper layer of heap - root area)
+    //to insert data to heap and rearrange (upper layer of heap - root area)
     private void heapUp(int index) {
         int child = index;
         while (child > 0) {
@@ -171,7 +177,7 @@ public class Heap<E extends Comparable<E>> implements HeapInterface<E> {
         }
     }
 
-    // to rearrange data (lower layer of heap)
+    //to rearrange data (lower layer of heap)
     private void heapDown(int index) {
         int parent = index;
         while (true) {

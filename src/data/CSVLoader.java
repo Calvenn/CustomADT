@@ -168,9 +168,12 @@ public class CSVLoader {
                 LocalDateTime consultTime = LocalDateTime.parse(values[5], formatter);
                 LocalDateTime apptDateTime = values[6].equals("null") ? null : LocalDateTime.parse(values[6], formatter);
                 LocalDateTime createdAt = LocalDateTime.parse(values[7], formatter);
+                
+                if(apptDateTime != null && LocalDateTime.now().isBefore(apptDateTime.plusMinutes(15))){
+                    Consultation.numOfFollowUp++;
+                }
 
-                Consultation c = new Consultation(severity, patient, disease, notes, doc,
-                                                  consultTime, apptDateTime, createdAt);
+                Consultation c = new Consultation(severity, patient, disease, notes, doc,consultTime, apptDateTime, createdAt);
 
                 List<Consultation> doctorConsults = consultLog.get(doctorId);
                 if (doctorConsults == null) {
@@ -266,6 +269,7 @@ public class CSVLoader {
                     // Create MedRecord and add to list
                     MedRecord record = new MedRecord(patient, doctor, medicine, quantity, dateTime, collected, consult);
                     medRecList.add(record);
+                    Consultation.numOfPharmacy++;
 
                 } catch (Exception e) {
                     System.err.println("Skipping invalid row: " + line + " (" + e.getMessage() + ")");
@@ -332,7 +336,7 @@ public class CSVLoader {
                 LocalDateTime createdAt = LocalDateTime.parse(values[4].trim(), formatter);
 
                 trtApptManager.newTreatmentApptHist(doctor, consult, treatment, apptTime, createdAt);
-                
+                Consultation.numOfTreatment++;
             }
 
         } catch (Exception e) {
