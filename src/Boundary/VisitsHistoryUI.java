@@ -46,11 +46,12 @@ public class VisitsHistoryUI {
 
         System.out.println("\nTotal visits in selected period: " + filteredVisits.size());
         System.out.println("-".repeat(107));
-        System.out.println("| VISIT HISTORY FOR " + month + "/" + year + " ".repeat(76) + " |");
+        System.out.println("| VISIT HISTORY FOR " + month + "/" + year + " ".repeat(79) + " |");
 
         if (filteredVisits.size() == 0) {
-            System.out.println("No visits found for the selected period.");
-            System.out.println("-".repeat(101));
+            System.out.println("-".repeat(107));
+            System.out.println("| No visits found for the selected period." + " ".repeat(63) + " |");
+            System.out.println("-".repeat(107));
             return;
         }
 
@@ -67,7 +68,9 @@ public class VisitsHistoryUI {
         System.out.println("| VISIT HISTORY FOR PATIENT " + patient.getPatientIC() + " ".repeat(63) + " |");
         List<Visit> patientVisits = historyManager.getVisitsByPatient(patient.getPatientIC());
         if (patientVisits.size() == 0) {
-            System.out.println("No visit records found for this patient.");
+            System.out.println("-".repeat(107));
+            System.out.println("| No visit records found for this patient." + " ".repeat(63) + " |");
+            System.out.println("-".repeat(107));
             return;
         }
         visitsTableHeader();
