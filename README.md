@@ -12,7 +12,8 @@ The system provides an integrated solution for:
 - Handling staff information (doctors, nurses, admins)  
 - Managing consultations & appointments  
 - Managing treatments and treatment appointments  
-- Managing pharmacy operations and medicine records  
+- Managing pharmacy operations and medicine records
+- Managing Payment functoin  
 - Generating reports for decision-making  
 
 ---
