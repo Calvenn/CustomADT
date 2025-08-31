@@ -134,13 +134,26 @@ Each module follows the **Entity – Control – Boundary** structure:
 3. Run the `Main.java` file.  
 4. Navigate through the **Main Menu** to access modules:  
 
-### Main Menu Options  
-- **Option 1** → Patient Management  
-- **Option 2** → Treatment Management  
-- **Option 3** → Treatment Appointment  
-- **Option 4** → Patient Management (Queue & Visits)  
-- **Option 7** → Staff Management  
-- **Option 8** → Pharmacy Control System  
+### Main Menu Options  (LogIn as Doctor)
+- **Option 1** → Consultatoin & Appointment Management System
+- **Option 2** → Treatment Management System
+- **Option 3** → Treatment Appointment System
+- **Option 4** → Pharmacy System (Read Only)
+- **Option 5** → Staff Management System
+
+### Main Menu Options  (LogIn as Admin)
+- **Option 1** → Consultatoin (Read Only) & Appointment Management System
+- **Option 2** → Treatment Management System
+- **Option 3** → Treatment Appointment System
+- **Option 4** → Pharmacy System (Read Only)
+- **Option 5** → Patient Registration System
+- **Option 6** → Payment System
+- **Option 7** → Staff Management System
+
+### Main Menu Options  (LogIn as Nurse)
+- **Option 1** → Consultatoin (Read Only) & Appointment Management System
+- **Option 2** → Pharmacy Control System
+- **Option 3** → Patient Registration System
 
 ---
 
