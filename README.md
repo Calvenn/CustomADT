@@ -17,7 +17,7 @@ The system provides an integrated solution for:
 
 ---
 
-# ⚙️ Features by Module  
+# Features by Module  
 
 ## 1. Patient Management Module  
 
