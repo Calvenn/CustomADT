@@ -251,9 +251,11 @@ public class StaffManagementUI {
         // Get Gender
         while(true){
             System.out.println("Gender - 1. Male");
-            System.out.println("        2. Female");
+            System.out.println("         2. Female");
             System.out.print("Select:  ");
-
+            
+            choice = scanner.nextLine();
+            
             try{
                 TryCatchThrowFromFile.validateIntegerRange(choice, 1, 2);
                 break;
@@ -288,7 +290,7 @@ public class StaffManagementUI {
             }
         }
             
-        return LocalDateTime.parse(input);
+        return LocalDateTime.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     // Password
@@ -318,9 +320,9 @@ public class StaffManagementUI {
         // Get Staff Position
         while (true){
             System.out.println("\nStaff Position: 1. Admin");
-            System.out.println("                  2. Doctor");
-            System.out.println("                  3. Nurse");
-            System.out.println("Select: ");
+            System.out.println("                2. Doctor");
+            System.out.println("                3. Nurse");
+            System.out.print("Select: ");
             scanner.nextLine();
             try{
                 TryCatchThrowFromFile.validateIntegerRange(choice, 1, 3);
@@ -430,6 +432,7 @@ public class StaffManagementUI {
         while (true){
             printTitle("Staff Management: Add New Staff");
             
+            position = position();
             name = name();
             age = age();
             phoneNo = phoneNo();
@@ -442,14 +445,14 @@ public class StaffManagementUI {
                 department = department();
                 
                 if(docManager.addNewDoctor(name, age, phoneNo, gender, position, department, dateJoined, password)){
-                    System.out.println("\nStaff Successfully Added");
+                    System.out.println("\nStaff Successfully Added!");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                 }
             }
                 // Add Staff
                 if(staffManager.addNewStaff(name, age, phoneNo, gender, position, dateJoined, password)){
-                    System.out.println("\nStaff Successfully Added");
+                    System.out.println("\nStaff Successfully Added!");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                     break;
@@ -513,7 +516,7 @@ public class StaffManagementUI {
         cont = confirmation();
         
         if(cont){
-            staffMenu();
+            editStaffMenu();
         }
         
     }
@@ -688,16 +691,13 @@ public class StaffManagementUI {
         System.out.println("\nNumber of Staff");
         System.out.println("   ^");
         
-        
         for (int i = max + 2; i > 0; i--) {
             System.out.printf("%-2d | ", i);
             for (int j = 0; j < uniqueCount; j++) {
                 if (counts[j] >= i) {
-                    System.out.print("  | |  ");  // filled block
-                } else if (counts[j] + 1 == i){
-                    System.out.print("   _   ");  // spaces
+                    System.out.print("  @  ");  // filled block
                 } else {
-                    System.out.print("       ");  // spaces
+                    System.out.print("     ");  // spaces
                 }
             }
             System.out.println();
