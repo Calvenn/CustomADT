@@ -7,7 +7,6 @@ import adt.LinkedHashMap;
 import Entity.TreatmentAppointment; 
 import Entity.Treatment; 
 import Entity.Appointment; 
-import Entity.Payment;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -20,7 +19,7 @@ public class TreatmentApptManager {
     private final LinkedHashMap<String, Heap<Appointment>> incomingAppointment; 
     private final LinkedHashMap<String, List<TreatmentAppointment>> history;
     private final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
-    private final LocalTime WORK_END = LocalTime.of(23, 0);    // 17:00
+    private final LocalTime WORK_END = LocalTime.of(17, 0);    // 17:00
     
     public TreatmentApptManager(LinkedHashMap<String, List<TreatmentAppointment>> history) {
         incomingAppointment = new LinkedHashMap<>();
