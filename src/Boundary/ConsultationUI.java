@@ -335,27 +335,31 @@ public class ConsultationUI {
         }
     }
 
-    private void sortAndDisplayMenu(List<Consultation> records, boolean allowSearch) {
+    private void sortAndDisplayMenu(List<Consultation> records) {
         while (true) {
             System.out.println("\nDo you want to sort records by consultation date?");
             System.out.println("[1] Ascending (oldest first)");
             System.out.println("[2] Descending (latest first)");
-            System.out.print(allowSearch == true? "[3] Search by patient IC\n" : "");
+            System.out.println("[3] Search by patient IC");
             System.out.println("[0] Back");
 
-            int maxOption = allowSearch ? 3 : 2;
-            int choice = ValidationHelper.inputValidatedChoice(0, maxOption, "sort option");
+            int choice = ValidationHelper.inputValidatedChoice(0, 3, "sort option");
 
-            if (choice == 1) {
-                consultManager.sortByDate(records, true);
-                printRecords(records);
-            } else if (choice == 2) {
-                consultManager.sortByDate(records, false);
-                printRecords(records);
-            } else if (allowSearch && choice == 3) {
-                displayByIC();
-            } else if (choice == 0) {
-                return;
+            switch (choice) {
+                case 1 -> {
+                    consultManager.sortByDate(records, true);
+                    printRecords(records);
+                }
+                case 2 -> {
+                    consultManager.sortByDate(records, false);
+                    printRecords(records);
+                }
+                case 3 -> displayByIC();
+                case 0 -> {
+                    return;
+                }
+                default -> {
+                }
             }
         }
     }
@@ -368,7 +372,7 @@ public class ConsultationUI {
             return;
         }
         printRecords(record);
-        sortAndDisplayMenu(record, false);
+        sortAndDisplayMenu(record);
     }
 
     // For current doctor
@@ -379,7 +383,7 @@ public class ConsultationUI {
             return;
         }
         printRecords(allConsultRec);
-        sortAndDisplayMenu(allConsultRec, true);
+        sortAndDisplayMenu(allConsultRec);
     }
 
 
