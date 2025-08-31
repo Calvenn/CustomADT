@@ -99,9 +99,10 @@ Manages medicines, stock, dispensing, and revenue analysis.
 - **Medicine Records** (search by patient, doctor, medicine)  
 - **Reports**: Low Usage Medicine, Revenue, Dispense Summary  
 
-### ADT Used  
+### ADT Used
+- Heap
 - LinkedHashMap  
-- List  
+- List
 
 ---
 
