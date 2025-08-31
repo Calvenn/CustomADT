@@ -131,31 +131,82 @@ Each module follows the **Entity – Control – Boundary** structure:
 
 # How to Run  
 
+## 1. Setup  
 1. Clone or download the project.  
 2. Open in any Java IDE (e.g., IntelliJ, Eclipse, NetBeans).  
-3. Run the `Main.java` file.  
-4. Navigate through the **Main Menu** to access modules:  
+3. Run the `Main.java` file.
+4. Log in using one of the default accounts:  
+   - Admin → A0001 / abc123 (Example)
+   - Consult Department Doctor → D0003, D0005, D0006, D0008, D0009, D0010/ abc123  
+   - Treatment Department Doctor → D0001, D0002, D0004, D0007/ abc123 
+   - Nurse → N0002 / abc123 (Example) 
 
-### Main Menu Options  (LogIn as Doctor)
-- **Option 1** → Consultatoin & Appointment Management System
-- **Option 2** → Treatment Management System
-- **Option 3** → Treatment Appointment System
-- **Option 4** → Pharmacy System (Read Only)
-- **Option 5** → Staff Management System
+---
 
-### Main Menu Options  (LogIn as Admin)
-- **Option 1** → Consultatoin (Read Only) & Appointment Management System
-- **Option 2** → Treatment Management System
-- **Option 3** → Treatment Appointment System
-- **Option 4** → Pharmacy System (Read Only)
-- **Option 5** → Patient Registration System
-- **Option 6** → Payment System
-- **Option 7** → Staff Management System
+## 2. Main Menu Access by Role  
 
-### Main Menu Options  (LogIn as Nurse)
-- **Option 1** → Consultatoin (Read Only) & Appointment Management System
-- **Option 2** → Pharmacy Control System
-- **Option 3** → Patient Registration System
+### Doctor Login  
+- **Option 1** → Consultation & Appointment Management System  
+- **Option 2** → Treatment Management System  
+- **Option 3** → Treatment Appointment System  
+- **Option 4** → Pharmacy System (Read Only)  
+- **Option 5** → Staff Management System  
+
+### Admin Login  
+- **Option 1** → Consultation (Read Only) & Appointment Management System  
+- **Option 2** → Treatment Management System  
+- **Option 3** → Treatment Appointment System  
+- **Option 4** → Pharmacy System (Read Only)  
+- **Option 5** → Patient Registration System  
+- **Option 6** → Payment System  
+- **Option 7** → Staff Management System  
+
+### Nurse Login  
+- **Option 1** → Consultation (Read Only) & Appointment Management System  
+- **Option 2** → Pharmacy Control System  
+- **Option 3** → Patient Registration System  
+
+---
+
+## 3. Typical Workflow  
+
+1. **Admin Setup**  
+   - Create staff records (Consultation Doctors & Treatment Doctors) using the default Admin account.  
+
+2. **Patient Registration**  
+   - Register a patient or create a visit using dummy data.  
+
+3. **Doctor Consultation**  
+   - Log out and log in with a Doctor account (e.g., D0003 / abc123).  
+   - Conduct a consultation.  
+   - Decide whether to:  
+     - Make an appointment (Step 4)
+     - Schedule treatment (Step 5) 
+     - Prescribe medicine (Step 6)  
+
+4. **Appointment Handling**  
+   - Enter appointment date and view records in the Appointment module.  
+   - Note: Appointments can only be scheduled after a consultation is completed.    
+
+5. **Treatment Handling**  
+   - Enter treatment appointment date.  
+   - Enter the Treatment module to view upcoming appointments.  
+   - Mark an appointment as complete once the treatment is finished.  
+   - Once treatment is completed, proceed with payment.  
+
+6. **Pharmacy Handling**  
+   - Enter prescribed medicine and quantity.  
+   - Payment must be made before the patient collects medicine.  
+   - After payment is done, enter the Pharmacy module to dispense medicine.   
+
+---
+
+## 4. Notes  
+
+- The system uses dummy data for demonstration.  
+- You may create new records for Staff, Patients, Treatments, and Medicines, or perform CRUD operations on them.  
+- Appointments can only be scheduled after a consultation is completed.  
+- Access permissions differ by role (Admin, Doctor, Nurse) as shown in the Main Menu Access section.  
 
 ---
 
