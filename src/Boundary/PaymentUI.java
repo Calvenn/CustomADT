@@ -5,6 +5,7 @@
 package Boundary;
 
 import Control.PaymentManager;
+import Entity.Consultation;
 import Entity.Payment;
 import adt.List;
 import exception.ValidationHelper;
@@ -76,8 +77,10 @@ public class PaymentUI {
                     payment.setPaymentAt(java.time.LocalDateTime.now());
                     if(paymentManager.isTrtAppt(payment)){
                         System.out.println("Payment done. Please ask patient to wait for treatment time.");
+                        Consultation.numOfTreatment++;
                     } else if(paymentManager.isMedCollect(payment)){
                         System.out.println("Payment done. Please ask patient go collect medicine.");
+                        Consultation.numOfPharmacy++;
                     } else {                                       
                         System.out.println("Payment done");
                     }
@@ -105,3 +108,4 @@ public class PaymentUI {
         }
      }
 }
+

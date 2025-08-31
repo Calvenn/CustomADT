@@ -158,7 +158,7 @@ public class ConsultationUI {
         int choice = ValidationHelper.inputValidatedChoice(0,2, "your choice");
         
         switch (choice) {
-            case 1 -> displayDiagnosisTrends();
+            case 1 -> displayOutcomeReport();
             case 2 -> displayTimeToConsultReport();
             case 0 -> {
                 System.out.println("Returning to main menu");
