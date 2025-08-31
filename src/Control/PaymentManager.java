@@ -17,12 +17,10 @@ import adt.Queue;
  * @author CalvenPhnuahKahHong
  */
 public class PaymentManager {
-    private final Queue<TreatmentAppointment> treatmentQueue;
     private final Queue<MedRecord> medCollectQueue;
     public static List<Payment> paymentRec = new List<>();
     
-    public PaymentManager(Queue<TreatmentAppointment> treatmentQueue, Queue<MedRecord> medCollectQueue){
-        this.treatmentQueue = treatmentQueue;
+    public PaymentManager(Queue<MedRecord> medCollectQueue){
         this.medCollectQueue = medCollectQueue;
         this.paymentRec = new List<>();
     }
@@ -54,7 +52,7 @@ public class PaymentManager {
         if(payment.getTrtAppt() == null){
             return false;
         }
-        treatmentQueue.enqueue(payment.getTrtAppt());
+        //treatmentQueue.enqueue(payment.getTrtAppt());
         Consultation.numOfTreatment++;
         return true;
     }

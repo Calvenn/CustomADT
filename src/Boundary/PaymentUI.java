@@ -62,7 +62,7 @@ public class PaymentUI {
                 System.out.println("Medicine            : " + payment.getMedCollect().getMed().getName() + "(" + payment.getMedCollect().getMed().getMedID() +")");
             } 
             if(payment.getTrtAppt() != null) {
-                System.out.println("Treatment           : " + payment.getTrtAppt().getTreatment());
+                System.out.println("Treatment           : " + payment.getTrtAppt().getTreatment().getName());
             } 
             System.out.println("Created At          : " + payment.getCreatedAt().format(dtf));
             System.out.println("=".repeat(35));  
@@ -92,6 +92,8 @@ public class PaymentUI {
                 default:
                     System.out.println("Invalid option. Try again.");
             }
+        } else {
+            System.out.println("Pending payment for patient " + ic + " not found");
         }
     }
      
