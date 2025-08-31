@@ -155,8 +155,11 @@ public class TreatmentUI {
             duration = scanner.nextLine();
 
             try {
-                TryCatchThrowFromFile.validatePositiveInteger(duration);
                 if(checkCancel(duration)) return null;
+                TryCatchThrowFromFile.validatePositiveInteger(duration);
+                if(duration.equals("0")) {
+                    throw new InvalidInputException("Duration should not be zero.");
+                }
                 break; 
             } catch (InvalidInputException e) {
                 ValidationUtility.printErrorWithSolution(e); 
@@ -246,6 +249,7 @@ public class TreatmentUI {
                         ValidationUtility.printErrorWithSolution(e);
                     }
                 }
+                System.out.println();
                 if(input.charAt(0) == 'n') {
                     return null; 
                 }
@@ -292,6 +296,10 @@ public class TreatmentUI {
                 switch(Integer.parseInt(input)) {
                     case 1 -> {
                         String newDescription = inputDescription();
+                        if(newDescription == null) {
+                            System.out.println("Cancelled modify description.");
+                            break;
+                        }
                         String oldDescription = treatment.getDescription();
                         if(confirmChange(oldDescription, newDescription)) {
                             if(!treatmentManager.changeDescription(treatment, newDescription)) {
@@ -304,6 +312,10 @@ public class TreatmentUI {
                     }
                     case 2 -> {
                         Duration newDuration  = inputDuration();
+                        if(newDuration == null) {
+                            System.out.println("Cancelled modify duration.");
+                            break;
+                        }
                         Duration oldDuration = treatment.getDuration();
                         if(confirmChange(oldDuration.toMinutes() + " minutes", newDuration.toMinutes() + " minutes")) {
                             if(!treatmentManager.changeDuration(treatment, newDuration)) {
@@ -316,6 +328,10 @@ public class TreatmentUI {
                     }
                     case 3 -> {
                         double newPrice  = inputPrice();
+                        if(newPrice == 0) {
+                            System.out.println("Cancelled modify price.");
+                            break; 
+                        }
                         double oldPrice = treatment.getPrice();
                         if(confirmChange(String.format("RM %.02f", oldPrice), String.format("RM %.02f", newPrice))) {
                             if(!treatmentManager.changePrice(treatment, newPrice)) {

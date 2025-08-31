@@ -30,7 +30,7 @@ public class TreatmentApptManager {
     
     //check if chosen appt time is within working hours and after now 
     public boolean validDateTime(LocalDateTime time) {
-        return (time.isAfter(LocalDateTime.now()) && (time.toLocalTime().isAfter(WORK_START) && time.toLocalTime().isBefore(WORK_END)));
+        return (time.isAfter(LocalDateTime.now()) && (!time.toLocalTime().isBefore(WORK_START) && time.toLocalTime().isBefore(WORK_END)));
     }
     
     public boolean newTreatmentToHeap(Doctor doctor, Consultation consult, Treatment treatment, LocalDateTime treatmentTime) {
@@ -67,6 +67,8 @@ public class TreatmentApptManager {
         return incomingAppointment.containsKey(doctorID) && history.containsKey(doctorID);
     }
     
+    //not time is before -- is at or after start time 
+    //time is before end -- not at and after end time 
     public boolean startEndTimeConflict(LocalDateTime start, LocalDateTime end, LocalDateTime time) {
         return (!time.isBefore(start) && time.isBefore(end));
     }

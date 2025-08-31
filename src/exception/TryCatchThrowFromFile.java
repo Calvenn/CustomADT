@@ -127,7 +127,7 @@ public class TryCatchThrowFromFile {
 
         double priceValue = Double.parseDouble(value);
         if (priceValue <= 0) {
-            throw new InvalidInputException("Price must be more than zero.");
+            throw new InvalidInputException("Invalid price. Must be more than zero.");
         }
     }
 

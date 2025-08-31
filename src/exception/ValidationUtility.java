@@ -184,8 +184,7 @@ public class ValidationUtility {
         if (msg.contains ("not found")) {
             return "OBJECT NOT FOUND ERROR";
         }
-        if (msg.contains ("invalid price entered") || 
-            msg.contains ("price must be more than zero")) {
+        if (msg.contains ("Invalid price")) {
             return "PRICE ERROR";
         }
         if (msg.contains("invalid student id format") ||
