@@ -12,7 +12,8 @@ The system provides an integrated solution for:
 - Handling staff information (doctors, nurses, admins)  
 - Managing consultations & appointments  
 - Managing treatments and treatment appointments  
-- Managing pharmacy operations and medicine records  
+- Managing pharmacy operations and medicine records
+- Managing Payment functoin  
 - Generating reports for decision-making  
 
 ---
@@ -99,9 +100,10 @@ Manages medicines, stock, dispensing, and revenue analysis.
 - **Medicine Records** (search by patient, doctor, medicine)  
 - **Reports**: Low Usage Medicine, Revenue, Dispense Summary  
 
-### ADT Used  
+### ADT Used
+- Heap
 - LinkedHashMap  
-- List  
+- List
 
 ---
 
