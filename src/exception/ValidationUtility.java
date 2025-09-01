@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 public class ValidationUtility {
     
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+?6?01[0-9]-*[0-9]{7,8})$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^01[0-9]-[0-9]{7,8}$");
     private static final Pattern IC_PATTERN = Pattern.compile("^\\d{6}-\\d{2}-\\d{4}$");
     private static final Pattern STUDENT_ID_PATTERN = Pattern.compile("\\d{2}[A-Z]{3}\\d{5}");
     public static final LocalTime WORK_START = LocalTime.of(8, 0);   // 08:00
