@@ -261,7 +261,7 @@ public class ConsultationUI {
                         return;
                     }
                     case 4 -> {
-                        System.out.println("Done.");
+                        System.out.println("Done. Please ask patient made payment at counter.");
                         PaymentManager.paymentRec.add(new Payment(patient, consultInfo, Payment.consultPrice, false, null, null));
                         return;
                     }

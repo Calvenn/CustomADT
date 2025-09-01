@@ -136,7 +136,7 @@ public class AppointmentUI {
     }
 
     private void updateAppointmentUI() {
-        if(apptManager.getAppointmentHeap().isEmpty()) {
+        if(apptManager.getAppointmentHeap() == null) {
             System.out.println("No appointment record found");
             return;
         }
@@ -158,7 +158,7 @@ public class AppointmentUI {
     }
 
     private void cancelAppointmentUI() {
-        if(apptManager.getAppointmentHeap().isEmpty()) {
+        if(apptManager.getAppointmentHeap() == null) {
             System.out.println("No appointment record found");
             return;
         }
@@ -242,6 +242,4 @@ public class AppointmentUI {
             }
         }
     }
-    
-    //Enter patient IC number
 }

@@ -6,9 +6,7 @@ package Control;
 
 import Entity.Consultation;
 import Entity.MedRecord;
-import Entity.Patient;
 import Entity.Payment;
-import Entity.TreatmentAppointment;
 import adt.List;
 import adt.Queue;
 
@@ -18,7 +16,7 @@ import adt.Queue;
  */
 public class PaymentManager {
     private final Queue<MedRecord> medCollectQueue;
-    public static List<Payment> paymentRec = new List<>();
+    public static List<Payment> paymentRec;
     
     public PaymentManager(Queue<MedRecord> medCollectQueue){
         this.medCollectQueue = medCollectQueue;
@@ -52,7 +50,6 @@ public class PaymentManager {
         if(payment.getTrtAppt() == null){
             return false;
         }
-        //treatmentQueue.enqueue(payment.getTrtAppt());
         Consultation.numOfTreatment++;
         return true;
     }
@@ -65,4 +62,28 @@ public class PaymentManager {
         Consultation.numOfPharmacy++;
         return true;
     }   
+    
+    public void sortByDate(List<Payment> list, boolean ascending) {
+        if (list.isEmpty()) return;
+
+        // Bubble sort using ADT 
+        for (int i = 1; i <= list.size(); i++) {
+            for (int j = 1; j <= list.size() - i; j++) {
+                Payment p1 = list.get(j);
+                Payment p2 = list.get(j + 1);
+
+                boolean needSwap = false;
+                if (ascending && p1.getPaymentAt().isAfter(p2.getPaymentAt())) {
+                    needSwap = true;
+                } else if (!ascending && p1.getPaymentAt().isBefore(p2.getPaymentAt())) {
+                    needSwap = true;
+                }
+
+                if (needSwap) {
+                    list.replace(j, p2);
+                    list.replace(j + 1, p1);
+                }
+            }
+        }
+    }
 }

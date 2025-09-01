@@ -4,7 +4,6 @@
  */
 package Entity;
 
-import adt.List;
 import java.time.LocalDateTime;
 
 /**
@@ -14,6 +13,7 @@ import java.time.LocalDateTime;
 public class Payment {
     public static final double consultPrice = 20.00;
     private static int idNo = 0; 
+    private static int receiptIdNo = 0; 
     
     private String paymentId;
     private String receiptId;
@@ -22,7 +22,6 @@ public class Payment {
     private TreatmentAppointment trtAppt;
     private MedRecord medRec;
     private double price;
-    private LocalDateTime createdAt;
     private LocalDateTime paymentAt;
     private boolean isPay;
     
@@ -31,7 +30,7 @@ public class Payment {
         this.patient = patient;
         this.consult = consult;
         this.price = price;
-        this.createdAt = LocalDateTime.now();
+        this.paymentAt = LocalDateTime.now();
         this.isPay = isPay;
         this.trtAppt = trtAppt;
         this.medRec = medRec;
@@ -66,10 +65,6 @@ public class Payment {
         return price;
     }
     
-    public LocalDateTime getCreatedAt(){
-        return createdAt;
-    }
-    
     public LocalDateTime getPaymentAt(){
         return paymentAt;
     }
@@ -78,8 +73,13 @@ public class Payment {
         return isPay;
     }
     
+    private static int generateReceiptIdNo(){
+        receiptIdNo += 1; 
+        return receiptIdNo; 
+    }
+    
     public void generateReceiptId(){
-        this.receiptId = "R" + String.format("%04d", generateId()); ;
+        this.receiptId = "R" + String.format("%04d", generateReceiptIdNo());
     }
     
     public void setIsPay(boolean isPay){
@@ -112,7 +112,7 @@ public class Payment {
             (trtAppt != null ? trtAppt.getTreatment().getName() : "-"),
             (medRec != null ? medRec.getMed().getMedID() : "-"),
             price,
-            createdAt.format(dtf),
+            paymentAt.format(dtf),
             (isPay ? "Yes" : "No")
         );
     }
