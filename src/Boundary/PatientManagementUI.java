@@ -75,7 +75,6 @@ public class PatientManagementUI {
             ic = ValidationHelper.inputValidatedIC("Enter IC number");
             if (patientManager.isPatientExist(ic)) {
                 System.out.println("Patient already exists!");
-                patientManager.displayPatientDetails(patientManager.findPatientByIC(ic));
                 return; // stop registration
             }
             break;
