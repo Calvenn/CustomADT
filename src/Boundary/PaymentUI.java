@@ -37,17 +37,30 @@ public class PaymentUI {
 
             switch(choice){
                 case 1 -> payment();
-                case 2 -> displayPayment(true); //payment history
+                case 2 -> {
+                    displayPayment(true);
+                    sortAndDisplayMenu();
+                } //payment history
                 case 0 -> {return;}
                 default -> System.out.printf("\nInvalid choice entered. Please choose again.");
             }
         }
      }
      
-     public void payment() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+     private Payment searchByIC(){
         String ic = ValidationHelper.inputValidatedIC("Enter ic number");
         Payment payment = paymentManager.getPaymentInfo(ic);
+        if(payment == null){
+            System.out.println("Pending payment for patient " + ic + " not found");
+            return null;
+        } else {
+            return payment;
+        }
+     }
+     
+     public void payment() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        Payment payment = searchByIC();
 
         if (payment != null) {
             System.out.println("\n" + "=".repeat(35));
@@ -64,7 +77,7 @@ public class PaymentUI {
             if(payment.getTrtAppt() != null) {
                 System.out.println("Treatment           : " + payment.getTrtAppt().getTreatment().getName());
             } 
-            System.out.println("Created At          : " + payment.getCreatedAt().format(dtf));
+            System.out.println("Created At          : " + payment.getPaymentAt().format(dtf));
             System.out.println("=".repeat(35));  
             System.out.println("\n[1] Mark as Paid");
             System.out.println("[0] Exit");
@@ -92,9 +105,7 @@ public class PaymentUI {
                 default:
                     System.out.println("Invalid option. Try again.");
             }
-        } else {
-            System.out.println("Pending payment for patient " + ic + " not found");
-        }
+        } 
     }
      
      public void displayPayment(boolean isPay){
@@ -108,6 +119,55 @@ public class PaymentUI {
             Payment info = pending.get(i);
             System.out.println(info);
         }
+        
      }
+     
+     private void sortAndDisplayMenu() {
+        List<Payment> sortPayment = PaymentManager.paymentRec;
+        while (true) {
+            System.out.println("\nDo you want to sort records by consultation date?");
+            System.out.println("[1] Ascending (oldest first)");
+            System.out.println("[2] Descending (latest first)");
+            System.out.println("[3] Search by patient IC");
+            System.out.println("[0] Back");
+
+            int choice = ValidationHelper.inputValidatedChoice(0, 3, "sort option");
+
+            switch (choice) {
+                case 1 -> {
+                    paymentManager.sortByDate(sortPayment,true);
+                    printRecords(sortPayment);
+                }
+                case 2 -> {
+                    paymentManager.sortByDate(sortPayment, false);
+                    printRecords(sortPayment);
+                }
+                case 3 -> {
+                    Payment payment = searchByIC();
+                    Payment rec = paymentManager.getPaymentInfo(payment.getPatient().getPatientIC());
+                    System.out.println(Payment.getHeader());
+                    System.out.println(rec);
+                }
+                case 0 -> {
+                    return;
+                }
+                default -> {
+                }
+            }
+        }
+    }
+     
+     private void printRecords(List<Payment> records) {
+        if (records.isEmpty()) {
+            System.out.println("No records found.");
+            return;
+        }
+
+        System.out.println(Payment.getHeader());
+        for (int i = 1; i <= records.size(); i++) {   
+            Payment p = records.get(i);
+            System.out.println(p);
+        }
+    }
 }
 
